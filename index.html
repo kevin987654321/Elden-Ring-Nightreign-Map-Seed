@@ -69,9 +69,11 @@ button.small { padding:4px 8px; margin:3px; }
   <tbody>
     <tr>
       <td height="60" colspan="7" align="center" valign="top" bgcolor="#191919" style="color: #303030; font-size: 11px; border-right-width: 0px;"><p><img src="logo.png" width="192" height="50" alt=""/></p>
-        <p>&gt;點擊圖標或文字選擇夜王</p>
-        <p>&gt;按住Ctrl並點擊多選或取消選擇</p>
-		<p>&gt;按住Ctrl+Shift並任意點擊全選</p>
+        <div id="nightGuide">
+  		<p>&gt;點擊圖標或文字選擇夜王</p>
+ 		<p>&gt;按住Ctrl並點擊多選或取消選擇</p>
+ 		<p>&gt;按住Ctrl+Shift並任意點擊全選</p>
+		</div>
       <td width="4" height="60" align="center" valign="middle">&nbsp;</td>
       <td width="277" height="60" align="center" valign="top" bgcolor="#191919" style="text-align: center; font-size: 14px;">
         <p><strong><em>城堡</em></strong></p>
@@ -112,7 +114,13 @@ button.small { padding:4px 8px; margin:3px; }
 </style>
 
       <td width="4" height="30" rowspan="2" align="center" valign="middle">&nbsp;</td>
-      <td height="30" colspan="4" rowspan="2" align="center" valign="middle" bgcolor="#202020" style="color: #444444">左鍵放置教堂/右鍵放置法師塔</td>
+      <td id="mapGuide" height="30" colspan="3" rowspan="2" align="center" valign="middle" bgcolor="#202020" style="color: #444444">
+  		左鍵放置教堂/右鍵放置法師塔
+		</td>
+      <td id="modeToggleBtn" height="30" rowspan="2" align="center" valign="middle" bgcolor="#202020" style="color: #666666; cursor:pointer;">
+  		切換為觸控模式
+		</td>
+
     </tr>
     <tr>
 
@@ -275,6 +283,48 @@ button.small { padding:4px 8px; margin:3px; }
 </table>
 
 <script>
+	
+/* ---------------------------
+   模式狀態
+   --------------------------- */
+let isTouchMode = false;
+document.addEventListener("DOMContentLoaded", () => {
+    const modeBtn = document.getElementById("modeToggleBtn");
+    if (modeBtn) modeBtn.addEventListener("click", toggleMode);
+});
+
+/* ---------------------------
+   切換觸控/鍵鼠模式
+   --------------------------- */
+function toggleMode() {
+    isTouchMode = !isTouchMode;
+
+    const modeBtn = document.getElementById("modeToggleBtn");
+    const nightGuide = document.getElementById("nightGuide");
+    const mapGuide = document.getElementById("mapGuide");
+    const infoMsg = document.getElementById("infoMsg");
+
+    if (isTouchMode) {
+        // 觸控模式
+        modeBtn.textContent = "切換為鍵鼠模式";
+        nightGuide.innerHTML =
+            "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+            "<p>&gt;再次點擊取消選擇</p>" +
+            "<p>&gt;點擊其他夜王多選</p>";
+        mapGuide.textContent = "點擊放置教堂/再次點擊切換法師塔";
+        infoMsg.textContent = "已切換為觸控模式";
+    } else {
+        // 鍵鼠模式
+        modeBtn.textContent = "切換為觸控模式";
+        nightGuide.innerHTML =
+            "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+            "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
+            "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
+        mapGuide.textContent = "左鍵放置教堂/右鍵放置法師塔";
+        infoMsg.textContent = "已切換為鍵鼠模式";
+    }
+}
+
 /* ---------------------------
    禁止圖片被拖動
    --------------------------- */
@@ -3625,16 +3675,24 @@ function updateIconVisual(i){
 }
 
 /* ---------------------------
-   左右鍵切換圖標
+   切換圖標
    --------------------------- */
-function toggleIcon(i,button){
-  if(button===0) setCurrentIconState(i,'教堂');
-  else if(button===2) setCurrentIconState(i,'法師塔');
-  else return;
+function toggleIcon(i, button) {
+  if (isTouchMode) {
+    // 🔹觸控模式：單點交替切換
+    const current = getCurrentIconState(i);
+    if (current === null) setCurrentIconState(i, '教堂');
+    else if (current === '教堂') setCurrentIconState(i, '法師塔');
+    else setCurrentIconState(i, null);
+  } else {
+    // 🔹鍵鼠模式：左鍵教堂、右鍵法師塔
+    if (button === 0) setCurrentIconState(i, '教堂');
+    else if (button === 2) setCurrentIconState(i, '法師塔');
+    else return;
+  }
   updateIconVisual(i);
   runFilter();
 }
-
 /* ---------------------------
    顯示/隱藏地形圖標
    --------------------------- */
@@ -3678,47 +3736,52 @@ function getCurrentTerrainCount(){
 }
 
 /* ---------------------------
-   選擇黑夜
+   選擇黑夜（支援鍵鼠/觸控兩種）
    --------------------------- */
 function selectNight(name, event) {
-  const ctrl = event.ctrlKey, shift = event.shiftKey;
   const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
 
-  // 處理多選邏輯
-  if (shift && ctrl) selectedNightsMulti = [...allNights];
-  else if (ctrl) {
-    if (selectedNightsMulti.includes(name)) selectedNightsMulti = selectedNightsMulti.filter(n => n !== name);
-    else selectedNightsMulti.push(name);
-  } else selectedNightsMulti = [name];
+  if (isTouchMode) {
+    // 觸控模式：點擊多選/取消
+    if (selectedNightsMulti.includes(name)) {
+      selectedNightsMulti = selectedNightsMulti.filter(n => n !== name);
+    } else {
+      selectedNightsMulti.push(name);
+    }
+  } else {
+    // 鍵鼠模式：保留原 Ctrl 多選邏輯
+    const ctrl = event.ctrlKey, shift = event.shiftKey;
+    if (shift && ctrl) selectedNightsMulti = [...allNights];
+    else if (ctrl) {
+      if (selectedNightsMulti.includes(name)) selectedNightsMulti = selectedNightsMulti.filter(n => n !== name);
+      else selectedNightsMulti.push(name);
+    } else selectedNightsMulti = [name];
+  }
 
-  // 更新選中樣式
+  // 更新樣式
   document.querySelectorAll('.黑夜').forEach(el => el.classList.remove('selected'));
   selectedNightsMulti.forEach(n => {
     const el = document.getElementById(n);
     if (el) el.classList.add('selected');
   });
 
-  // 先更新訊息，顯示已選擇夜王數量或名稱
-  let infoMsg = '';
-  if (selectedNightsMulti.length === allNights.length) {
-    infoMsg = '已全選夜王，請在地圖上點圖標設定位置。';
+  // 更新訊息
+  const infoMsgEl = document.getElementById('infoMsg');
+  if (selectedNightsMulti.length === 0) {
+    // 沒選任何黑夜 → 保持預設提示
+    infoMsgEl.textContent = "請先選擇地形，再放置圖標、選擇目標王";
+  } else if (selectedNightsMulti.length === allNights.length) {
+    infoMsgEl.textContent = '已全選夜王，請在地圖上點圖標設定位置。';
   } else if (selectedNightsMulti.length > 1) {
-    infoMsg = '已選擇 ' + selectedNightsMulti.length + ' 位夜王，請在地圖上點圖標設定位置。';
+    infoMsgEl.textContent = '已選擇 ' + selectedNightsMulti.length + ' 位夜王，請在地圖上點圖標設定位置。';
   } else if (selectedNightsMulti.length === 1) {
-    infoMsg = '已選擇：' + selectedNightsMulti[0] + '，請在地圖上點圖標設定位置。';
+    infoMsgEl.textContent = '已選擇：' + selectedNightsMulti[0] + '，請在地圖上點圖標設定位置。';
   }
 
-  // 隱藏失敗訊息、顯示所有圖標
   hideFail();
   showAllIcons();
-
-  // 先執行篩選，但避免覆蓋訊息
-  runFilter(true); // 傳入參數告訴 runFilter 不要改 infoMsg
-
-  // 最後再把訊息寫回去
-  if (infoMsg) document.getElementById('infoMsg').textContent = infoMsg;
+  runFilter();
 }
-
 
 
 /* ---------------------------
@@ -4014,4 +4077,3 @@ document.addEventListener('DOMContentLoaded',init);
 </script>
 </body>
 </html>
-
