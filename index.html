@@ -12,14 +12,14 @@ body {
     font-size: 14px;
     font-family: "標楷體", Arial, sans-serif;
 }
+
 .黑夜 {
   color: #808080;
   text-align: center;
   background-color: #202020;
   cursor: pointer;
-  padding: 8px;
-  user-select: none;
   padding: 6px;
+  user-select: none;
   transition: filter 0.2s, background-color 0.2s;
 }
 
@@ -34,11 +34,13 @@ body {
   color: #fff;
   filter: none; /* 不受 hover 影響 */
 }
+
 .名字 {
     color: #606060;
     background-color: #252525;
-	border-radius: 4px; 
+    border-radius: 4px; 
 }
+
 #mapWrapper { position: relative; width: 400px; height: 400px; margin: 0 auto; }
 #大地圖 { width:100%; height:100%; display:block; }
 .icon {
@@ -47,6 +49,75 @@ body {
     cursor: pointer;
     user-select: none;
 }
+
+button.small { padding:4px 8px; margin:3px; }
+.controls { text-align:center; margin:10px 0; color:#ddd; }
+
+/* 外觀按鈕樣式 */
+.styleBtn {
+  background-color: #303030;
+  color: #ddd;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+.styleBtn:hover { background-color: #404040; }
+.styleBtn.active { background-color: #606060; color: white; }
+
+/* 方形樣式 */
+.square td, .square .名字, .square .icon, .square #mapWrapper img, .square #縮圖1,
+.square #縮圖2, .square #縮圖3, .square #縮圖4 {
+  border-radius: 0 !important;
+}
+
+/* 圓形樣式 */
+/* 圓角模式 */
+
+/* 四角圓角 */
+.roundStyle .full {
+  border-radius: 12px;
+}
+
+/* 上方兩角圓角 */
+.roundStyle .top {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 0;
+}
+
+/* 左下角圓角 */
+.roundStyle .bottom-left {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 12px;
+  border-bottom-right-radius: 0;
+}
+
+/* 右下角圓角 */
+.roundStyle .bottom-right {
+  border-top-left-radius: 0;
+  border-top-right-radius: 0;
+  border-bottom-left-radius: 0;
+  border-bottom-right-radius: 12px;
+}
+
+/* 中間格子小圓角或保持原狀 */
+.roundStyle .middle {
+  border-radius: 4px;
+}
+
+/* 圖標區塊 */
+.roundStyle .icon {
+  border-top-left-radius: 12px;
+  border-top-right-radius: 12px;
+  border-bottom-left-radius: 4px;
+  border-bottom-right-radius: 4px;
+}
+
 #failMsg {
     color: #ff6666;
     text-align:center;
@@ -64,41 +135,86 @@ button.small { padding:4px 8px; margin:3px; }
 </style>
 </head>
 
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+    const styleSquareBtn = document.getElementById("styleSquare");
+    const styleRoundBtn = document.getElementById("styleRound");
+
+    styleSquareBtn.addEventListener("click", () => {
+        document.body.classList.add("square");
+        document.body.classList.remove("roundStyle");
+        styleSquareBtn.classList.add("active");
+        styleRoundBtn.classList.remove("active");
+    });
+
+    styleRoundBtn.addEventListener("click", () => {
+        document.body.classList.add("roundStyle");
+        document.body.classList.remove("square");
+        styleRoundBtn.classList.add("active");
+        styleSquareBtn.classList.remove("active");
+    });
+});
+
+</script>
+
+	
 <body>
 <table width="1152" align="center">
   <tbody>
     <tr>
-      <td height="60" colspan="7" align="center" valign="top" bgcolor="#191919" style="color: #303030; font-size: 11px; border-right-width: 0px;"><p><img src="logo.png" width="192" height="50" alt=""/></p>
+      <td height="60" colspan="7" align="center" valign="top" bgcolor="#191919" 
+          class="roundStyle full" 
+          style="color: #303030; font-size: 11px; border-right-width: 0px;">
+        <p><img src="logo.png" width="192" height="50" alt=""/></p>
         <div id="nightGuide">
-  		<p>&gt;點擊圖標或文字選擇夜王</p>
- 		<p>&gt;按住Ctrl並點擊多選或取消選擇</p>
- 		<p>&gt;按住Ctrl+Shift並任意點擊全選</p>
-		</div>
+          <p>&gt;點擊圖標或文字選擇夜王</p>
+          <p>&gt;按住Ctrl並點擊多選或取消選擇</p>
+          <p>&gt;按住Ctrl+Shift並任意點擊全選</p>
+        </div>
+      </td>
+
       <td width="4" height="60" align="center" valign="middle">&nbsp;</td>
-      <td width="277" height="60" align="center" valign="top" bgcolor="#191919" style="text-align: center; font-size: 14px;">
+
+      <td width="277" height="60" align="center" valign="top" bgcolor="#191919" 
+          class="roundStyle full" 
+          style="text-align: center; font-size: 14px;">
         <p><strong><em>城堡</em></strong></p>
         <p><strong>地下:</strong></p>
         <p><strong>主要:</strong></p>
         <p><strong>樓頂:</strong></p>
       </td>
-      <td width="148" height="60" align="center" valign="top" bgcolor="#191919" style="font-family: 標楷體">
+
+      <td width="148" height="60" align="center" valign="top" bgcolor="#191919" 
+          class="roundStyle full" 
+          style="font-family: 標楷體">
         <p><strong><em>夜晚</em></strong></p>
         <p><strong>第一夜:</strong></p>
         <p><strong>第二夜:</strong></p>
       </td>
-      <td height="60" colspan="2" align="center" valign="top" bgcolor="#191919" style="font-family: 標楷體">
+
+      <td height="60" colspan="2" align="center" valign="top" bgcolor="#191919" 
+          class="roundStyle full" 
+          style="font-family: 標楷體">
         <p><em><strong>特殊</strong></em></p>
         <p><strong>第一天:</strong></p>
         <p><strong>第二天:</strong></p>
       </td>
-    <tr>
-      <td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" style="color: #666666">
-      <a href="index.html" style="color:#666666; text-decoration:none;">重置頁面</a></td>
+    </tr>
 
-<td width="3" align="center" valign="middle" bgcolor="#323232">&nbsp;</td>
-<td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" class="small" style="color: #666666">
-  <span id="clearIconsBtn" class="clickable-text">清除所有圖標狀態</span>
-</td>
+    <tr>
+      <td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" 
+          class="roundStyle top" 
+          style="color: #666666">
+        <a href="index.html" style="color:#666666; text-decoration:none;">重置頁面</a>
+      </td>
+      
+      <td width="3" align="center" valign="middle">&nbsp;</td>
+
+      <td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" 
+          class="roundStyle top small" 
+          style="color: #666666">
+        <span id="clearIconsBtn" class="clickable-text">清除所有圖標狀態</span>
+      </td>
 
 <style>
 .clickable-text {
@@ -111,15 +227,40 @@ button.small { padding:4px 8px; margin:3px; }
 .clickable-text:hover {
 
 }
+	
+.styleBtn {
+  background-color: #303030;
+  color: #ddd;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.styleBtn:hover {
+  background-color: #404040;
+}
+
+.styleBtn.active {
+  background-color: #606060;
+  color: white;
+}
+
 </style>
 
       <td width="4" height="30" rowspan="2" align="center" valign="middle">&nbsp;</td>
-      <td id="mapGuide" height="30" colspan="3" rowspan="2" align="center" valign="middle" bgcolor="#202020" style="color: #444444">
-  		左鍵放置教堂/右鍵放置法師塔
-		</td>
-      <td id="modeToggleBtn" height="30" rowspan="2" align="center" valign="middle" bgcolor="#202020" style="color: #666666; cursor:pointer;">
-  		切換為觸控模式
-		</td>
+
+	  <td id="mapGuide" height="30" colspan="3" rowspan="2" align="center" valign="middle" 
+ 	     class="roundStyle top" bgcolor="#202020" style="color: #444444">
+  	     左鍵放置教堂/右鍵放置法師塔
+	  </td>
+
+	  <td id="modeToggleBtn" height="30" rowspan="2" align="center" valign="middle" 
+  	    class="roundStyle top" bgcolor="#202020" style="color: #666666; cursor:pointer;">
+  	    切換為觸控模式
+	  </td>
 
     </tr>
     <tr>
@@ -134,7 +275,7 @@ button.small { padding:4px 8px; margin:3px; }
       </td>
 
       <td width="16" align="center" valign="middle" bgcolor="#252525" class="名字">格拉狄烏斯</td>
-      <td width="3" align="center" valign="middle" bgcolor="#323232">&nbsp;</td>
+      <td width="3" align="center" valign="middle">&nbsp;</td>
 
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜之魔">黑夜之魔</div>
@@ -148,10 +289,10 @@ button.small { padding:4px 8px; margin:3px; }
       <td width="4" align="center" valign="middle">&nbsp;</td>
 
       <!-- 地圖區（大地圖 + 11 個可點圖標） -->
-      <td colspan="3" rowspan="4" align="center" valign="middle" bgcolor="#252525">
-        <div id="mapWrapper">
-          <!-- 大地圖（預設普通地形） -->
-          <img src="普通地形.png" id="大地圖" alt="大地圖">
+      <td colspan="3" rowspan="4" align="center" valign="middle" bgcolor="#252525" class="roundStyle bottom-left">
+  <div id="mapWrapper" class="roundStyle bottom-left">
+    <!-- 大地圖（預設普通地形） -->
+    <img src="普通地形.png" id="大地圖" class="roundStyle bottom-left" alt="大地圖">
 
           <!-- 45 個圖標位置 -->
 		  <img id="普通地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
@@ -217,7 +358,7 @@ button.small { padding:4px 8px; margin:3px; }
         <img src="黑夜之爵圖標.png" id="黑夜之爵_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
       <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">艾德雷</td>
-      <td width="3" align="center" valign="middle" bgcolor="#323232">&nbsp;</td>
+      <td width="3" align="center" valign="middle">&nbsp;</td>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜光騎士">黑夜光騎士</div>
       </td>
@@ -240,7 +381,7 @@ button.small { padding:4px 8px; margin:3px; }
       </td>
 
       <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">格諾斯塔</td>
-      <td width="3" align="center" valign="middle" bgcolor="#323232">&nbsp;</td>
+      <td width="3" align="center" valign="middle">&nbsp;</td>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜霧霾">黑夜霧霾</div>
       </td>
@@ -255,15 +396,16 @@ button.small { padding:4px 8px; margin:3px; }
 </tr>
 
     <tr>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="深海黑夜">深海黑夜</div>
-      </td>
+	  <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
+  	 	 <div class="黑夜" id="深海黑夜">深海黑夜</div>
+	  </td>
+
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="深海黑夜圖標.png" id="深海黑夜_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
       <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">瑪利斯</td>
-      <td width="3" align="center" valign="middle" bgcolor="#323232">&nbsp;</td>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="3" align="center" valign="middle">&nbsp;</td>
+      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
         <div class="黑夜" id="黑夜王">黑夜王</div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
@@ -271,10 +413,48 @@ button.small { padding:4px 8px; margin:3px; }
       </td>
       <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">布德奇冥</td>
       <td width="4" align="center" valign="middle">&nbsp;</td>
-      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
-    <img src="隱城地形.png" id="縮圖4" width="100" height="100" style="cursor:pointer;" onclick="switchTerrain('隱城地形')">
+      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828" class="roundStyle bottom-right">
+    <img src="隱城地形.png" id="縮圖4" width="100" height="100" class="roundStyle bottom-right" style="cursor:pointer;" onclick="switchTerrain('隱城地形')">
   </td>
+
 </tr>
+	  
+<!-- 漂浮按鈕 -->
+<img src="設定.png" id="floatingBtn" style="position: fixed; bottom: 447px; right: 30px; width: 50px; height:50px; cursor: grab; z-index:1000;">
+
+<!-- 遮罩背景 -->
+<div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:900;"></div>
+
+<!-- 模態視窗 -->
+<div id="modalWindow" style="display:none; position:fixed; width:80%; max-width:600px; height:80%; max-height:400px; top:50%; left:50%; transform:translate(-50%,-50%); background:#202020; color:#ddd; padding:20px; border-radius:12px; z-index:1001; overflow:auto;">
+  <h2>設定</h2>
+
+  <!-- 設定 -->
+<div style="margin-bottom: 20px;">
+  <span style="margin-right: 10px;">外觀：</span>
+  <button id="styleSquare" class="styleBtn active">方</button>
+  <button id="styleRound" class="styleBtn">圓</button>
+</div>
+
+<!-- 更新日誌區塊 -->
+<div style="background-color:#1a1a1a; color:#ccc; padding:10px; margin-top:10px; border-radius:8px; font-size:13px;">
+  <strong>更新日誌</strong>
+  <ul style="margin:5px 0 0 15px; padding:0; list-style: disc;">
+    <li>最後更新日期2025/10/21</li>
+    <li style="list-style:none;">&nbsp;</li>
+    <li>[2025/10/21]</li>
+    <li>&nbsp;&gt;添加可拖動的設定懸浮按鈕</li>
+    <li>&nbsp;&gt;添加設定，切換圓角功能</li>
+  </ul>
+</div>
+
+<!-- 隱藏的關閉按鈕（保留給程式使用） -->
+<button id="closeModalBtn" style="display:none;">關閉</button>
+
+<!-- 點空白處關閉提示文字 -->
+<div style="text-align:center; color:#666666; font-size:12px; margin-top:5px;">
+  點擊空白處關閉
+</div>
 
     <tr>
       <td height="49" colspan="12" align="center" valign="middle" style="color: #3E3E3E">版本:1.02.4</td>
@@ -283,7 +463,50 @@ button.small { padding:4px 8px; margin:3px; }
 </table>
 
 <script>
-	
+
+/* ---------------------------
+   將設定狀態儲存在伺服器
+   --------------------------- */
+window.addEventListener('DOMContentLoaded', () => {
+  const btnSquare = document.getElementById('styleSquare');
+  const btnRound = document.getElementById('styleRound');
+
+  // 先清除兩個按鈕的 active
+  if (btnSquare) btnSquare.classList.remove('active');
+  if (btnRound) btnRound.classList.remove('active');
+
+  // 根據 localStorage 設定加上 active
+  const style = localStorage.getItem('style');
+  if (style === 'round') {
+    document.body.classList.add('roundStyle');
+    if (btnRound) btnRound.classList.add('active');
+  } else {
+    document.body.classList.add('squareStyle');
+    if (btnSquare) btnSquare.classList.add('active');
+  }
+
+  // 點擊按鈕儲存設定
+  if (btnSquare) {
+    btnSquare.addEventListener('click', () => {
+      document.body.classList.remove('roundStyle');
+      document.body.classList.add('squareStyle');
+      localStorage.setItem('style', 'square');
+      btnSquare.classList.add('active');
+      if (btnRound) btnRound.classList.remove('active');
+    });
+  }
+
+  if (btnRound) {
+    btnRound.addEventListener('click', () => {
+      document.body.classList.remove('squareStyle');
+      document.body.classList.add('roundStyle');
+      localStorage.setItem('style', 'round');
+      btnRound.classList.add('active');
+      if (btnSquare) btnSquare.classList.remove('active');
+    });
+  }
+});
+
 /* ---------------------------
    模式狀態
    --------------------------- */
@@ -331,6 +554,74 @@ function toggleMode() {
 document.querySelectorAll('img').forEach(img => {
   img.ondragstart = e => e.preventDefault();
 });
+
+
+// ---------- 拖動功能 ----------
+const btn = document.getElementById('floatingBtn');
+let isDragging = false, startX=0, startY=0, offsetX=0, offsetY=0;
+
+btn.addEventListener('mousedown', e => {
+    isDragging = false; // 一開始不是拖動
+    startX = e.clientX;
+    startY = e.clientY;
+    offsetX = e.clientX - btn.getBoundingClientRect().left;
+    offsetY = e.clientY - btn.getBoundingClientRect().top;
+    btn.style.cursor = 'grabbing';
+
+    const onMouseMove = e => {
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (!isDragging && Math.sqrt(dx*dx + dy*dy) > 3) {
+            isDragging = true; // 超過閾值才算拖動
+        }
+        if (isDragging) {
+            let x = e.clientX - offsetX;
+            let y = e.clientY - offsetY;
+            x = Math.max(0, Math.min(window.innerWidth - btn.offsetWidth, x));
+            y = Math.max(0, Math.min(window.innerHeight - btn.offsetHeight, y));
+            btn.style.left = x + 'px';
+            btn.style.top = y + 'px';
+        }
+    };
+
+    const onMouseUp = e => {
+        btn.style.cursor = 'grab';
+        document.removeEventListener('mousemove', onMouseMove);
+        document.removeEventListener('mouseup', onMouseUp);
+    };
+
+    document.addEventListener('mousemove', onMouseMove);
+    document.addEventListener('mouseup', onMouseUp);
+});
+
+// 阻止拖動後觸發 click
+btn.addEventListener('click', e => {
+    if (isDragging) return; // 拖動中不要觸發
+    // 這裡放開啟模態視窗的程式
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.getElementById('modalWindow').style.display = 'block';
+});
+
+
+// ---------- 點擊打開模態 ----------
+btn.addEventListener('click', e => {
+    if (isDragging) return; // 拖動時不觸發點擊
+    document.getElementById('modalOverlay').style.display = 'block';
+    document.getElementById('modalWindow').style.display = 'block';
+});
+
+// ---------- 關閉模態 ----------
+document.getElementById('closeModalBtn').addEventListener('click', () => {
+    document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('modalWindow').style.display = 'none';
+});
+
+// 點擊背景也可以關閉
+document.getElementById('modalOverlay').addEventListener('click', () => {
+    document.getElementById('modalOverlay').style.display = 'none';
+    document.getElementById('modalWindow').style.display = 'none';
+});
+	
 
 /* ---------------------------
    資料：320 張圖與每張圖的 8~11 個點屬性
@@ -3289,6 +3580,7 @@ const imageTexts = {
         "第二夜": "古龍",
         "第一天": "無",
         "第二天": "無"
+
     },
     "283.png": {
         "地下": "王夫的紅狼",
@@ -3787,6 +4079,7 @@ function selectNight(name, event) {
 /* ---------------------------
    篩選邏輯
    - 先從 IMAGES 中找出屬於該夜的圖片（range）
+
    - 對每張圖片，檢查所有「使用者已指定」的圖標位 i（iconStates[i] !== null）
      - 若 user 指定為 '無' -> 圖片該位須為 '無'
      - 若 user 指定為 '教堂'/'法師塔' -> 圖片該位須相同
