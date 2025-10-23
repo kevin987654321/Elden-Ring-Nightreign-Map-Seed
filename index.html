@@ -57,6 +57,8 @@ img::selection {
 
 .名字 {
     color: #606060;
+	writing-mode: vertical-rl; /* 直式從右到左 */
+  	text-orientation: upright; /* 讓拉丁字母直立 */
     background-color: #252525;
     border-radius: 4px; 
 }
@@ -137,6 +139,17 @@ button.small { padding:4px 8px; margin:3px; }
   border-bottom-left-radius: 4px;
   border-bottom-right-radius: 4px;
 }
+	
+/* 預設字體大小 */
+body {
+  font-size: 14px;
+}
+
+/* 英文模式字體縮小 2px */
+body.lang-en {
+  font-size: 11px;
+}
+
 
 #failMsg {
     color: #ff6666;
@@ -197,27 +210,27 @@ document.addEventListener("DOMContentLoaded", () => {
 
       <td width="277" height="60" align="center" valign="top" bgcolor="#191919" 
           class="roundStyle full" 
-          style="text-align: center; font-size: 14px;">
-        <p><strong><em>城堡</em></strong></p>
-        <p><strong>地下:</strong></p>
-        <p><strong>主要:</strong></p>
-        <p><strong>樓頂:</strong></p>
+          style="font-family: 標楷體">
+        <p><strong><em data-key="城堡">城堡</em></strong></p>
+        <p><strong data-key="地下">地下:</strong></p>
+        <p><strong data-key="主要">主要:</strong></p>
+        <p><strong data-key="樓頂">樓頂:</strong></p>
       </td>
 
       <td width="148" height="60" align="center" valign="top" bgcolor="#191919" 
           class="roundStyle full" 
           style="font-family: 標楷體">
-        <p><strong><em>夜晚</em></strong></p>
-        <p><strong>第一夜:</strong></p>
-        <p><strong>第二夜:</strong></p>
+        <p><strong><em data-key="夜晚">夜晚</em></strong></p>
+        <p><strong data-key="第一夜">第一夜:</strong></p>
+        <p><strong data-key="第二夜">第二夜:</strong></p>
       </td>
 
       <td height="60" colspan="2" align="center" valign="top" bgcolor="#191919" 
           class="roundStyle full" 
           style="font-family: 標楷體">
-        <p><em><strong>特殊</strong></em></p>
-        <p><strong>第一天:</strong></p>
-        <p><strong>第二天:</strong></p>
+        <p><strong><em data-key="特殊">特殊</em></strong></p>
+        <p><strong data-key="第一天">第一天:</strong></p>
+        <p><strong data-key="第二天">第二天:</strong></p>
       </td>
     </tr>
 
@@ -288,23 +301,23 @@ document.addEventListener("DOMContentLoaded", () => {
     <!-- 黑夜種類 + 圖標區 -->
     <tr>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜野獸">黑夜野獸</div>
+        <div class="黑夜" id="黑夜野獸" data-zh="黑夜野獸" data-en="Beast of Night"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜野獸圖標.png" id="黑夜野獸_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
 
-      <td width="16" align="center" valign="middle" bgcolor="#252525" class="名字">格拉狄烏斯</td>
+      <td width="16" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格拉狄烏斯" data-en="GLADIUS">格拉狄烏斯</td>
       <td width="3" align="center" valign="middle">&nbsp;</td>
 
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜之魔">黑夜之魔</div>
+        <div class="黑夜" id="黑夜之魔" data-zh="黑夜之魔" data-en="Creature of Night"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜之魔圖標.png" id="黑夜之魔_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
 
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">利普拉</td>
+      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="利普拉" data-en="LIBRA">利普拉</td>
 
       <td width="4" align="center" valign="middle">&nbsp;</td>
 
@@ -372,20 +385,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <tr>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜之爵">黑夜之爵</div>
+        <div class="黑夜" id="黑夜之爵" data-zh="黑夜之爵" data-en="Baron of Night"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜之爵圖標.png" id="黑夜之爵_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">艾德雷</td>
+      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="艾德雷" data-en="ADEL">艾德雷</td>
       <td width="3" align="center" valign="middle">&nbsp;</td>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜光騎士">黑夜光騎士</div>
+        <div class="黑夜" id="黑夜光騎士" data-zh="黑夜光騎士" data-en="Champion of Nightglow"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜光騎士圖標.png" id="黑夜光騎士_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">弗格爾</td>
+      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="弗格爾" data-en="FULGHOR">弗格爾</td>
       <td width="4" align="center" valign="middle">&nbsp;</td>
       <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
     <img src="火山地形.png" id="縮圖2" width="100" height="100" style="cursor:pointer;" onclick="switchTerrain('火山地形')">
@@ -394,21 +407,21 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <tr>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜之智">黑夜之智</div>
+        <div class="黑夜" id="黑夜之智" data-zh="黑夜之智" data-en="Wisdom of Night"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜之智圖標.png" id="黑夜之智_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
 
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">格諾斯塔</td>
+      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格諾斯塔" data-en="GNOSTER">格諾斯塔</td>
       <td width="3" align="center" valign="middle">&nbsp;</td>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
-        <div class="黑夜" id="黑夜霧霾">黑夜霧霾</div>
+        <div class="黑夜" id="黑夜霧霾" data-zh="黑夜霧霾" data-en="Miasma of Night"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜霧霾圖標.png" id="黑夜霧霾_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">卡莉果</td>
+      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="卡莉果" data-en="CALIGO">卡莉果</td>
       <td width="4" align="center" valign="middle">&nbsp;</td>
       <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
     <img src="腐敗地形.png" id="縮圖3" width="100" height="100" style="cursor:pointer;" onclick="switchTerrain('腐敗地形')">
@@ -417,31 +430,32 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <tr>
 	  <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
-  	 	 <div class="黑夜" id="深海黑夜">深海黑夜</div>
+  	 	 <div class="黑夜" id="深海黑夜" data-zh="深海黑夜" data-en="Fathom of Night"></div>
 	  </td>
 
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="深海黑夜圖標.png" id="深海黑夜_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">瑪利斯</td>
+      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="瑪利斯" data-en="MARIS">瑪利斯</td>
       <td width="3" align="center" valign="middle">&nbsp;</td>
       <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
-        <div class="黑夜" id="黑夜王">黑夜王</div>
+        <div class="黑夜" id="黑夜王" data-zh="黑夜王" data-en="Lord of Nightlord"></div>
       </td>
       <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
         <img src="黑夜王圖標.png" id="黑夜王_icon" style="width:100px;height:100px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字">布德奇冥</td>
+      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="布德奇冥" data-en="HEOLSTOR">布德奇冥</td>
       <td width="4" align="center" valign="middle">&nbsp;</td>
       <td width="142" height="100" align="center" valign="middle" bgcolor="#282828" class="roundStyle bottom-right">
     <img src="隱城地形.png" id="縮圖4" width="100" height="100" class="roundStyle bottom-right" style="cursor:pointer;" onclick="switchTerrain('隱城地形')">
   </td>
 
 </tr>
+
 	  
 <!-- 漂浮按鈕 -->
 <img src="設定.png" id="floatingBtn"
-     style="position: fixed; bottom: 74%; right: 4%; width: 50px; height:50px; cursor: grab; z-index:1000;">
+     style="position: fixed; bottom: 72%; right: 3%; width: 60px; height:60px; cursor: grab; z-index:1000;">
 
 <!-- 遮罩背景 -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:900;"></div>
@@ -456,21 +470,31 @@ document.addEventListener("DOMContentLoaded", () => {
   <button id="styleSquare" class="styleBtn active">方</button>
   <button id="styleRound" class="styleBtn">圓</button>
 </div>
+	
+<div style="margin-bottom: 20px;">
+  <span style="margin-right: 10px;">語言：</span>
+  <button id="chinese" class="styleBtn active">正體中文</button>
+  <button id="english" class="styleBtn">English</button>
+</div>
 
 <!-- 更新日誌區塊 -->
-<div style="background-color:#1a1a1a; color:#ccc; padding:10px; margin-top:10px; border-radius:8px; font-size:13px;">
-  <strong>更新日誌</strong>
-  <ul style="margin:5px 0 0 15px; padding:0; list-style: disc;">
-    <li>最後更新日期2025/10/22</li>
-    <li style="list-style:none;">&nbsp;</li>
-    <li>[2025/10/21]</li>
-    <li>&nbsp;&gt;添加可拖動的設定懸浮按鈕</li>
-    <li>&nbsp;&gt;添加設定，切換圓角功能</li>
-    <li style="list-style:none;">&nbsp;</li>
-    <li>[2025/10/22]</li>
-    <li>&nbsp;&gt;修復了設定圖標在觸控模式下無法拖動的問題</li>
-	<li>&nbsp;&gt;修復了在不同裝置下，設定圖標會跑掉的問題</li>
-	<li>&nbsp;&gt;改善了手機平板長按會叫出保存圖片視窗的問題</li>
+<div id="changelog" style="background-color:#1a1a1a; color:#ccc; padding:10px; margin-top:10px; border-radius:8px; font-size:13px;">
+  <strong id="changelogTitle">更新日誌</strong>
+  <ul id="changelogList" style="margin:5px 0 0 15px; padding:0; list-style: disc;">
+    <li data-zh="最後更新日期2025/10/22" data-en="Last updated: 2025/10/22">最後更新日期2025/10/22</li>
+    <li data-zh="[2025/10/23]" data-en="[2025/10/23]">[2025/10/23]</li>
+    <li data-zh="&nbsp;&gt;新增語言選項:English" data-en="&nbsp;&gt;Added language option: English">&nbsp;&gt;新增語言選項:English</li>
+    <li data-zh="&nbsp;&gt;更新了設定懸浮按鈕圖示" data-en="&nbsp;&gt;Updated floating settings button icon">&nbsp;&gt;更新了設定懸浮按鈕圖示</li>
+    <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
+    <li data-zh="[2025/10/22]" data-en="[2025/10/22]">[2025/10/22]</li>
+    <li data-zh="&nbsp;&gt;修復了設定圖標在觸控模式下無法拖動的問題" data-en="&nbsp;&gt;Fixed issue where settings icon could not be dragged in touch mode">&nbsp;&gt;修復了設定圖標在觸控模式下無法拖動的問題</li>
+    <li data-zh="&nbsp;&gt;修復了在不同裝置下，設定圖標會跑掉的問題" data-en="&nbsp;&gt;Fixed issue where settings icon would misalign on different devices">&nbsp;&gt;修復了在不同裝置下，設定圖標會跑掉的問題</li>
+    <li data-zh="&nbsp;&gt;改善了手機平板長按會叫出保存圖片視窗的問題" data-en="&nbsp;&gt;Improved issue where long press on mobile/tablet triggered save image window">&nbsp;&gt;改善了手機平板長按會叫出保存圖片視窗的問題</li>
+    <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
+    <li data-zh="[2025/10/21]" data-en="[2025/10/21]">[2025/10/21]</li>
+    <li data-zh="&nbsp;&gt;添加可拖動的設定懸浮按鈕" data-en="&nbsp;&gt;Added draggable floating settings button">&nbsp;&gt;添加可拖動的設定懸浮按鈕</li>
+    <li data-zh="&nbsp;&gt;添加設定，切換圓角功能" data-en="&nbsp;&gt;Added setting to toggle round corners">&nbsp;&gt;添加設定，切換圓角功能</li>
+    <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
   </ul>
 </div>
 
@@ -487,6 +511,164 @@ document.addEventListener("DOMContentLoaded", () => {
     </tr>
   </tbody>
 </table>
+	
+<!-- 公告遮罩背景 -->
+<div id="announcementOverlay" style="
+  display:none;
+  position:fixed;
+  top:0; left:0;
+  width:100%; height:100%;
+  background:rgba(0,0,0,0.5);
+  z-index:900;
+"></div>
+
+<!-- 公告模態視窗 -->
+<div id="announcementWindow" style="
+  display:none;
+  position:fixed;
+  width:80%;
+  max-width:600px;
+  height:auto;
+  max-height:80%;
+  top:50%;
+  left:50%;
+  transform:translate(-50%,-50%);
+  background:#202020;
+  color:#ddd;
+  padding:20px;
+  border-radius:12px;
+  z-index:1001;
+  box-shadow:0 0 10px rgba(0,0,0,0.7);
+  overflow:auto;
+  font-family:'標楷體', sans-serif;
+">
+  <h2 id="announcementTitle" style="text-align:center; color:#fff; margin-top:0;">📢 公告</h2>
+  
+  <!-- 深色內容區塊 -->
+  <div style="
+    background:#1a1a1a;
+    border-radius:8px;
+    padding:15px;
+    margin-bottom:15px;
+    line-height:1.6;
+  ">
+    <div id="announcementContent">
+    </div>
+
+    <!-- 前往設定按鈕 -->
+    <div style="text-align:center; margin-top:15px;">
+      <button id="goToSettingsBtn" style="
+        background-color:#303030;
+        color:#ddd;
+        border:none;
+        padding:8px 16px;
+        border-radius:8px;
+        cursor:pointer;
+        font-size:14px;
+        transition:background 0.3s;
+      " onmouseover="this.style.background='#444';" onmouseout="this.style.background='#303030';">
+        ⚙ 前往設定
+      </button>
+    </div>
+  </div>
+
+  <!-- 下次不再顯示 -->
+  <label id="dontShowLabel" style="display:flex; align-items:center; gap:6px; font-size:14px; cursor:pointer;">
+    <input type="checkbox" id="dontShowAgain">
+    下次更新前不再顯示
+  </label>
+
+  <!-- 關閉提示 -->
+  <p id="closeHint" style="text-align:center; font-size:12px; color:#888; margin-top:12px;">
+    點擊空白處即可關閉此視窗
+  </p>
+</div>
+
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+  const overlay = document.getElementById("announcementOverlay");
+  const modal = document.getElementById("announcementWindow");
+  const checkbox = document.getElementById("dontShowAgain");
+  const goToSettingsBtn = document.getElementById("goToSettingsBtn");
+
+  const titleEl = document.getElementById("announcementTitle");
+  const contentEl = document.getElementById("announcementContent");
+  const dontShowLabel = document.getElementById("dontShowLabel");
+  const closeHint = document.getElementById("closeHint");
+
+  // 設定公告版本（每次更新改這裡）
+  const ANNOUNCEMENT_VERSION = "2025-10-23";
+
+  // 語言判斷
+  const lang = localStorage.getItem("lang") || "chinese";
+
+  // 多語言內容
+  const texts = {
+    chinese: {
+      title: "📢 公告",
+      content: `
+        <p>添加可拖動的設定懸浮按鈕</p>
+        <p>添加設定，切換圓角功能</p>
+        <p>新增語言選項:English</p>
+      `,
+      btn: "⚙ 前往設定",
+      dontShow: "下次更新前不再顯示",
+      closeHint: "點擊空白處即可關閉此視窗"
+    },
+    english: {
+      title: "📢 Announcement",
+      content: `
+        <p>Added draggable floating settings button</p>
+        <p>Added setting to toggle round corners</p>
+        <p>Added language option: English</p>
+      `,
+      btn: "⚙ Go to Settings",
+      dontShow: "Don’t show again until next update",
+      closeHint: "Click blank area to close this window"
+    }
+  };
+
+  // 根據語言更新內容
+  titleEl.textContent = texts[lang].title;
+  contentEl.innerHTML = texts[lang].content;
+  goToSettingsBtn.textContent = texts[lang].btn;
+  dontShowLabel.innerHTML = `<input type="checkbox" id="dontShowAgain"> ${texts[lang].dontShow}`;
+  closeHint.textContent = texts[lang].closeHint;
+
+  // 讀取紀錄
+  const savedVersion = localStorage.getItem("hideAnnouncementUntil");
+
+  // 顯示公告
+  if (savedVersion !== ANNOUNCEMENT_VERSION) {
+    overlay.style.display = "block";
+    modal.style.display = "block";
+  }
+
+  // 點擊空白處關閉
+  overlay.addEventListener("click", () => {
+    overlay.style.display = "none";
+    modal.style.display = "none";
+
+    const newCheckbox = document.getElementById("dontShowAgain");
+    if (newCheckbox && newCheckbox.checked) {
+      localStorage.setItem("hideAnnouncementUntil", ANNOUNCEMENT_VERSION);
+    }
+  });
+
+  // 點擊「前往設定」按鈕
+  goToSettingsBtn.addEventListener("click", () => {
+    overlay.style.display = "none";
+    modal.style.display = "none";
+
+    const settingsOverlay = document.getElementById("modalOverlay");
+    const settingsModal = document.getElementById("modalWindow");
+    if (settingsOverlay && settingsModal) {
+      settingsOverlay.style.display = "block";
+      settingsModal.style.display = "block";
+    }
+  });
+});
+</script>
 
 <script>
 
@@ -533,6 +715,196 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// -----------------------------
+// 語言切換功能
+// -----------------------------
+
+const langChineseBtn = document.getElementById('chinese');
+const langEnglishBtn = document.getElementById('english');
+
+// -----------------------------
+// 更新黑夜名稱、地圖名字、infoMsg
+// -----------------------------
+function updateNamesAndNights(lang) {
+  // 黑夜名稱
+  document.querySelectorAll('.黑夜').forEach(el => {
+    el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
+  });
+
+  // 地圖名字 td
+  document.querySelectorAll('.名字').forEach(el => {
+    el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
+  });
+
+  // infoMsg
+  const infoMsgEl = document.getElementById('infoMsg');
+  if (!infoMsgEl) return;
+
+  const total = selectedNightsMulti.length;
+  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
+  const isAll = total === allNights.length;
+
+  if (lang === 'english') {
+    if (total === 0) infoMsgEl.textContent = "Please select a terrain first, then place icons and choose target lords.";
+    else if (isAll) infoMsgEl.textContent = "All Night Lords selected. Tap on the map icons to set their locations.";
+    else if (total > 1) infoMsgEl.textContent = "Selected " + total + " Night Lords. Tap on the map icons to set their locations.";
+    else infoMsgEl.textContent = "Selected: " + getNightName(selectedNightsMulti[0]) + ". Tap on the map icons to set its location.";
+  } else {
+    if (total === 0) infoMsgEl.textContent = "請先選擇地形，再放置圖標、選擇目標王。";
+    else if (isAll) infoMsgEl.textContent = "已全選夜王，請在地圖上點圖標設定位置。";
+    else if (total > 1) infoMsgEl.textContent = "已選擇 " + total + " 位夜王，請在地圖上點圖標設定位置。";
+    else infoMsgEl.textContent = "已選擇：" + selectedNightsMulti[0] + "，請在地圖上點圖標設定位置。";
+  }
+}
+
+function getNightName(id) {
+  const el = document.getElementById(id);
+  if (!el) return id;
+  const lang = localStorage.getItem('lang') || 'chinese';
+  return (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
+}
+
+// -----------------------------
+// 切換語言
+// -----------------------------
+function setLanguage(lang) {
+  // 按鈕亮起
+  if (lang === 'english') {
+    langEnglishBtn.classList.add('active');
+    langChineseBtn.classList.remove('active');
+    document.body.classList.add('lang-en');
+  } else {
+    langChineseBtn.classList.add('active');
+    langEnglishBtn.classList.remove('active');
+    document.body.classList.remove('lang-en');
+  }
+function updateChangelogLanguage(lang) {
+  document.getElementById("changelogTitle").textContent = (lang === "english") ? "Changelog" : "更新日誌";
+  document.querySelectorAll("#changelogList li").forEach(li => {
+    li.innerHTML = (lang === "english") ? li.dataset.en : li.dataset.zh;
+  });
+}
+
+
+  // 全局文字替換
+  if (lang === 'english') {
+    document.documentElement.lang = 'en';
+    document.title = 'Elden Ring Nightreign Map Seed';
+    replaceText({
+      '外觀：': 'Style:',
+      '方': 'Square',
+      '圓': 'Round',
+      '語言：': 'Language:',
+      '正體中文': '正體中文',
+      '清除所有圖標狀態': 'Clear All Icon States',
+      '重置頁面': 'Reset Page',
+      '左鍵放置教堂/右鍵放置法師塔': 'Left click: Place Church / Right click: Place Wizard Tower',
+      '切換為觸控模式': 'Switch to Touch Mode',
+      '設定': 'Settings',
+      '更新日誌': 'Update Log',
+      '點擊空白處關閉': 'Click blank area to close'
+    });
+  } else {
+    document.documentElement.lang = 'zh-TW';
+    document.title = 'Elden Ring 夜幕地圖種子';
+    replaceText({
+      'Style:': '外觀：',
+      'Square': '方',
+      'Round': '圓',
+      'Language:': '語言：',
+      'Traditional Chinese': '正體中文',
+      'Clear All Icon States': '清除所有圖標狀態',
+      'Reset Page': '重置頁面',
+      'Left click: Place Church / Right click: Place Wizard Tower': '左鍵放置教堂/右鍵放置法師塔',
+      'Switch to Touch Mode': '切換為觸控模式',
+      'Settings': '設定',
+      'Update Log': '更新日誌',
+      'Click blank area to close': '點擊空白處關閉'
+    });
+  }
+
+  // === 更新 imageTexts (地圖資料) ===
+  const imageTextsEn = {};
+  for (const file in imageTexts) {
+    imageTextsEn[file] = {};
+    for (const key in imageTexts[file]) {
+      const zh = imageTexts[file][key];
+      imageTextsEn[file][key] = zhToEn[zh] || zh;
+    }
+  }
+  function updateImageText(file) {
+    const texts = lang === 'english' ? imageTextsEn : imageTexts;
+    const textObj = texts[file];
+    for (const key in textObj) {
+      const el = document.getElementById(key + "_" + file);
+      if (el) el.textContent = textObj[key];
+    }
+  }
+  function updateAllImagesText() {
+    for (const file in imageTexts) updateImageText(file);
+  }
+  updateAllImagesText();
+
+  // === 更新夜晚與地圖名稱 ===
+  updateNamesAndNights(lang);
+
+  // === 更新頁面動態欄位（城堡、夜晚、特殊...） ===
+  updateText(true);
+
+  // === 更新模式按鈕與提示（夜王說明 / 放置說明 / infoMsg） ===
+  toggleMode(isTouchMode);
+
+  // === 更新當前夜晚資訊區（若有顯示） ===
+  updateNightInfo();
+  
+  // 更新更新日誌語言
+  updateChangelogLanguage(lang);
+
+}
+	
+// -----------------------------
+// 批次替換文字
+// -----------------------------
+function replaceText(map) {
+  const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
+  while (walker.nextNode()) {
+    const node = walker.currentNode;
+    const text = node.nodeValue.trim();
+    if (map[text]) node.nodeValue = map[text];
+  }
+}
+
+// -----------------------------
+// 綁定事件
+// -----------------------------
+langChineseBtn.addEventListener('click', () => {
+  localStorage.setItem('lang', 'chinese');
+  setLanguage('chinese');
+  updateNightInfo();
+});
+
+langEnglishBtn.addEventListener('click', () => {
+  localStorage.setItem('lang', 'english');
+  setLanguage('english');
+  updateNightInfo();
+});
+
+// -----------------------------
+// DOM ready 初始化
+// -----------------------------
+window.addEventListener('load', () => {
+  const savedLang = localStorage.getItem('lang') || 'chinese';
+  setLanguage(savedLang);
+  updateNightInfo();
+
+  // 預設鍵鼠模式
+  isTouchMode = false;
+  toggleMode(false); // false 表示鍵鼠模式
+
+  // 強制刷新頁面文字
+  updateText(true);
+});
+
 /* ---------------------------
    模式狀態
    --------------------------- */
@@ -542,12 +914,10 @@ document.addEventListener("DOMContentLoaded", () => {
     if (modeBtn) modeBtn.addEventListener("click", toggleMode);
 });
 
-/* ---------------------------
-   切換觸控/鍵鼠模式
-   --------------------------- */
 function toggleMode() {
     isTouchMode = !isTouchMode;
 
+    const lang = localStorage.getItem('lang') || 'chinese';
     const modeBtn = document.getElementById("modeToggleBtn");
     const nightGuide = document.getElementById("nightGuide");
     const mapGuide = document.getElementById("mapGuide");
@@ -555,24 +925,80 @@ function toggleMode() {
 
     if (isTouchMode) {
         // 觸控模式
-        modeBtn.textContent = "切換為鍵鼠模式";
-        nightGuide.innerHTML =
-            "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-            "<p>&gt;再次點擊取消選擇</p>" +
-            "<p>&gt;點擊其他夜王多選</p>";
-        mapGuide.textContent = "點擊放置教堂/再次點擊切換法師塔";
-        infoMsg.textContent = "已切換為觸控模式";
+        modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
+        nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Tap icons or names to select BOSS</p>" +
+              "<p>&gt;Tap again to deselect</p>" +
+              "<p>&gt;Tap other BOSS to multi-select</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+              "<p>&gt;再次點擊取消選擇</p>" +
+              "<p>&gt;點擊其他夜王多選</p>";
+        mapGuide.textContent = (lang === 'english')
+            ? "Tap to place Church / tap again to switch to Wizard Tower"
+            : "點擊放置教堂/再次點擊切換法師塔";
+        infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
     } else {
         // 鍵鼠模式
-        modeBtn.textContent = "切換為觸控模式";
-        nightGuide.innerHTML =
-            "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-            "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
-            "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
-        mapGuide.textContent = "左鍵放置教堂/右鍵放置法師塔";
-        infoMsg.textContent = "已切換為鍵鼠模式";
+        modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
+        nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Click icons or names to select BOSS</p>" +
+              "<p>&gt;Hold Ctrl to multi-select or deselect</p>" +
+              "<p>&gt;Hold Ctrl+Shift to select all</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+              "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
+              "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
+        mapGuide.textContent = (lang === 'english')
+            ? "Left click: Place Church / Right click: Place Wizard Tower"
+            : "左鍵放置教堂/右鍵放置法師塔";
+        infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
     }
 }
+
+document.addEventListener("DOMContentLoaded", () => {
+    const modeBtn = document.getElementById("modeToggleBtn");
+    if (modeBtn) modeBtn.addEventListener("click", toggleMode);
+});
+
+function toggleMode() {
+    isTouchMode = !isTouchMode;
+
+    const lang = localStorage.getItem('lang') || 'chinese';
+    const modeBtn = document.getElementById("modeToggleBtn");
+    const nightGuide = document.getElementById("nightGuide");
+    const mapGuide = document.getElementById("mapGuide");
+    const infoMsg = document.getElementById("infoMsg");
+
+    if (isTouchMode) {
+        // 觸控模式
+        modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
+        nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Tap icons or names to select BOSS</p>" +
+              "<p>&gt;Tap again to deselect</p>" +
+              "<p>&gt;Tap other BOSS to multi-select</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+              "<p>&gt;再次點擊取消選擇</p>" +
+              "<p>&gt;點擊其他夜王多選</p>";
+        mapGuide.textContent = (lang === 'english')
+            ? "Tap to place Church / tap again to switch to Wizard Tower"
+            : "點擊放置教堂/再次點擊切換法師塔";
+        infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
+    } else {
+        // 鍵鼠模式
+        modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
+        nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Click icons or names to select BOSS</p>" +
+              "<p>&gt;Hold Ctrl to multi-select or deselect</p>" +
+              "<p>&gt;Hold Ctrl+Shift to select all</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
+              "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
+              "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
+        mapGuide.textContent = (lang === 'english')
+            ? "Left click: Place Church / Right click: Place Wizard Tower"
+            : "左鍵放置教堂/右鍵放置法師塔";
+        infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
+    }
+}
+
 
 /* ---------------------------
    禁止圖片被拖動
@@ -4084,20 +4510,47 @@ function getCurrentTerrainCount(){
 }
 
 /* ---------------------------
-   選擇黑夜（支援鍵鼠/觸控兩種）
+   選擇黑夜（支援鍵鼠/觸控 + 多語提示）
    --------------------------- */
+
+// 更新訊息（可重用）
+function updateNightInfo() {
+  const infoMsgEl = document.getElementById('infoMsg');
+  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
+  const total = selectedNightsMulti.length;
+  const isAll = total === allNights.length;
+  const lang = localStorage.getItem('lang') || 'chinese';
+
+  function getNightName(id) {
+    const el = document.getElementById(id);
+    if (!el) return id;
+    return lang === 'english' && el.dataset.en ? el.dataset.en : id;
+  }
+
+  if (lang === 'english') {
+    if (total === 0) infoMsgEl.textContent = "Please select a terrain first, then place icons and choose target BOSS.";
+    else if (isAll) infoMsgEl.textContent = "All BOSS selected. Tap on the map icons to set their locations.";
+    else if (total > 1) infoMsgEl.textContent = "Selected " + total + " BOSS. Tap on the map icons to set their locations.";
+    else infoMsgEl.textContent = "Selected: " + getNightName(selectedNightsMulti[0]) + ". Tap on the map icons to set its location.";
+  } else {
+    if (total === 0) infoMsgEl.textContent = "請先選擇地形，再放置圖標、選擇目標王。";
+    else if (isAll) infoMsgEl.textContent = "已全選夜王，請在地圖上點圖標設定位置。";
+    else if (total > 1) infoMsgEl.textContent = "已選擇 " + total + " 位夜王，請在地圖上點圖標設定位置。";
+    else infoMsgEl.textContent = "已選擇：" + selectedNightsMulti[0] + "，請在地圖上點圖標設定位置。";
+  }
+}
+
 function selectNight(name, event) {
   const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
 
+  // 鍵鼠/觸控選取邏輯
   if (isTouchMode) {
-    // 觸控模式：點擊多選/取消
     if (selectedNightsMulti.includes(name)) {
       selectedNightsMulti = selectedNightsMulti.filter(n => n !== name);
     } else {
       selectedNightsMulti.push(name);
     }
   } else {
-    // 鍵鼠模式：保留原 Ctrl 多選邏輯
     const ctrl = event.ctrlKey, shift = event.shiftKey;
     if (shift && ctrl) selectedNightsMulti = [...allNights];
     else if (ctrl) {
@@ -4114,23 +4567,12 @@ function selectNight(name, event) {
   });
 
   // 更新訊息
-  const infoMsgEl = document.getElementById('infoMsg');
-  if (selectedNightsMulti.length === 0) {
-    // 沒選任何黑夜 → 保持預設提示
-    infoMsgEl.textContent = "請先選擇地形，再放置圖標、選擇目標王";
-  } else if (selectedNightsMulti.length === allNights.length) {
-    infoMsgEl.textContent = '已全選夜王，請在地圖上點圖標設定位置。';
-  } else if (selectedNightsMulti.length > 1) {
-    infoMsgEl.textContent = '已選擇 ' + selectedNightsMulti.length + ' 位夜王，請在地圖上點圖標設定位置。';
-  } else if (selectedNightsMulti.length === 1) {
-    infoMsgEl.textContent = '已選擇：' + selectedNightsMulti[0] + '，請在地圖上點圖標設定位置。';
-  }
+  updateNightInfo();
 
   hideFail();
   showAllIcons();
   runFilter();
 }
-
 
 /* ---------------------------
    篩選邏輯
@@ -4144,45 +4586,244 @@ function selectNight(name, event) {
    篩選成功/失敗更新文字
    flag: true = 更新文字，false = 清空文字
    --------------------------- */
-function updateText(flag = true){
+// 中文 → 英文對照表
+const zhToEn = {
+  // 區塊標題
+  "城堡": "CASTLE",
+  "夜晚": "NIGHT",
+  "特殊": "EVENT",
+
+  // 欄位名稱（冒號前）
+  "地下": "Basement",
+  "主要": "Main",
+  "樓頂": "Rooftop",
+  "第一夜": "Night 1",
+  "第二夜": "Night 2",
+  "第一天": "Day 1",
+  "第二天": "Day 2",
+
+  // 內容（冒號後）
+	
+  //地下
+  "鈴珠獵人": "Bell Bearing Hunter",
+  "接肢貴族": "Grafted Scion",
+  "薩米爾的古英雄": "Ancient Hero of Zamor",
+  "黑刀刺客": "Black Knife Assassin",
+  "獅子混種": "Leonine Misbegotten",
+  "王夫的紅狼": "Red Wolf of the King Consort",
+  "王室幽魂": "Royal Revenant",
+  "無": "None",
+	
+  //主要
+  "山妖": "Troll",
+  "熔爐騎士": "Crucible Knight",
+  "失鄉騎士": "Banished Knight",
+  "無": "None",
+	
+  //樓頂
+  "鈴珠獵人": "Bell Bearing Hunter",
+  "羅蕾塔": "Royal Carian Knight",
+  "祖靈": "Ancestor Spirit",
+  "大樹守衛": "Tree Sentinel",
+  "黑劍眷屬": "Black Blade Kindred",
+  "死亡儀式鳥": "Death Rite Bird",
+  "龍裝大樹守衛": "Draconic Tree Sentinel",
+  "熔岩土龍": "Magma Wyrm",
+  "黃金樹的化身": "Erdtree Avatar",
+  "腐爛樹靈": "Ulcerated Tree Spirit",
+  "無": "None",
+
+  //第一夜
+  "亞人雙人組": "Demi-Human Queen & Demi-Human Swordmaster",
+  "鈴珠獵人": "Bell Bearing Hunter",
+  "貪食魔龍": "Gaping Dragon",
+  "蚯蚓臉": "Wormface",
+  "英雄石像鬼": "Valiant Gargoyle",
+  "公爵的夫雷迪亞": "The Duke's Dear Freja",
+  "黑夜騎兵": "Night's Cavalry",
+  "熔鐵惡魔": "Smelter Demon",
+  "戰場老將": "Battlefield Commander",
+  "百足惡魔": "Centipede Demon",
+  "提比亞的喚聲船": "Tibia Mariner",
+  "腐爛樹靈": "Ulcerated Tree Spirit",
+  "接肢君王": "Grafted Monarch",
+  "王室幽魂": "Royal Revenant",
+	
+  //第二夜
+  "蒙葛特": "Fell Omen",
+  "大樹守衛": "Tree Sentinel & Royal Cavalrymen",
+  "古龍": "Ancient Dragon",
+  "熔爐河馬": "Crucible Knight & Golden Hippopotamus",
+  "偏地老將": "Outland Commander",
+  "大土龍": "Great Wyrm",
+  "龍人士兵": "Nox Dragonkin Soldier",
+  "龍裝大樹守衛": "Draconic Tree Sentinel & Royal Cavalrymen",
+  "墜星成獸": "Full-Grown Fallingstar Beast",
+  "死亡儀式鳥": "Death Rite Bird",
+  "無名王者": "Nameless King",
+  "冷冽谷的舞孃": "Dancer of the Boreal Valley",
+  "神皮雙人組": "Godskin Duo",
+	
+  //特殊事件
+  "黑夜勢力": "Night Horde",
+  "隕石墜落": "Meteor Strike",
+  "蒙葛特入侵": "Morgott Invasion",
+  "巨大水泡現蹤": "Morgott Invasion",
+  "癲火現蹤": "frenzy tower",
+  "古老魔師塔": "Difficult Sorcerer's Rise",
+  "蟲群大量出現": "Gnoster Plague",
+  "惡魔詛咒": "Libra Curse",
+	
+  "額外BOSS:蒙葛特": "Extra Night Boss: Fell Omen",
+  "額外BOSS:大樹守衛": "Extra Night Boss: Tree Sentinel & Royal Cavalrymen",
+  "額外BOSS:古龍": "Extra Night Boss: Ancient Dragon",
+  "額外BOSS:熔爐河馬": "Extra Night Boss: Crucible Knight & Golden Hippopotamus",
+  "額外BOSS:偏地老將": "Extra Night Boss: Outland Commander",
+  "額外BOSS:大土龍": "Extra Night Boss: Great Wyrm",
+  "額外BOSS:龍人士兵": "Extra Night Boss: Nox Dragonkin Soldier",
+  "額外BOSS:龍裝大樹守衛": "Extra Night Boss: Draconic Tree Sentinel & Royal Cavalrymen",
+  "額外BOSS:墜星成獸": "Extra Night Boss: Full-Grown Fallingstar Beast",
+  "額外BOSS:死亡儀式鳥": "Extra Night Boss: Death Rite Bird",
+  "額外BOSS:無名王者": "Extra Night Boss: Nameless King",
+  "額外BOSS:冷冽谷的舞孃": "Extra Night Boss: Dancer of the Boreal Valley",
+  "額外BOSS:神皮雙人組": "Extra Night Boss: Godskin Duo",
+};
+
+window.addEventListener('load', () => {
+  const savedLang = localStorage.getItem('lang') || 'chinese';
+  setLanguage(savedLang);
+  updateNightInfo();
+  refreshModeText();  
+
+  // 強制更新頁面文字
+  updateAllText(savedLang);
+});
+
+function updateAllText(lang) {
+  // 更新欄位文字
+  document.querySelectorAll('strong[data-key]').forEach(el => {
+    const key = el.dataset.key;
+    if(lang === 'english'){
+      const enKey = zhToEn[key] || key;
+      // 冒號後如果有 imageTexts 可以更新
+      const mapEl = document.getElementById('大地圖');
+      const file = mapEl ? mapEl.src.split('/').pop() : null;
+      const value = file && imageTexts[file] ? imageTexts[file][key] : "";
+      const enValue = zhToEn[value] || value;
+      el.textContent = `${enKey}: ${enValue}`;
+    } else {
+      const mapEl = document.getElementById('大地圖');
+      const file = mapEl ? mapEl.src.split('/').pop() : null;
+      const value = file && imageTexts[file] ? imageTexts[file][key] : "";
+      el.textContent = `${key}: ${value}`;
+    }
+  });
+
+  // 更新區塊標題
+  document.querySelectorAll('em[data-key]').forEach(el => {
+    const zh = el.dataset.key;
+    el.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
+  });
+}
+
+	
+function updateText(flag = true) {
   try {
     const mapEl = document.getElementById('大地圖');
-    const strongs = document.querySelectorAll('strong');
+    const file = mapEl ? mapEl.src.split('/').pop() : null;
+    const texts = file && imageTexts[file] ? imageTexts[file] : {};
+    const lang = localStorage.getItem('lang') || 'chinese';
 
-    if(flag){
-      // 篩選成功 → 填入文字
-      const currentFile = mapEl.src.split('/').pop(); // 取目前圖片檔名
-      const texts = imageTexts[currentFile];
-      if(!texts) return;
+    // 更新欄位文字（strong[data-key]）
+    document.querySelectorAll('strong[data-key]').forEach(el => {
+      const key = el.dataset.key;
+      const value = texts[key] || "";
 
-      strongs.forEach(s => {
-        for(const key in texts){
-          if(s.textContent.trim().startsWith(key + ":")){
-            s.textContent = `${key}: ${texts[key]}`;
-          }
+      if (flag) {
+        if (lang === 'english') {
+          const enKey = zhToEn[key] || key;
+          const enValue = zhToEn[value] || value;
+          el.textContent = `${enKey}: ${enValue}`;
+        } else {
+          el.textContent = `${key}: ${value}`;
         }
-      });
-    } else {
-      // 篩選失敗或取消 → 清空文字（恢復初始狀態）
-      strongs.forEach(s => {
-        const keys = ['地下','主要','樓頂','第一夜','第二夜','第一天','第二天'];
-        for(const key of keys){
-          if(s.textContent.trim().startsWith(key + ":")){
-            s.textContent = `${key}:`; // 保留冒號
-          }
+      } else {
+        // 清空冒號後內容
+        if (lang === 'english') {
+          const enKey = zhToEn[key] || key;
+          el.textContent = `${enKey}:`;
+        } else {
+          el.textContent = `${key}:`;
         }
-      });
-    }
+      }
+    });
 
-  } catch(e){
+    // 更新區塊小標題（data-section）
+    document.querySelectorAll('[data-section]').forEach(s => {
+      const zh = s.dataset.section;
+      s.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
+    });
+
+    // 更新主標題（城堡、夜晚、特殊）
+    document.querySelectorAll('em[data-key]').forEach(el => {
+      const zh = el.dataset.key;
+      el.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
+    });
+
+  } catch (e) {
     console.warn('更新文字失敗：', e);
   }
 }
 
+// -----------------------------
+// 網頁載入初始化
+// -----------------------------
+window.addEventListener('load', () => {
+  const savedLang = localStorage.getItem('lang') || 'chinese';
+  setLanguage(savedLang);
+  updateNightInfo();
+  toggleMode(true);
+
+  // 強制刷新頁面文字
+  updateText(true);
+});
+
+// -----------------------------
+// 清除圖標時呼叫
+// -----------------------------
+function clearAllIcons() {
+  const count = getCurrentTerrainCount();
+  for (let i = 1; i <= count; i++) {
+    setCurrentIconState(i, null);
+    updateIconVisual(i);
+    const el = getCurrentTerrainIcon(i);
+    if (el) el.style.display = '';
+    if (el) el.oncontextmenu = e => e.preventDefault();
+  }
+
+  const lang = localStorage.getItem('lang') || 'chinese';
+  const infoMsgEl = document.getElementById('infoMsg');
+  if (infoMsgEl) {
+    infoMsgEl.textContent = (lang === 'english') 
+      ? 'All icon states cleared.' 
+      : '已清除圖標狀態。';
+  }
+
+  const mapEl = document.getElementById('大地圖');
+  mapEl.src = selectedTerrain + '.png';
+  mapEl.style.display = '';
+  hideFail();
+  showAllIcons();
+
+  // 刷新頁面文字，清空冒號後內容
+  updateText(false);
+}
+
 /* ---------------------------
-   切換地形（自動清除所有圖標）
+   切換地形（自動清除所有圖標 + 多語支援）
    --------------------------- */
 function switchTerrain(name) {
+  const lang = localStorage.getItem('lang') || 'chinese';
   const mapEl = document.getElementById('大地圖');
   const terrainOrder = {
     "普通地形": ["山頂地形", "火山地形", "腐敗地形", "隱城地形"],
@@ -4211,9 +4852,22 @@ function switchTerrain(name) {
     }
   }
 
-  // 更新提示訊息
+  // 更新提示訊息（多語支援）
   const infoBox = document.getElementById('infoMsg');
-  if (infoBox) infoBox.textContent = "已切換至：" + name;
+  if (infoBox) {
+    const terrainNamesEn = {
+      "普通地形": "Default",
+      "山頂地形": "Mountaintop",
+      "火山地形": "Crater",
+      "腐敗地形": "Rotted Woods",
+      "隱城地形": "Noklateo"
+    };
+    if (lang === 'english') {
+      infoBox.textContent = "Switched to: " + (terrainNamesEn[name] || name);
+    } else {
+      infoBox.textContent = "已切換至：" + name;
+    }
+  }
 
   // 顯示該地形圖標
   showTerrainIcons(name);
@@ -4221,6 +4875,7 @@ function switchTerrain(name) {
   // 重新篩選（確保顯示狀態正確）
   runFilter();
 }
+
 
 
 /* ---------------------------
@@ -4248,6 +4903,8 @@ function runFilter() {
   const defaultMap = selectedTerrain + '.png';
   const nightRanges = terrainNightRanges[selectedTerrain];
   const nightsToCheck = selectedNightsMulti.length > 0 ? selectedNightsMulti : [];
+  const lang = localStorage.getItem('lang') || 'chinese';
+  const infoBox = document.getElementById('infoMsg');
 
   // 如果沒選夜王
   if (nightsToCheck.length === 0) {
@@ -4256,7 +4913,11 @@ function runFilter() {
     showAllIcons();
     updateText(false);
     hideFail();
-    document.getElementById('infoMsg').textContent = '請選擇目標王';
+    if (infoBox) {
+      infoBox.textContent = (lang === 'english') 
+        ? 'Please select target BOSS(s).' 
+        : '請選擇目標王';
+    }
     return;
   }
 
@@ -4287,7 +4948,6 @@ function runFilter() {
     });
 
     if (candidates.length > 0) {
-      // 保存對應夜王名稱
       candidates.forEach(c => (c._night = night));
       filteredResults.push(...candidates);
     }
@@ -4298,15 +4958,16 @@ function runFilter() {
 
   setTimeout(() => {
     hideFail(); // 先隱藏失敗訊息
-    const infoBox = document.getElementById('infoMsg');
 
     if (uniqueFiltered.length === 0) {
       mapEl.src = defaultMap;
       mapEl.style.display = 'none';
       hideAllIcons();
       updateText(false);
-      showFail('篩選失敗 — 沒有符合的種子。');
-      infoBox.textContent = '';
+      showFail(lang === 'english' 
+        ? 'Filter failed — no matching seed found.' 
+        : '篩選失敗 — 沒有符合的種子。');
+      if (infoBox) infoBox.textContent = '';
     } else if (uniqueFiltered.length === 1) {
       const result = uniqueFiltered[0];
       mapEl.src = result.file;
@@ -4314,11 +4975,21 @@ function runFilter() {
       hideAllIcons();
       updateText(true);
 
-      // 🔹多選夜王時顯示黑夜名稱
-      if (selectedNightsMulti.length > 1 && result._night) {
-        infoBox.textContent = `找到唯一符合種子：${result.file}丨${result._night}`;
-      } else {
-        infoBox.textContent = `找到唯一符合種子：${result.file}`;
+      if (infoBox) {
+        if (selectedNightsMulti.length > 1 && result._night) {
+  		  // 找到對應的 div
+			const nightEl = document.getElementById(result._night);
+  			const nightText = (lang === 'english' && nightEl) 
+			? nightEl.dataset.en 
+    		: result._night;
+  		infoBox.textContent = (lang === 'english') 
+			? `Unique matching seed found: ${result.file} | ${nightText}` 
+			: `找到唯一符合種子：${result.file}丨${nightText}`;
+        } else {
+          infoBox.textContent = (lang === 'english') 
+            ? `Unique matching seed found: ${result.file}` 
+            : `找到唯一符合種子：${result.file}`;
+        }
       }
     } else {
       mapEl.src = defaultMap;
@@ -4326,13 +4997,14 @@ function runFilter() {
       showAllIcons();
       updateText(false);
 
-      if (activeIndices.length > 0) {
-        infoBox.textContent = `還剩 ${uniqueFiltered.length} 張（繼續設定圖標可進一步篩選）`;
+      if (infoBox && activeIndices.length > 0) {
+        infoBox.textContent = (lang === 'english') 
+          ? `${uniqueFiltered.length} seeds remaining (continue placing icons to refine the filter)` 
+          : `還剩 ${uniqueFiltered.length} 張（繼續設定圖標可進一步篩選）`;
       }
     }
   }, 150);
 }
-
 
 /* ---------------------------
    切換地形圖標顯示
@@ -4368,23 +5040,32 @@ function enableRightClickAll(){
 /* ---------------------------
    清除圖標
    --------------------------- */
-function clearAllIcons(){
-  const count=getCurrentTerrainCount();
-  for(let i=1;i<=count;i++){
-    setCurrentIconState(i,null);
+function clearAllIcons() {
+  const count = getCurrentTerrainCount();
+  for (let i = 1; i <= count; i++) {
+    setCurrentIconState(i, null);
     updateIconVisual(i);
-    const el=getCurrentTerrainIcon(i);
-    if(el) el.style.display='';
-    if(el) el.oncontextmenu=e=>e.preventDefault();
+    const el = getCurrentTerrainIcon(i);
+    if (el) el.style.display = '';
+    if (el) el.oncontextmenu = e => e.preventDefault();
   }
-  document.getElementById('infoMsg').textContent='已清除圖標狀態。';
-  const mapEl=document.getElementById('大地圖');
-  mapEl.src=selectedTerrain+'.png';
-  mapEl.style.display='';
+
+  const lang = localStorage.getItem('lang') || 'chinese';
+  const infoMsgEl = document.getElementById('infoMsg');
+  if (infoMsgEl) {
+    infoMsgEl.textContent = (lang === 'english') 
+      ? 'All icon states cleared.' 
+      : '已清除圖標狀態。';
+  }
+
+  const mapEl = document.getElementById('大地圖');
+  mapEl.src = selectedTerrain + '.png';
+  mapEl.style.display = '';
   hideFail();
   updateText(false);
   showAllIcons();
 }
+
 
 /* ---------------------------
    初始化
