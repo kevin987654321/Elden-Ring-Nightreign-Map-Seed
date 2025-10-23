@@ -57,11 +57,12 @@ img::selection {
 
 .名字 {
     color: #606060;
-	writing-mode: vertical-rl; /* 直式從右到左 */
-  	text-orientation: upright; /* 讓拉丁字母直立 */
+    writing-mode: vertical-lr; /* 直式從左到右 */
+    text-orientation: upright;
     background-color: #252525;
     border-radius: 4px; 
 }
+
 
 #mapWrapper { position: relative; width: 400px; height: 400px; margin: 0 auto; }
 #大地圖 { width:100%; height:100%; display:block; }
@@ -605,7 +606,7 @@ document.addEventListener("DOMContentLoaded", function() {
   // 多語言內容
   const texts = {
     chinese: {
-      title: "📢 公告",
+      title: "公告",
       content: `
         <p>添加可拖動的設定懸浮按鈕</p>
         <p>添加設定，切換圓角功能</p>
@@ -616,7 +617,7 @@ document.addEventListener("DOMContentLoaded", function() {
       closeHint: "點擊空白處即可關閉此視窗"
     },
     english: {
-      title: "📢 Announcement",
+      title: "Announcement",
       content: `
         <p>Added draggable floating settings button</p>
         <p>Added setting to toggle round corners</p>
@@ -806,7 +807,7 @@ function updateChangelogLanguage(lang) {
     });
   } else {
     document.documentElement.lang = 'zh-TW';
-    document.title = 'Elden Ring 夜幕地圖種子';
+    document.title = 'Elden Ring Nightreign Map Seed';
     replaceText({
       'Style:': '外觀：',
       'Square': '方',
