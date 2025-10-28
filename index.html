@@ -72,6 +72,18 @@ img::selection {
     cursor: pointer;
     user-select: none;
 }
+.觸控模式拖動框 {
+    position: absolute;
+    width: 40px; height: 100px;
+    cursor: pointer;
+    user-select: none;
+}
+.觸控模式拖動框圖標 {
+    position: absolute;
+    width: 30px; height: 30px;
+    cursor: pointer;
+    user-select: none;
+}
 
 button.small { padding:4px 8px; margin:3px; }
 .controls { text-align:center; margin:10px 0; color:#ddd; }
@@ -374,6 +386,13 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="隱城地形圖標位置6" class="icon" src="圖標位置.png" style="top:258px; left:219px;">
           <img id="隱城地形圖標位置7" class="icon" src="圖標位置.png" style="top:233px; left:338px;">
           <img id="隱城地形圖標位置8" class="icon" src="圖標位置.png" style="top:332px; left:228px;">
+	  
+		  <!-- 觸控模式拖動 UI -->
+		  <img id="觸控模式拖動框" class="觸控模式拖動框" src="觸控模式拖動框.png" style="display:none; top:0px; left:-15px;">
+		  <img id="觸控模式拖動框教堂" class="觸控模式拖動框圖標" src="教堂圖標.png" style="display:none; position:absolute; top:10px; left:-10px;">
+		  <img id="觸控模式拖動框法師塔" class="觸控模式拖動框圖標" src="法師塔圖標.png" style="display:none; position:absolute; top:55px; left:-10px;">
+
+
         </div>
         <div id="failMsg">篩選失敗 — 沒有符合的種子。</div>
         <div id="infoMsg">請先選擇地形，再放置圖標、選擇目標王。</div>
@@ -477,20 +496,38 @@ document.addEventListener("DOMContentLoaded", () => {
   <button id="chinese" class="styleBtn active">正體中文</button>
   <button id="english" class="styleBtn">English</button>
 </div>
+	
+<div style="margin-bottom: 20px;">
+  <span style="margin-right: 10px;">預設：</span>
+  <button id="modeMouse" class="styleBtn active">鍵鼠模式</button>
+  <button id="modeTouch" class="styleBtn">觸控模式</button>
+</div>
+
 
 <!-- 更新日誌區塊 -->
 <div id="changelog" style="background-color:#1a1a1a; color:#ccc; padding:10px; margin-top:10px; border-radius:8px; font-size:13px;">
   <strong id="changelogTitle">更新日誌</strong>
   <ul id="changelogList" style="margin:5px 0 0 15px; padding:0; list-style: disc;">
-    <li data-zh="最後更新日期2025/10/22" data-en="Last updated: 2025/10/23">最後更新日期2025/10/23</li>
+    <li data-zh="最後更新日期2025/10/28" data-en="Last updated: 2025/10/28">最後更新日期2025/10/28</li>
+	  
+    <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
+    <li data-zh="[2025/10/28]" data-en="[2025/10/28]">[2025/10/28]</li>
+    <li data-zh="&nbsp;&gt;為觸控模式添加了拖動放置圖標的方式" data-en="&nbsp;&gt;Added drag-and-drop icon functionality for touch mode">&nbsp;&gt;為觸控模式添加了拖動放置圖標的方式</li>
+    <li data-zh="&nbsp;&gt;添加設定，預設模式狀態" data-en="&nbsp;&gt;Add settings, preset mode status">&nbsp;&gt;添加設定，預設模式狀態</li>
+    <li data-zh="&nbsp;&gt;修復了部分BUG" data-en="&nbsp;&gt;Fixed some bugs">&nbsp;&gt;修復了部分BUG</li>
+
+	  
+    <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
     <li data-zh="[2025/10/23]" data-en="[2025/10/23]">[2025/10/23]</li>
     <li data-zh="&nbsp;&gt;新增語言選項:English" data-en="&nbsp;&gt;Added language option: English">&nbsp;&gt;新增語言選項:English</li>
     <li data-zh="&nbsp;&gt;更新了設定懸浮按鈕圖示" data-en="&nbsp;&gt;Updated floating settings button icon">&nbsp;&gt;更新了設定懸浮按鈕圖示</li>
+	  
     <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
     <li data-zh="[2025/10/22]" data-en="[2025/10/22]">[2025/10/22]</li>
     <li data-zh="&nbsp;&gt;修復了設定圖標在觸控模式下無法拖動的問題" data-en="&nbsp;&gt;Fixed issue where settings icon could not be dragged in touch mode">&nbsp;&gt;修復了設定圖標在觸控模式下無法拖動的問題</li>
     <li data-zh="&nbsp;&gt;修復了在不同裝置下，設定圖標會跑掉的問題" data-en="&nbsp;&gt;Fixed issue where settings icon would misalign on different devices">&nbsp;&gt;修復了在不同裝置下，設定圖標會跑掉的問題</li>
     <li data-zh="&nbsp;&gt;改善了手機平板長按會叫出保存圖片視窗的問題" data-en="&nbsp;&gt;Improved issue where long press on mobile/tablet triggered save image window">&nbsp;&gt;改善了手機平板長按會叫出保存圖片視窗的問題</li>
+	  
     <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
     <li data-zh="[2025/10/21]" data-en="[2025/10/21]">[2025/10/21]</li>
     <li data-zh="&nbsp;&gt;添加可拖動的設定懸浮按鈕" data-en="&nbsp;&gt;Added draggable floating settings button">&nbsp;&gt;添加可拖動的設定懸浮按鈕</li>
@@ -501,6 +538,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
 <!-- 隱藏的關閉按鈕（保留給程式使用） -->
 <button id="closeModalBtn" style="display:none;">關閉</button>
+	
+<div style="text-align:center; color:#353535; font-size:12px; margin-top:5px;">
+  Sources of the 320 images::<br>https://thefifthmatt.github.io/nightreign/
+</div>
 
 <!-- 點空白處關閉提示文字 -->
 <div style="text-align:center; color:#666666; font-size:12px; margin-top:5px;">
@@ -510,7 +551,6 @@ document.addEventListener("DOMContentLoaded", () => {
     <tr>
       <td height="49" colspan="12" align="center" valign="middle" style="color: #3E3E3E">版本:1.02.4</td>
     </tr>
-  </tbody>
 </table>
 	
 <!-- 公告遮罩背景 -->
@@ -543,7 +583,7 @@ document.addEventListener("DOMContentLoaded", () => {
   overflow:auto;
   font-family:'標楷體', sans-serif;
 ">
-  <h2 id="announcementTitle" style="text-align:center; color:#fff; margin-top:0;">📢 公告</h2>
+  <h2 id="announcementTitle" style="text-align:center; color:#fff; margin-top:0;">公告</h2>
   
   <!-- 深色內容區塊 -->
   <div style="
@@ -586,6 +626,79 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 
 <script>
+function enableTouchDrag() {
+  const churchIcon = document.getElementById("觸控模式拖動框教堂");
+  const towerIcon = document.getElementById("觸控模式拖動框法師塔");
+  let draggingType = null;
+  let dragImg = null;
+
+  function startDrag(e, type) {
+    e.preventDefault();
+    draggingType = type;
+    dragImg = e.target;
+
+    document.addEventListener("mousemove", onMove);
+    document.addEventListener("mouseup", endDrag);
+  }
+
+  function onMove(e) {
+    if (!dragImg) return;
+    const t = e.touches ? e.touches[0] : e;
+    const rect = dragImg.parentElement.getBoundingClientRect();
+    dragImg.style.left = (t.clientX - rect.left - 24) + "px";
+    dragImg.style.top = (t.clientY - rect.top - 24) + "px";
+  }
+
+  function endDrag(e) {
+    if (!draggingType || !dragImg) return;
+    const t = e.changedTouches ? e.changedTouches[0] : e;
+    const target = document.elementFromPoint(t.clientX, t.clientY);
+
+    if (target && target.classList.contains("icon")) {
+      // 抓出圖標索引
+      const match = target.id.match(/\d+$/);
+      if (match) {
+        const i = parseInt(match[0], 10);
+        // 直接放置對應圖標，不切換模式
+        setCurrentIconState(i, draggingType);
+        updateIconVisual(i);
+        runFilter();
+      }
+    }
+
+    resetIconPosition(dragImg);
+    draggingType = null;
+    dragImg = null;
+
+    document.removeEventListener("mousemove", onMove);
+    document.removeEventListener("mouseup", endDrag);
+  }
+
+  function resetIconPosition(img) {
+    if (!img) return;
+    if (img.id === "觸控模式拖動框教堂") {
+      img.style.left = "-10px";
+      img.style.top = "10px";
+    } else if (img.id === "觸控模式拖動框法師塔") {
+      img.style.left = "-10px";
+      img.style.top = "55px";
+    }
+  }
+
+  // 滑鼠事件
+  churchIcon.addEventListener("mousedown", e => startDrag(e, "教堂"));
+  towerIcon.addEventListener("mousedown", e => startDrag(e, "法師塔"));
+
+  // 觸控事件
+  churchIcon.addEventListener("touchstart", e => startDrag(e, "教堂"));
+  towerIcon.addEventListener("touchstart", e => startDrag(e, "法師塔"));
+
+  document.addEventListener("touchmove", onMove);
+  document.addEventListener("touchend", endDrag);
+}
+
+
+
 document.addEventListener("DOMContentLoaded", function() {
   const overlay = document.getElementById("announcementOverlay");
   const modal = document.getElementById("announcementWindow");
@@ -597,8 +710,30 @@ document.addEventListener("DOMContentLoaded", function() {
   const dontShowLabel = document.getElementById("dontShowLabel");
   const closeHint = document.getElementById("closeHint");
 
+  //  Switch to English 按鈕（固定顯示英文）
+  const switchToEnglishBtn = document.createElement("button");
+  switchToEnglishBtn.id = "switchToEnglishBtn";
+  switchToEnglishBtn.textContent = "Switch to English";
+  switchToEnglishBtn.style.marginTop = "8px";
+  switchToEnglishBtn.style.display = "block";
+  switchToEnglishBtn.style.width = "100%";
+  switchToEnglishBtn.style.padding = "8px";
+  switchToEnglishBtn.style.borderRadius = "6px";
+  switchToEnglishBtn.style.backgroundColor = "#3a3a3a";
+  switchToEnglishBtn.style.color = "#fff";
+  switchToEnglishBtn.style.border = "none";
+  switchToEnglishBtn.style.cursor = "pointer";
+  switchToEnglishBtn.style.fontSize = "14px";
+  switchToEnglishBtn.style.transition = "background 0.2s";
+  switchToEnglishBtn.addEventListener("mouseenter", () => {
+    switchToEnglishBtn.style.backgroundColor = "#555";
+  });
+  switchToEnglishBtn.addEventListener("mouseleave", () => {
+    switchToEnglishBtn.style.backgroundColor = "#3a3a3a";
+  });
+
   // 設定公告版本（每次更新改這裡）
-  const ANNOUNCEMENT_VERSION = "2025-10-23";
+  const ANNOUNCEMENT_VERSION = "2025-10-28";
 
   // 語言判斷
   const lang = localStorage.getItem("lang") || "chinese";
@@ -608,6 +743,7 @@ document.addEventListener("DOMContentLoaded", function() {
     chinese: {
       title: "公告",
       content: `
+        <p>為觸控模式添加了拖動放置圖標的方式</p>
         <p>添加可拖動的設定懸浮按鈕</p>
         <p>添加設定，切換圓角功能</p>
         <p>新增語言選項:English</p>
@@ -619,6 +755,7 @@ document.addEventListener("DOMContentLoaded", function() {
     english: {
       title: "Announcement",
       content: `
+        <p>Added drag-and-drop icon functionality for touch mode</p>
         <p>Added draggable floating settings button</p>
         <p>Added setting to toggle round corners</p>
         <p>Added language option: English</p>
@@ -635,6 +772,9 @@ document.addEventListener("DOMContentLoaded", function() {
   goToSettingsBtn.textContent = texts[lang].btn;
   dontShowLabel.innerHTML = `<input type="checkbox" id="dontShowAgain"> ${texts[lang].dontShow}`;
   closeHint.textContent = texts[lang].closeHint;
+
+  // 插入 Switch to English 按鈕到「前往設定」的下方
+  goToSettingsBtn.insertAdjacentElement("afterend", switchToEnglishBtn);
 
   // 讀取紀錄
   const savedVersion = localStorage.getItem("hideAnnouncementUntil");
@@ -668,7 +808,18 @@ document.addEventListener("DOMContentLoaded", function() {
       settingsModal.style.display = "block";
     }
   });
+
+  // 點擊「Switch to English」按鈕 → 切換語言
+  switchToEnglishBtn.addEventListener("click", () => {
+    localStorage.setItem("lang", "english");
+    if (typeof setLanguage === "function") {
+      setLanguage("english");
+    }
+    overlay.style.display = "none";
+    modal.style.display = "none";
+  });
 });
+
 </script>
 
 <script>
@@ -716,6 +867,8 @@ window.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+	
+	
 // -----------------------------
 // 語言切換功能
 // -----------------------------
@@ -779,13 +932,6 @@ function setLanguage(lang) {
     langEnglishBtn.classList.remove('active');
     document.body.classList.remove('lang-en');
   }
-function updateChangelogLanguage(lang) {
-  document.getElementById("changelogTitle").textContent = (lang === "english") ? "Changelog" : "更新日誌";
-  document.querySelectorAll("#changelogList li").forEach(li => {
-    li.innerHTML = (lang === "english") ? li.dataset.en : li.dataset.zh;
-  });
-}
-
 
   // 全局文字替換
   if (lang === 'english') {
@@ -797,16 +943,19 @@ function updateChangelogLanguage(lang) {
       '圓': 'Round',
       '語言：': 'Language:',
       '正體中文': '正體中文',
+	  '預設：': 'Default:',
+	  '鍵鼠模式': 'Mouse & Keyboard Mode',
+	  '觸控模式': 'Touch Mode',
       '清除所有圖標狀態': 'Clear All Icon States',
       '重置頁面': 'Reset Page',
       '左鍵放置教堂/右鍵放置法師塔': 'Left click: Place Church / Right click: Place Wizard Tower',
       '切換為觸控模式': 'Switch to Touch Mode',
       '設定': 'Settings',
-      '更新日誌': 'Update Log',
+      '更新日誌': 'Changelog',
       '點擊空白處關閉': 'Click blank area to close'
     });
   } else {
-    document.documentElement.lang = 'zh-TW';
+    document.documentElement.lang = 'zh-ROC';
     document.title = 'Elden Ring Nightreign Map Seed';
     replaceText({
       'Style:': '外觀：',
@@ -814,17 +963,20 @@ function updateChangelogLanguage(lang) {
       'Round': '圓',
       'Language:': '語言：',
       'Traditional Chinese': '正體中文',
+	  'Default:': '預設：',
+	  'Mouse & Keyboard Mode': '鍵鼠模式',
+	  'Touch Mode': '觸控模式',
       'Clear All Icon States': '清除所有圖標狀態',
       'Reset Page': '重置頁面',
       'Left click: Place Church / Right click: Place Wizard Tower': '左鍵放置教堂/右鍵放置法師塔',
       'Switch to Touch Mode': '切換為觸控模式',
       'Settings': '設定',
-      'Update Log': '更新日誌',
+      'Changelog': '更新日誌',
       'Click blank area to close': '點擊空白處關閉'
     });
   }
 
-  // === 更新 imageTexts (地圖資料) ===
+  // 更新地圖資料文字
   const imageTextsEn = {};
   for (const file in imageTexts) {
     imageTextsEn[file] = {};
@@ -841,26 +993,36 @@ function updateChangelogLanguage(lang) {
       if (el) el.textContent = textObj[key];
     }
   }
-  function updateAllImagesText() {
-    for (const file in imageTexts) updateImageText(file);
-  }
-  updateAllImagesText();
+  for (const file in imageTexts) updateImageText(file);
 
-  // === 更新夜晚與地圖名稱 ===
+  // 更新夜晚、地圖名稱
   updateNamesAndNights(lang);
 
-  // === 更新頁面動態欄位（城堡、夜晚、特殊...） ===
+  // 更新頁面動態欄位（城堡、夜晚、特殊...）
   updateText(true);
 
-  // === 更新模式按鈕與提示（夜王說明 / 放置說明 / infoMsg） ===
-  toggleMode(isTouchMode);
+  // 更新模式顯示文字，但不改變模式
+  applyMode();
 
-  // === 更新當前夜晚資訊區（若有顯示） ===
+  // 更新當前夜晚資訊區
   updateNightInfo();
-  
+
   // 更新更新日誌語言
   updateChangelogLanguage(lang);
+}
+	
+// -----------------------------
+// 更新更新日誌語言 (Changelog)
+// -----------------------------
+function updateChangelogLanguage(lang) {
+  document.querySelectorAll('#changelog [data-zh][data-en]').forEach(el => {
+    el.textContent = (lang === 'english') ? el.dataset.en : el.dataset.zh;
+  });
 
+  const changelogTitle = document.getElementById('changelogTitle');
+  if (changelogTitle) {
+    changelogTitle.textContent = (lang === 'english') ? 'Changelog' : '更新日誌';
+  }
 }
 	
 // -----------------------------
@@ -908,95 +1070,105 @@ window.addEventListener('load', () => {
 
 /* ---------------------------
    模式狀態
-   --------------------------- */
+--------------------------- */
+let currentMode = 'mouse'; // 預設模式
 let isTouchMode = false;
+
+// DOM Ready
 document.addEventListener("DOMContentLoaded", () => {
+    const btnMouse = document.getElementById("modeMouse");
+    const btnTouch = document.getElementById("modeTouch");
     const modeBtn = document.getElementById("modeToggleBtn");
-    if (modeBtn) modeBtn.addEventListener("click", toggleMode);
+
+    // 綁定模式選擇按鈕
+    if (btnMouse) btnMouse.addEventListener("click", () => setDefaultMode('mouse'));
+    if (btnTouch) btnTouch.addEventListener("click", () => setDefaultMode('touch'));
+
+    // 綁定切換模式按鈕
+    if (modeBtn) modeBtn.addEventListener("click", () => toggleMode());
+
+    // 讀取已保存的模式
+    const savedMode = localStorage.getItem('defaultMode') || 'mouse';
+    setDefaultMode(savedMode);
+
+    // 先綁定拖動事件，但不啟用
+    if (typeof enableTouchDrag === "function") enableTouchDrag();
 });
 
-function toggleMode() {
-    isTouchMode = !isTouchMode;
+function setDefaultMode(mode) {
+    currentMode = mode;
+    isTouchMode = (mode === 'touch');
 
-    const lang = localStorage.getItem('lang') || 'chinese';
-    const modeBtn = document.getElementById("modeToggleBtn");
-    const nightGuide = document.getElementById("nightGuide");
-    const mapGuide = document.getElementById("mapGuide");
-    const infoMsg = document.getElementById("infoMsg");
+    // 保存狀態
+    localStorage.setItem('defaultMode', mode);
 
-    if (isTouchMode) {
-        // 觸控模式
-        modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
-        nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Tap icons or names to select BOSS</p>" +
-              "<p>&gt;Tap again to deselect</p>" +
-              "<p>&gt;Tap other BOSS to multi-select</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-              "<p>&gt;再次點擊取消選擇</p>" +
-              "<p>&gt;點擊其他夜王多選</p>";
-        mapGuide.textContent = (lang === 'english')
-            ? "Tap to place Church / tap again to switch to Wizard Tower"
-            : "點擊放置教堂/再次點擊切換法師塔";
-        infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
-    } else {
-        // 鍵鼠模式
-        modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
-        nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Click icons or names to select BOSS</p>" +
-              "<p>&gt;Hold Ctrl to multi-select or deselect</p>" +
-              "<p>&gt;Hold Ctrl+Shift to select all</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-              "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
-              "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
-        mapGuide.textContent = (lang === 'english')
-            ? "Left click: Place Church / Right click: Place Wizard Tower"
-            : "左鍵放置教堂/右鍵放置法師塔";
-        infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
-    }
+    updateModeUI();
+    applyMode();
 }
 
-document.addEventListener("DOMContentLoaded", () => {
-    const modeBtn = document.getElementById("modeToggleBtn");
-    if (modeBtn) modeBtn.addEventListener("click", toggleMode);
-});
-
+// 切換模式按鈕
 function toggleMode() {
     isTouchMode = !isTouchMode;
+    currentMode = isTouchMode ? 'touch' : 'mouse';
+    localStorage.setItem('defaultMode', currentMode);
 
+    updateModeUI();
+    applyMode();
+}
+
+// 只更新按鈕樣式
+function updateModeUI() {
+    const btnMouse = document.getElementById("modeMouse");
+    const btnTouch = document.getElementById("modeTouch");
+
+    if (btnMouse) btnMouse.classList.toggle('active', !isTouchMode);
+    if (btnTouch) btnTouch.classList.toggle('active', isTouchMode);
+}
+
+/**
+ * applyMode() 套用當前模式，不翻轉
+ */
+function applyMode() {
     const lang = localStorage.getItem('lang') || 'chinese';
     const modeBtn = document.getElementById("modeToggleBtn");
     const nightGuide = document.getElementById("nightGuide");
     const mapGuide = document.getElementById("mapGuide");
     const infoMsg = document.getElementById("infoMsg");
 
-    if (isTouchMode) {
-        // 觸控模式
-        modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
-        nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Tap icons or names to select BOSS</p>" +
-              "<p>&gt;Tap again to deselect</p>" +
-              "<p>&gt;Tap other BOSS to multi-select</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-              "<p>&gt;再次點擊取消選擇</p>" +
-              "<p>&gt;點擊其他夜王多選</p>";
-        mapGuide.textContent = (lang === 'english')
-            ? "Tap to place Church / tap again to switch to Wizard Tower"
-            : "點擊放置教堂/再次點擊切換法師塔";
-        infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
+    const touch = isTouchMode;
+
+    // 控制觸控圖示顯示
+    const touchIcons = [
+        document.getElementById("觸控模式拖動框"),
+        document.getElementById("觸控模式拖動框教堂"),
+        document.getElementById("觸控模式拖動框法師塔")
+    ];
+    touchIcons.forEach(el => {
+        if (el) el.style.display = touch ? "block" : "none";
+    });
+
+    if (touch) {
+        if (modeBtn) modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
+        if (nightGuide) nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Tap icons or names to select BOSS</p><p>&gt;Tap again to deselect</p><p>&gt;Tap other BOSS to multi-select</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;再次點擊取消選擇</p><p>&gt;點擊其他夜王多選</p>";
+        if (mapGuide) mapGuide.textContent = (lang === 'english')
+            ? "Drag icons from left to place / Tap to place Church, tap again to switch to Wizard Tower"
+            : "拖動左側圖標放置/或點擊放置教堂，再次點擊切換法師塔";
+        if (infoMsg) infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
+
+        // 啟用拖動
+        if (typeof enableTouchDrag === "function") enableTouchDrag();
+
     } else {
-        // 鍵鼠模式
-        modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
-        nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Click icons or names to select BOSS</p>" +
-              "<p>&gt;Hold Ctrl to multi-select or deselect</p>" +
-              "<p>&gt;Hold Ctrl+Shift to select all</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p>" +
-              "<p>&gt;按住Ctrl並點擊多選或取消選擇</p>" +
-              "<p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
-        mapGuide.textContent = (lang === 'english')
+        if (modeBtn) modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
+        if (nightGuide) nightGuide.innerHTML = (lang === 'english')
+            ? "<p>&gt;Click icons or names to select BOSS</p><p>&gt;Hold Ctrl to multi-select or deselect</p><p>&gt;Hold Ctrl+Shift to select all</p>"
+            : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;按住Ctrl並點擊多選或取消選擇</p><p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
+        if (mapGuide) mapGuide.textContent = (lang === 'english')
             ? "Left click: Place Church / Right click: Place Wizard Tower"
             : "左鍵放置教堂/右鍵放置法師塔";
-        infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
+        if (infoMsg) infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
     }
 }
 
@@ -4454,13 +4626,13 @@ function updateIconVisual(i){
    --------------------------- */
 function toggleIcon(i, button) {
   if (isTouchMode) {
-    // 🔹觸控模式：單點交替切換
+    // 觸控模式：單點交替切換
     const current = getCurrentIconState(i);
     if (current === null) setCurrentIconState(i, '教堂');
     else if (current === '教堂') setCurrentIconState(i, '法師塔');
     else setCurrentIconState(i, null);
   } else {
-    // 🔹鍵鼠模式：左鍵教堂、右鍵法師塔
+    // 鍵鼠模式：左鍵教堂、右鍵法師塔
     if (button === 0) setCurrentIconState(i, '教堂');
     else if (button === 2) setCurrentIconState(i, '法師塔');
     else return;
