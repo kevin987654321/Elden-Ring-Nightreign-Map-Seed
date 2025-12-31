@@ -13,82 +13,226 @@ body {
     font-family: "標楷體", Arial, sans-serif;
 }
 	
+/* =========================================
+   設定懸浮按鈕特效 (修正: 動畫排他性)
+   ========================================= */
 #floatingBtn {
   position: fixed;
-  cursor: grab;
+  cursor: pointer;
   z-index: 9999;
-  touch-action: none; /*防止拖曳時頁面跟著滑動 */
+  touch-action: none;
+  transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.3s;
 }
 
-/* 全域禁止圖片被長按、拖動或右鍵另存 */
+/* Hover: 放大並旋轉 */
+#floatingBtn:hover {
+  transform: scale(1.15) rotate(90deg);
+  filter: brightness(1.2);
+}
+
+/* 1. 點擊動畫 (順時針下壓) */
+.gear-clicked {
+  animation: gear-press 0.4s ease-out forwards !important;
+}
+@keyframes gear-press {
+  0% { transform: scale(1.15) rotate(90deg); }
+  40% { transform: scale(0.75) rotate(45deg); } 
+  80% { transform: scale(1.25) rotate(100deg); }
+  100% { transform: scale(1.15) rotate(90deg); }
+}
+
+/* 2. 反向關閉動畫 (逆時針歸位) */
+.gear-reverse-anim {
+  animation: gear-reverse 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+}
+@keyframes gear-reverse {
+  0% { transform: scale(1.15) rotate(90deg); } 
+  40% { transform: scale(0.9) rotate(-20deg); } 
+  100% { transform: scale(1) rotate(0deg); }    
+}
+
+/* 3. 進場動畫 */
+.btn-enter {
+  animation: gear-enter 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+@keyframes gear-enter {
+  0% { transform: scale(0) rotate(-180deg); opacity: 0; }
+  100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
 img {
-  -webkit-user-drag: none;       /* 禁止拖動圖片（Safari、Chrome） */
-  -webkit-touch-callout: none;   /* 禁止 iOS 長按圖片選單 */
-  user-select: none;             /* 禁止選取圖片 */
-  pointer-events: auto;          /* 保持可點擊（不會影響 onclick） */
+  -webkit-user-drag: none;
+  -webkit-touch-callout: none;
+  user-select: none;
+  pointer-events: auto;
 }
+img::selection { background: transparent; }
 
-img::selection {
-  background: transparent; /* 禁止被選取時的藍色高亮 */
-}
-
-	
+/* 黑夜按鈕 */
 .黑夜 {
   color: #808080;
   text-align: center;
   background-color: #202020;
   cursor: pointer;
-  padding: 6px;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   user-select: none;
-  transition: filter 0.2s, background-color 0.2s;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, color 0.3s ease;
+  transform-origin: center center;
 }
 
-/* 滑過時微亮，但只有「未被選中」的才有效 */
-.黑夜:not(.selected):hover {
-  filter: brightness(1.2);
+.黑夜:not(.selected):hover,
+.黑夜.hover-linked:not(.selected) {
+  background-color: #2a2a2a; 
+  color: #bbb;
+  z-index: 5;
+  animation: jelly-micro-float 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
 }
 
-/* 被選中狀態 */
 .黑夜.selected {
-  background-color: #404040;
+  background-color: #505050;
   color: #fff;
-  filter: none; /* 不受 hover 影響 */
+  filter: none;
+  animation: jelly-pop 0.6s ease-in-out;
+  box-shadow: 0 0 5px rgba(0,0,0,0.5);
+  z-index: 10;
+}
+
+img[id$="_icon"] {
+  transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), filter 0.3s;
+}
+img[id$="_icon"]:hover,
+img[id$="_icon"].hover-linked {
+  transform: scale(1.15);
+  filter: brightness(1.2);
+  z-index: 5;
 }
 
 .名字 {
     color: #606060;
-    writing-mode: vertical-lr; /* 直式從左到右 */
+    writing-mode: vertical-lr;
     text-orientation: upright;
     background-color: #252525;
     border-radius: 4px; 
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1), background-color 0.4s;
+    transform-origin: center center;
+    cursor: default;
+}
+.名字:hover {
+  transform: rotate(5deg) scale(1.1);
+  background-color: #353535;
+  color: #ccc;
+  box-shadow: 2px 2px 5px rgba(0,0,0,0.2);
 }
 
+/* 父容器 */
+#mapWrapper { 
+    position: relative; 
+    width: 400px; 
+    height: 400px; 
+    margin: 0 auto;
+    overflow: visible !important;
+    z-index: 1;
+    transition: transform 0.5s ease;
+}
 
-#mapWrapper { position: relative; width: 400px; height: 400px; margin: 0 auto; }
-#大地圖 { width:100%; height:100%; display:block; }
+/* 大地圖微呼吸 */
+#mapWrapper:hover {
+    transform: translateY(-5px);
+}
+#mapWrapper:hover .icon,
+#mapWrapper:hover #大地圖 {
+    filter: brightness(1.08);
+}
+
+#大地圖 { 
+  width:100%; height:100%; display:block; 
+  opacity: 1;
+  transition: opacity 0.3s ease-in-out, filter 0.5s ease;
+}
+#大地圖.fading-out { opacity: 0.3; filter: blur(2px); }
+
+/* 群體呼吸動畫 */
+@keyframes soft-breathe {
+    0%, 100% { transform: scale(1); filter: brightness(1); }
+    50% { transform: scale(1.05); filter: brightness(1.15); }
+}
+
+/* 圖標樣式 */
 .icon {
     position: absolute;
     width: 30px; height: 30px;
     cursor: pointer;
     user-select: none;
+    transition: filter 0.2s;
+    transform-origin: bottom center;
 }
-.觸控模式拖動框 {
+
+/* 群體呼吸 */
+#mapWrapper:hover .icon:not(:hover):not(.pop-effect) {
+    animation: soft-breathe 2.5s infinite ease-in-out;
+}
+
+/* 單個圖標 Hover */
+.icon:hover {
+    filter: brightness(1.4) drop-shadow(0 0 3px rgba(255,255,255,0.5)) !important;
+    z-index: 20;
+}
+
+/* 西洋棋落子動畫 */
+.icon.pop-effect {
+    animation: chess-impact 0.6s forwards !important; 
+    filter: brightness(1.1); 
+    z-index: 50;
+}
+
+@keyframes chess-impact {
+  0% { opacity: 0; transform: translateY(-60px) scale(1); animation-timing-function: ease-in; }
+  40% { opacity: 1; transform: translateY(0) scale(1); }
+  50% { transform: translateY(2px) scale(1.3, 0.7); animation-timing-function: ease-out; }
+  65% { transform: translateY(-4px) scale(0.9, 1.1); }
+  80% { transform: translateY(0) scale(1.05, 0.95); }
+  100% { transform: translateY(0) scale(1); }
+}
+
+/* 觸控拖動框 */
+.觸控模式拖動框 { 
+    width: 40px; height: 100px; 
     position: absolute;
-    width: 40px; height: 100px;
     cursor: pointer;
     user-select: none;
+    z-index: 100 !important;
+    display: none; 
 }
-.觸控模式拖動框圖標 {
+.觸控模式拖動框圖標 { 
+    width: 30px; height: 30px; 
     position: absolute;
-    width: 30px; height: 30px;
     cursor: pointer;
     user-select: none;
+    z-index: 101;
+    transition: transform 0.3s ease;
+}
+.觸控模式拖動框圖標:hover {
+    transform: scale(1.2);
+}
+
+.pop-enter {
+    animation: drag-pop-in 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+    display: block;
+}
+@keyframes drag-pop-in {
+    0% { transform: scale(0) translateX(-20px); opacity: 0; }
+    100% { transform: scale(1) translateX(0); opacity: 1; }
 }
 
 button.small { padding:4px 8px; margin:3px; }
 .controls { text-align:center; margin:10px 0; color:#ddd; }
 
-/* 外觀按鈕樣式 */
+/* 按鈕樣式 */
 .styleBtn {
   background-color: #303030;
   color: #ddd;
@@ -97,72 +241,31 @@ button.small { padding:4px 8px; margin:3px; }
   padding: 6px 12px;
   margin: 0 4px;
   cursor: pointer;
-  transition: 0.2s;
+  transition: background-color 0.2s, transform 0.2s;
+  transform-origin: center;
 }
-.styleBtn:hover { background-color: #404040; }
+.styleBtn:hover { background-color: #404040; transform: translateY(-2px); animation: jelly-micro-float 0.5s; }
 .styleBtn.active { background-color: #606060; color: white; }
+.styleBtn.anim-click { animation: jelly-pop 0.5s ease-in-out; }
 
-/* 方形樣式 */
+/* 圓角 */
+.roundStyle { overflow: hidden; }
+.roundStyle.no-clip { overflow: visible !important; }
+
 .square td, .square .名字, .square .icon, .square #mapWrapper img, .square #縮圖1,
-.square #縮圖2, .square #縮圖3, .square #縮圖4 {
+.square #縮圖2, .square #縮圖3, .square #縮圖4, .square #縮圖5 {
   border-radius: 0 !important;
 }
 
-/* 圓形樣式 */
-/* 圓角模式 */
-
-/* 四角圓角 */
-.roundStyle .full {
-  border-radius: 12px;
-}
-
-/* 上方兩角圓角 */
-.roundStyle .top {
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-}
-
-/* 左下角圓角 */
-.roundStyle .bottom-left {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 12px;
-  border-bottom-right-radius: 0;
-}
-
-/* 右下角圓角 */
-.roundStyle .bottom-right {
-  border-top-left-radius: 0;
-  border-top-right-radius: 0;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 12px;
-}
-
-/* 中間格子小圓角或保持原狀 */
-.roundStyle .middle {
-  border-radius: 4px;
-}
-
-/* 圖標區塊 */
-.roundStyle .icon {
-  border-top-left-radius: 12px;
-  border-top-right-radius: 12px;
-  border-bottom-left-radius: 4px;
-  border-bottom-right-radius: 4px;
-}
+.roundStyle .full { border-radius: 12px; }
+.roundStyle .top { border-top-left-radius: 12px; border-top-right-radius: 12px; }
+.roundStyle .bottom-left { border-bottom-left-radius: 12px; }
+.roundStyle .bottom-right { border-bottom-right-radius: 12px; }
+.roundStyle .middle { border-radius: 4px; }
+.roundStyle .icon { border-radius: 12px 12px 4px 4px; }
 	
-/* 預設字體大小 */
-body {
-  font-size: 14px;
-}
-
-/* 英文模式字體縮小 2px */
-body.lang-en {
-  font-size: 11px;
-}
-
+body { font-size: 14px; }
+body.lang-en { font-size: 11px; }
 
 #failMsg {
     color: #ff6666;
@@ -170,14 +273,71 @@ body.lang-en {
     font-weight: bold;
     display: none;
     margin-top: -389px;
+    animation: shake-up 0.5s ease-out;
 }
+@keyframes shake-up {
+  0% { opacity: 0; transform: translateY(10px); }
+  20% { opacity: 1; transform: translateY(-5px); }
+  40% { transform: translateY(5px); }
+  60% { transform: translateY(-2px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+
 #infoMsg {
     color: #ddd;
     text-align:center;
     margin-top: 10px;
 }
-button.small { padding:4px 8px; margin:3px; }
-.controls { text-align:center; margin:10px 0; color:#ddd; }
+
+#clearIconsBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+/* 動畫特效 */
+.vertical-only-anim {
+  transition: background-color 0.4s ease, box-shadow 0.4s ease;
+  transform-origin: bottom center;
+}
+.vertical-only-anim:hover {
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.05) inset;
+  z-index: 5;
+  animation: jelly-stretch-up 0.6s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+@keyframes jelly-stretch-up {
+  0% { transform: scaleY(1); } 30% { transform: scaleY(1.15); } 60% { transform: scaleY(1.08); } 100% { transform: scaleY(1.12); }
+}
+.vertical-only-anim:active { transform: scaleY(0.95); transition: transform 0.1s; }
+
+@keyframes jelly-micro-float {
+  0% { transform: scale(1, 1) translateY(0); } 30% { transform: scale(1.05, 0.95) translateY(-4px); } 60% { transform: scale(0.98, 1.02) translateY(-3px); } 100% { transform: scale(1, 1) translateY(-3px); }
+}
+@keyframes jelly-pop {
+  0% { transform: scale(1, 1); } 30% { transform: scale(1.25, 0.75); } 40% { transform: scale(0.75, 1.25); } 50% { transform: scale(1.15, 0.85); } 65% { transform: scale(0.95, 1.05); } 100% { transform: scale(1, 1); }
+}
+
+td.roundStyle.full {
+  transition: transform 0.4s, background-color 0.4s, box-shadow 0.4s;
+  transform-origin: center center;
+}
+td.roundStyle.full:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 20px rgba(0,0,0,0.6);
+  z-index: 5;
+  background-color: #252525 !important;
+  animation: jelly-micro-float 0.8s cubic-bezier(0.25, 1, 0.5, 1) forwards;
+}
+td.roundStyle.full:hover * { color: #bbb; }
+
+#modalWindow, #announcementWindow { animation: modal-zoom-in 0.3s; }
+@keyframes modal-zoom-in { 0% { transform: translate(-50%,-50%) scale(0.8); opacity:0; } 100% { transform: translate(-50%,-50%) scale(1); opacity:1; } }
+#modalOverlay, #announcementOverlay { animation: fade-in 0.3s; }
+@keyframes fade-in { from { opacity: 0; } to { opacity: 1; } }
+
 </style>
 </head>
 
@@ -185,12 +345,33 @@ button.small { padding:4px 8px; margin:3px; }
 document.addEventListener("DOMContentLoaded", () => {
     const styleSquareBtn = document.getElementById("styleSquare");
     const styleRoundBtn = document.getElementById("styleRound");
+    
+    // Hover 連動
+    const nights = document.querySelectorAll('.黑夜');
+    nights.forEach(textDiv => {
+      const id = textDiv.id;
+      const iconImg = document.getElementById(id + '_icon');
+      if(iconImg) {
+        textDiv.addEventListener('mouseenter', () => iconImg.classList.add('hover-linked'));
+        textDiv.addEventListener('mouseleave', () => iconImg.classList.remove('hover-linked'));
+        iconImg.addEventListener('mouseenter', () => textDiv.classList.add('hover-linked'));
+        iconImg.addEventListener('mouseleave', () => textDiv.classList.remove('hover-linked'));
+      }
+    });
+
+    function addClickAnim(btn) {
+        btn.classList.remove('anim-click');
+        void btn.offsetWidth; 
+        btn.classList.add('anim-click');
+    }
 
     styleSquareBtn.addEventListener("click", () => {
         document.body.classList.add("square");
         document.body.classList.remove("roundStyle");
         styleSquareBtn.classList.add("active");
         styleRoundBtn.classList.remove("active");
+        addClickAnim(styleSquareBtn);
+        localStorage.setItem('style', 'square');
     });
 
     styleRoundBtn.addEventListener("click", () => {
@@ -198,12 +379,12 @@ document.addEventListener("DOMContentLoaded", () => {
         document.body.classList.remove("square");
         styleRoundBtn.classList.add("active");
         styleSquareBtn.classList.remove("active");
+        addClickAnim(styleRoundBtn);
+        localStorage.setItem('style', 'round');
     });
 });
-
 </script>
 
-	
 <body>
 <table width="1152" align="center">
   <tbody>
@@ -212,7 +393,7 @@ document.addEventListener("DOMContentLoaded", () => {
           class="roundStyle full" 
           style="color: #303030; font-size: 11px; border-right-width: 0px;">
         <p><img src="logo.png" width="192" height="50" alt=""/></p>
-        <div id="nightGuide">
+        <div id="nightGuide" style="transition: color 0.6s ease;">
           <p>&gt;點擊圖標或文字選擇夜王</p>
           <p>&gt;按住Ctrl並點擊多選或取消選擇</p>
           <p>&gt;按住Ctrl+Shift並任意點擊全選</p>
@@ -229,6 +410,7 @@ document.addEventListener("DOMContentLoaded", () => {
         <p><strong data-key="主要">主要:</strong></p>
         <p><strong data-key="樓頂">樓頂:</strong></p>
       </td>
+
 
       <td width="148" height="60" align="center" valign="top" bgcolor="#191919" 
           class="roundStyle full" 
@@ -249,99 +431,61 @@ document.addEventListener("DOMContentLoaded", () => {
 
     <tr>
       <td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" 
-          class="roundStyle top" 
-          style="color: #666666">
-        <a href="index.html" style="color:#666666; text-decoration:none;">重置頁面</a>
+          class="roundStyle top vertical-only-anim" 
+          style="color: #666666; cursor: pointer;" onclick="location.href='index.html'">
+        <a href="index.html" style="color:#666666; text-decoration:none; display:flex; width:100%; height:100%; align-items:center; justify-content:center;">重置頁面</a>
       </td>
       
       <td width="3" align="center" valign="middle">&nbsp;</td>
 
       <td height="14" colspan="3" align="center" valign="middle" bgcolor="#202020" 
-          class="roundStyle top small" 
+          class="roundStyle top small vertical-only-anim" 
           style="color: #666666">
-        <span id="clearIconsBtn" class="clickable-text">清除所有圖標狀態</span>
+        <span id="clearIconsBtn">清除所有圖標狀態</span>
       </td>
-
-<style>
-.clickable-text {
-    cursor: pointer;       /* 滑鼠變手指 */
-    user-select: none;     /* 禁止選取文字 */
-    color: #666666;        /* 文字顏色固定 */
-    text-decoration: none; /* 無底線 */
-}
-
-.clickable-text:hover {
-
-}
-	
-.styleBtn {
-  background-color: #303030;
-  color: #ddd;
-  border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  margin: 0 4px;
-  cursor: pointer;
-  transition: 0.2s;
-}
-
-.styleBtn:hover {
-  background-color: #404040;
-}
-
-.styleBtn.active {
-  background-color: #606060;
-  color: white;
-}
-
-</style>
 
       <td width="4" height="30" rowspan="2" align="center" valign="middle">&nbsp;</td>
 
 	  <td id="mapGuide" height="30" colspan="3" rowspan="2" align="center" valign="middle" 
- 	     class="roundStyle top" bgcolor="#202020" style="color: #444444">
+ 	     class="roundStyle top vertical-only-anim" bgcolor="#202020" style="color: #444444; cursor:default;">
   	     左鍵放置教堂/右鍵放置法師塔
 	  </td>
 
 	  <td id="modeToggleBtn" height="30" rowspan="2" align="center" valign="middle" 
-  	    class="roundStyle top" bgcolor="#202020" style="color: #666666; cursor:pointer;">
+  	    class="roundStyle top vertical-only-anim" bgcolor="#202020" style="color: #666666; cursor:pointer;">
   	    切換為觸控模式
 	  </td>
 
     </tr>
     <tr>
 
-    <!-- 黑夜種類 + 圖標區 -->
     <tr>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜野獸" data-zh="黑夜野獸" data-en="Beast of Night"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜野獸圖標.png" id="黑夜野獸_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜野獸圖標.png" id="黑夜野獸_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
 
-      <td width="16" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格拉狄烏斯" data-en="GLADIUS">格拉狄烏斯</td>
-      <td width="3" align="center" valign="middle">&nbsp;</td>
+      <td width="16" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格拉狄烏斯" data-en="GLADIUS">格拉狄烏斯</td>
+      <td width="3" height="80" align="center" valign="middle">&nbsp;</td>
 
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜之魔" data-zh="黑夜之魔" data-en="Creature of Night"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜之魔圖標.png" id="黑夜之魔_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜之魔圖標.png" id="黑夜之魔_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
 
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="利普拉" data-en="LIBRA">利普拉</td>
+      <td width="15" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="利普拉" data-en="LIBRA">利普拉</td>
 
-      <td width="4" align="center" valign="middle">&nbsp;</td>
+      <td width="4" height="80" align="center" valign="middle">&nbsp;</td>
 
-      <!-- 地圖區（大地圖 + 11 個可點圖標） -->
-      <td colspan="3" rowspan="4" align="center" valign="middle" bgcolor="#252525" class="roundStyle bottom-left">
+      <td colspan="3" rowspan="5" align="center" valign="middle" bgcolor="#252525" class="roundStyle bottom-left no-clip">
   <div id="mapWrapper" class="roundStyle bottom-left">
-    <!-- 大地圖（預設普通地形） -->
     <img src="普通地形.png" id="大地圖" class="roundStyle bottom-left" alt="大地圖">
 
-          <!-- 45 個圖標位置 -->
-		  <img id="普通地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
+          <img id="普通地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
           <img id="普通地形圖標位置2" class="icon" src="圖標位置.png" style="top:129px; left:68px;">
           <img id="普通地形圖標位置3" class="icon" src="圖標位置.png" style="top:147px; left:132px;">
           <img id="普通地形圖標位置4" class="icon" src="圖標位置.png" style="top:132px; left:286px;">
@@ -352,6 +496,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="普通地形圖標位置9" class="icon" src="圖標位置.png" style="top:292px; left:58px;">
           <img id="普通地形圖標位置10" class="icon" src="圖標位置.png" style="top:285px; left:176px;">
           <img id="普通地形圖標位置11" class="icon" src="圖標位置.png" style="top:332px; left:228px;">
+		  
 		  <img id="山頂地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
           <img id="山頂地形圖標位置2" class="icon" src="圖標位置.png" style="top:132px; left:286px;">
           <img id="山頂地形圖標位置3" class="icon" src="圖標位置.png" style="top:129px; left:326px;">
@@ -361,6 +506,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="山頂地形圖標位置7" class="icon" src="圖標位置.png" style="top:292px; left:58px;">
           <img id="山頂地形圖標位置8" class="icon" src="圖標位置.png" style="top:285px; left:176px;">
           <img id="山頂地形圖標位置9" class="icon" src="圖標位置.png" style="top:332px; left:228px;">
+		  
 		  <img id="火山地形圖標位置1" class="icon" src="圖標位置.png" style="top:129px; left:68px;">
           <img id="火山地形圖標位置2" class="icon" src="圖標位置.png" style="top:132px; left:286px;">
           <img id="火山地形圖標位置3" class="icon" src="圖標位置.png" style="top:129px; left:326px;">
@@ -370,6 +516,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="火山地形圖標位置7" class="icon" src="圖標位置.png" style="top:292px; left:58px;">
           <img id="火山地形圖標位置8" class="icon" src="圖標位置.png" style="top:285px; left:176px;">
           <img id="火山地形圖標位置9" class="icon" src="圖標位置.png" style="top:332px; left:228px;">
+		  
 		  <img id="腐敗地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
           <img id="腐敗地形圖標位置2" class="icon" src="圖標位置.png" style="top:129px; left:68px;">
           <img id="腐敗地形圖標位置3" class="icon" src="圖標位置.png" style="top:147px; left:132px;">
@@ -378,6 +525,7 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="腐敗地形圖標位置6" class="icon" src="圖標位置.png" style="top:221px; left:61px;">
           <img id="腐敗地形圖標位置7" class="icon" src="圖標位置.png" style="top:292px; left:58px;">
           <img id="腐敗地形圖標位置8" class="icon" src="圖標位置.png" style="top:285px; left:176px;">
+		  
 		  <img id="隱城地形圖標位置1" class="icon" src="圖標位置.png" style="top:66px; left:213px;">
           <img id="隱城地形圖標位置2" class="icon" src="圖標位置.png" style="top:129px; left:68px;">
           <img id="隱城地形圖標位置3" class="icon" src="圖標位置.png" style="top:147px; left:132px;">
@@ -386,8 +534,19 @@ document.addEventListener("DOMContentLoaded", () => {
           <img id="隱城地形圖標位置6" class="icon" src="圖標位置.png" style="top:258px; left:219px;">
           <img id="隱城地形圖標位置7" class="icon" src="圖標位置.png" style="top:233px; left:338px;">
           <img id="隱城地形圖標位置8" class="icon" src="圖標位置.png" style="top:332px; left:228px;">
+
+          <img id="大空洞圖標位置1" class="icon" src="圖標位置.png" style="display:none; top:66px; left:213px;">
+          <img id="大空洞圖標位置2" class="icon" src="圖標位置.png" style="display:none; top:129px; left:68px;">
+          <img id="大空洞圖標位置3" class="icon" src="圖標位置.png" style="display:none; top:147px; left:132px;">
+          <img id="大空洞圖標位置4" class="icon" src="圖標位置.png" style="display:none; top:132px; left:286px;">
+          <img id="大空洞圖標位置5" class="icon" src="圖標位置.png" style="display:none; top:129px; left:326px;">
+          <img id="大空洞圖標位置6" class="icon" src="圖標位置.png" style="display:none; top:221px; left:61px;">
+          <img id="大空洞圖標位置7" class="icon" src="圖標位置.png" style="display:none; top:258px; left:219px;">
+          <img id="大空洞圖標位置8" class="icon" src="圖標位置.png" style="display:none; top:233px; left:338px;">
+          <img id="大空洞圖標位置9" class="icon" src="圖標位置.png" style="display:none; top:292px; left:58px;">
+          <img id="大空洞圖標位置10" class="icon" src="圖標位置.png" style="display:none; top:285px; left:176px;">
+          <img id="大空洞圖標位置11" class="icon" src="圖標位置.png" style="display:none; top:332px; left:228px;">
 	  
-		  <!-- 觸控模式拖動 UI -->
 		  <img id="觸控模式拖動框" class="觸控模式拖動框" src="觸控模式拖動框.png" style="display:none; top:0px; left:-15px;">
 		  <img id="觸控模式拖動框教堂" class="觸控模式拖動框圖標" src="教堂圖標.png" style="display:none; position:absolute; top:10px; left:-10px;">
 		  <img id="觸控模式拖動框法師塔" class="觸控模式拖動框圖標" src="法師塔圖標.png" style="display:none; position:absolute; top:55px; left:-10px;">
@@ -397,95 +556,112 @@ document.addEventListener("DOMContentLoaded", () => {
         <div id="failMsg">篩選失敗 — 沒有符合的種子。</div>
         <div id="infoMsg">請先選擇地形，再放置圖標、選擇目標王。</div>
       </td>
-
-      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
-    <img src="山頂地形.png" width="100" height="100" id="縮圖1" style="cursor:pointer;" onclick="switchTerrain('山頂地形')">
-  </td>
+      
+      <td width="142" height="80" align="center" valign="middle" bgcolor="#282828" class="vertical-only-anim">
+         <img src="山頂地形.png" width="80" height="80" id="縮圖1" style="cursor:pointer;" onclick="switchTerrain('山頂地形')">
+      </td>
 </tr>
 
     <tr>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜之爵" data-zh="黑夜之爵" data-en="Baron of Night"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜之爵圖標.png" id="黑夜之爵_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜之爵圖標.png" id="黑夜之爵_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="艾德雷" data-en="ADEL">艾德雷</td>
-      <td width="3" align="center" valign="middle">&nbsp;</td>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="16" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="艾德雷" data-en="ADEL">艾德雷</td>
+      <td width="3" height="80" align="center" valign="middle">&nbsp;</td>
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜光騎士" data-zh="黑夜光騎士" data-en="Champion of Nightglow"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜光騎士圖標.png" id="黑夜光騎士_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜光騎士圖標.png" id="黑夜光騎士_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="弗格爾" data-en="FULGHOR">弗格爾</td>
-      <td width="4" align="center" valign="middle">&nbsp;</td>
-      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
-    <img src="火山地形.png" id="縮圖2" width="100" height="100" style="cursor:pointer;" onclick="switchTerrain('火山地形')">
-  </td>
+      <td width="15" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="弗格爾" data-en="FULGHOR">弗格爾</td>
+      <td width="4" height="80" align="center" valign="middle">&nbsp;</td>
+      <td width="142" height="80" align="center" valign="middle" bgcolor="#282828" class="vertical-only-anim">
+        <img src="火山地形.png" id="縮圖2" width="80" height="80" style="cursor:pointer;" onclick="switchTerrain('火山地形')">
+      </td>
 </tr>
 
     <tr>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜之智" data-zh="黑夜之智" data-en="Wisdom of Night"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜之智圖標.png" id="黑夜之智_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜之智圖標.png" id="黑夜之智_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
 
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格諾斯塔" data-en="GNOSTER">格諾斯塔</td>
-      <td width="3" align="center" valign="middle">&nbsp;</td>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020">
+      <td width="16" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="格諾斯塔" data-en="GNOSTER">格諾斯塔</td>
+      <td width="3" height="80" align="center" valign="middle">&nbsp;</td>
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜霧霾" data-zh="黑夜霧霾" data-en="Miasma of Night"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜霧霾圖標.png" id="黑夜霧霾_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜霧霾圖標.png" id="黑夜霧霾_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="卡莉果" data-en="CALIGO">卡莉果</td>
-      <td width="4" align="center" valign="middle">&nbsp;</td>
-      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828">
-    <img src="腐敗地形.png" id="縮圖3" width="100" height="100" style="cursor:pointer;" onclick="switchTerrain('腐敗地形')">
-  </td>
+      <td width="15" height="80" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="卡莉果" data-en="CALIGO">卡莉果</td>
+      <td width="4" height="80" align="center" valign="middle">&nbsp;</td>
+      <td width="142" height="80" align="center" valign="middle" bgcolor="#282828" class="vertical-only-anim">
+        <img src="腐敗地形.png" id="縮圖3" width="80" height="80" style="cursor:pointer;" onclick="switchTerrain('腐敗地形')">
+      </td>
 </tr>
 
     <tr>
-	  <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
+
+	  <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
   	 	 <div class="黑夜" id="深海黑夜" data-zh="深海黑夜" data-en="Fathom of Night"></div>
 	  </td>
 
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="深海黑夜圖標.png" id="深海黑夜_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="39" align="center" valign="middle" bgcolor="#282828">
+        <img src="深海黑夜圖標.png" id="深海黑夜_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
-      <td width="16" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="瑪利斯" data-en="MARIS">瑪利斯</td>
-      <td width="3" align="center" valign="middle">&nbsp;</td>
-      <td width="144" height="100" align="center" valign="middle" bgcolor="#202020" class="roundStyle bottom-left">
+      <td width="16" height="-2" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="瑪利斯" data-en="MARIS">瑪利斯</td>
+      <td width="3" height="80" rowspan="2" align="center" valign="middle">&nbsp;</td>
+      <td width="144" height="0" align="center" valign="middle" bgcolor="#202020">
         <div class="黑夜" id="黑夜王" data-zh="黑夜王" data-en="Lord of Nightlord"></div>
       </td>
-      <td width="102" height="100" align="center" valign="middle" bgcolor="#282828">
-        <img src="黑夜王圖標.png" id="黑夜王_icon" style="width:100px;height:100px;cursor:pointer;">
+      <td width="102" height="-2" align="center" valign="middle" bgcolor="#282828">
+        <img src="黑夜王圖標.png" id="黑夜王_icon" style="width:80px;height:80px;cursor:pointer;">
       </td>
-      <td width="15" height="100" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="布德奇冥" data-en="HEOLSTOR">布德奇冥</td>
-      <td width="4" align="center" valign="middle">&nbsp;</td>
-      <td width="142" height="100" align="center" valign="middle" bgcolor="#282828" class="roundStyle bottom-right">
-    <img src="隱城地形.png" id="縮圖4" width="100" height="100" class="roundStyle bottom-right" style="cursor:pointer;" onclick="switchTerrain('隱城地形')">
-  </td>
-
+      <td width="15" height="-2" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="布德奇冥" data-en="HEOLSTOR">布德奇冥</td>
+      <td width="4" height="80" rowspan="2" align="center" valign="middle">&nbsp;</td>
+      <td width="142" height="-2" align="center" valign="middle" bgcolor="#282828" class="vertical-only-anim">
+        <img src="隱城地形.png" id="縮圖4" width="80" height="80" class="roundStyle bottom-right" style="cursor:pointer;" onclick="switchTerrain('隱城地形')">
+      </td>
 </tr>
+    <tr>
+	  <td width="144" height="0" align="center" valign="middle" class="roundStyle bottom-left" bgcolor="#202020">
+        <div class="黑夜" id="安定者們" data-zh="安定者們" data-en="Balancers"></div>
+	  </td>
+      <td width="102" height="80" align="center" valign="middle" bgcolor="#282828">
+        <img src="安定者們圖標.png" id="安定者們_icon" style="width:80px;height:80px;cursor:pointer;">
+      </td>
+      <td width="16" height="-2" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="哈爾莫妮亞" data-en="HARMONIA">哈爾莫妮亞</td>
+		
+	  <td width="144" height="0" align="center" valign="middle" class="roundStyle bottom-left" bgcolor="#202020">
+        <div class="黑夜" id="廢棄物之王" data-zh="廢棄物之王" data-en="Dreglord"></div>
+	  </td>
+		
+      <td width="102" height="-2" align="center" valign="middle" bgcolor="#282828">
+        <img src="廢棄物之王圖標.png" id="廢棄物之王_icon" style="width:80px;height:80px;cursor:pointer;">
+      </td>
+      <td width="15" height="-2" align="center" valign="middle" bgcolor="#252525" class="名字" data-zh="史柴格斯" data-en="STRAGHESS">史柴格斯</td>
+      <td width="142" height="-2" align="center" valign="middle" bgcolor="#282828" class="roundStyle bottom-right vertical-only-anim">
+        <img src="大空洞.png" id="縮圖5" width="80" height="80" class="roundStyle bottom-right" style="cursor:pointer;" onclick="switchTerrain('大空洞')">
+      </td>
+    </tr>
 
 	  
-<!-- 漂浮按鈕 -->
 <img src="設定.png" id="floatingBtn"
-     style="position: fixed; bottom: 72%; right: 3%; width: 60px; height:60px; cursor: grab; z-index:1000;">
+     style="position: fixed; bottom: 72%; right: 3%; width: 60px; height:60px; cursor: pointer; z-index:1000;">
 
-<!-- 遮罩背景 -->
 <div id="modalOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:900;"></div>
 
-<!-- 模態視窗 -->
 <div id="modalWindow" style="display:none; position:fixed; width:80%; max-width:600px; height:80%; max-height:400px; top:50%; left:50%; transform:translate(-50%,-50%); background:#202020; color:#ddd; padding:20px; border-radius:12px; z-index:1001; overflow:auto;">
   <h2>設定</h2>
 
-  <!-- 設定 -->
-<div style="margin-bottom: 20px;">
+  <div style="margin-bottom: 20px;">
   <span style="margin-right: 10px;">外觀：</span>
   <button id="styleSquare" class="styleBtn active">方</button>
   <button id="styleRound" class="styleBtn">圓</button>
@@ -504,11 +680,17 @@ document.addEventListener("DOMContentLoaded", () => {
 </div>
 
 
-<!-- 更新日誌區塊 -->
 <div id="changelog" style="background-color:#1a1a1a; color:#ccc; padding:10px; margin-top:10px; border-radius:8px; font-size:13px;">
   <strong id="changelogTitle">更新日誌</strong>
   <ul id="changelogList" style="margin:5px 0 0 15px; padding:0; list-style: disc;">
-    <li data-zh="最後更新日期2025/10/28" data-en="Last updated: 2025/10/28">最後更新日期2025/10/28</li>
+    <li data-zh="最後更新日期2026/01/01" data-en="Last updated: 2026/01/01">最後更新日期2026/01/01</li>
+    <li style="list-style:none;">&nbsp;</li>
+    <li data-zh="[2026/01/01]"> [2026/01/01]</li>
+    <li data-zh="&nbsp;&gt;添加了DLC的內容(無相關資料因此暫不可用)" data-en="&nbsp;&gt;Visual Polish: Rewrote jelly physics for smoother feel">&nbsp;&gt;添加了DLC的內容(無相關資料因此暫不可用)</li>
+    <li data-zh="&nbsp;&gt;視覺優化：果凍按鍵動畫" data-en="&nbsp;&gt;Visual Optimization: Jelly Button Animation">&nbsp;&gt;視覺優化：果凍按鍵動畫</li>
+    <li data-zh="&nbsp;&gt;修復了預設模式無法儲存的問題" data-en="&nbsp;&gt;Fixed an issue where a preset mode could not be saved.">&nbsp;&gt;修復了預設模式無法儲存的問題</li>
+    <li data-zh="&nbsp;&gt;修復了部分BUG" data-en="&nbsp;&gt;Fixed some bugs">&nbsp;&gt;修復了部分BUG</li>
+	  
 	  
     <li style="list-style:none;" data-zh="&nbsp;" data-en="&nbsp;">&nbsp;</li>
     <li data-zh="[2025/10/28]" data-en="[2025/10/28]">[2025/10/28]</li>
@@ -536,34 +718,23 @@ document.addEventListener("DOMContentLoaded", () => {
   </ul>
 </div>
 
-<!-- 隱藏的關閉按鈕（保留給程式使用） -->
 <button id="closeModalBtn" style="display:none;">關閉</button>
 	
 <div style="text-align:center; color:#353535; font-size:12px; margin-top:5px;">
-  Sources of the 320 images::<br>https://thefifthmatt.github.io/nightreign/
+  Sources of the 320 images:<br>https://thefifthmatt.github.io/nightreign/
 </div>
 
-<!-- 點空白處關閉提示文字 -->
 <div style="text-align:center; color:#666666; font-size:12px; margin-top:5px;">
   點擊空白處關閉
 </div>
 
     <tr>
-      <td height="49" colspan="12" align="center" valign="middle" style="color: #3E3E3E">版本:1.02.4</td>
+      <td height="49" colspan="12" align="center" valign="middle" style="color: #3E3E3E">版本:1.03.3</td>
     </tr>
 </table>
 	
-<!-- 公告遮罩背景 -->
-<div id="announcementOverlay" style="
-  display:none;
-  position:fixed;
-  top:0; left:0;
-  width:100%; height:100%;
-  background:rgba(0,0,0,0.5);
-  z-index:900;
-"></div>
+<div id="announcementOverlay" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.5); z-index:900;"></div>
 
-<!-- 公告模態視窗 -->
 <div id="announcementWindow" style="
   display:none;
   position:fixed;
@@ -585,44 +756,21 @@ document.addEventListener("DOMContentLoaded", () => {
 ">
   <h2 id="announcementTitle" style="text-align:center; color:#fff; margin-top:0;">公告</h2>
   
-  <!-- 深色內容區塊 -->
-  <div style="
-    background:#1a1a1a;
-    border-radius:8px;
-    padding:15px;
-    margin-bottom:15px;
-    line-height:1.6;
-  ">
-    <div id="announcementContent">
-    </div>
-
-    <!-- 前往設定按鈕 -->
+  <div style="background:#1a1a1a; border-radius:8px; padding:15px; margin-bottom:15px; line-height:1.6;">
+    <div id="announcementContent"></div>
     <div style="text-align:center; margin-top:15px;">
       <button id="goToSettingsBtn" style="
-        background-color:#303030;
-        color:#ddd;
-        border:none;
-        padding:8px 16px;
-        border-radius:8px;
-        cursor:pointer;
-        font-size:14px;
-        transition:background 0.3s;
+        background-color:#303030; color:#ddd; border:none; padding:8px 16px; border-radius:8px; cursor:pointer; font-size:14px; transition:background 0.3s;
       " onmouseover="this.style.background='#444';" onmouseout="this.style.background='#303030';">
         ⚙ 前往設定
       </button>
     </div>
   </div>
 
-  <!-- 下次不再顯示 -->
   <label id="dontShowLabel" style="display:flex; align-items:center; gap:6px; font-size:14px; cursor:pointer;">
-    <input type="checkbox" id="dontShowAgain">
-    下次更新前不再顯示
+    <input type="checkbox" id="dontShowAgain"> 下次更新前不再顯示
   </label>
-
-  <!-- 關閉提示 -->
-  <p id="closeHint" style="text-align:center; font-size:12px; color:#888; margin-top:12px;">
-    點擊空白處即可關閉此視窗
-  </p>
+  <p id="closeHint" style="text-align:center; font-size:12px; color:#888; margin-top:12px;">點擊空白處即可關閉此視窗</p>
 </div>
 
 <script>
@@ -636,7 +784,6 @@ function enableTouchDrag() {
     e.preventDefault();
     draggingType = type;
     dragImg = e.target;
-
     document.addEventListener("mousemove", onMove);
     document.addEventListener("mouseup", endDrag);
   }
@@ -653,64 +800,46 @@ function enableTouchDrag() {
     if (!draggingType || !dragImg) return;
     const t = e.changedTouches ? e.changedTouches[0] : e;
     const target = document.elementFromPoint(t.clientX, t.clientY);
-
     if (target && target.classList.contains("icon")) {
-      // 抓出圖標索引
       const match = target.id.match(/\d+$/);
       if (match) {
         const i = parseInt(match[0], 10);
-        // 直接放置對應圖標，不切換模式
         setCurrentIconState(i, draggingType);
         updateIconVisual(i);
         runFilter();
       }
     }
-
     resetIconPosition(dragImg);
     draggingType = null;
     dragImg = null;
-
     document.removeEventListener("mousemove", onMove);
     document.removeEventListener("mouseup", endDrag);
   }
 
   function resetIconPosition(img) {
     if (!img) return;
-    if (img.id === "觸控模式拖動框教堂") {
-      img.style.left = "-10px";
-      img.style.top = "10px";
-    } else if (img.id === "觸控模式拖動框法師塔") {
-      img.style.left = "-10px";
-      img.style.top = "55px";
-    }
+    if (img.id === "觸控模式拖動框教堂") { img.style.left = "-10px"; img.style.top = "10px"; }
+    else if (img.id === "觸控模式拖動框法師塔") { img.style.left = "-10px"; img.style.top = "55px"; }
   }
 
-  // 滑鼠事件
   churchIcon.addEventListener("mousedown", e => startDrag(e, "教堂"));
   towerIcon.addEventListener("mousedown", e => startDrag(e, "法師塔"));
-
-  // 觸控事件
   churchIcon.addEventListener("touchstart", e => startDrag(e, "教堂"));
   towerIcon.addEventListener("touchstart", e => startDrag(e, "法師塔"));
-
   document.addEventListener("touchmove", onMove);
   document.addEventListener("touchend", endDrag);
 }
 
-
-
 document.addEventListener("DOMContentLoaded", function() {
   const overlay = document.getElementById("announcementOverlay");
   const modal = document.getElementById("announcementWindow");
-  const checkbox = document.getElementById("dontShowAgain");
   const goToSettingsBtn = document.getElementById("goToSettingsBtn");
-
   const titleEl = document.getElementById("announcementTitle");
   const contentEl = document.getElementById("announcementContent");
   const dontShowLabel = document.getElementById("dontShowLabel");
   const closeHint = document.getElementById("closeHint");
+  const floatingBtn = document.getElementById("floatingBtn");
 
-  //  Switch to English 按鈕（固定顯示英文）
   const switchToEnglishBtn = document.createElement("button");
   switchToEnglishBtn.id = "switchToEnglishBtn";
   switchToEnglishBtn.textContent = "Switch to English";
@@ -725,117 +854,84 @@ document.addEventListener("DOMContentLoaded", function() {
   switchToEnglishBtn.style.cursor = "pointer";
   switchToEnglishBtn.style.fontSize = "14px";
   switchToEnglishBtn.style.transition = "background 0.2s";
-  switchToEnglishBtn.addEventListener("mouseenter", () => {
-    switchToEnglishBtn.style.backgroundColor = "#555";
-  });
-  switchToEnglishBtn.addEventListener("mouseleave", () => {
-    switchToEnglishBtn.style.backgroundColor = "#3a3a3a";
-  });
+  switchToEnglishBtn.addEventListener("mouseenter", () => switchToEnglishBtn.style.backgroundColor = "#555");
+  switchToEnglishBtn.addEventListener("mouseleave", () => switchToEnglishBtn.style.backgroundColor = "#3a3a3a");
 
-  // 設定公告版本（每次更新改這裡）
-  const ANNOUNCEMENT_VERSION = "2025-10-28";
-
-  // 語言判斷
+  const ANNOUNCEMENT_VERSION = "2026-01-01"; //更新修改日期
   const lang = localStorage.getItem("lang") || "chinese";
-
-  // 多語言內容
   const texts = {
     chinese: {
       title: "公告",
-      content: `
-        <p>為觸控模式添加了拖動放置圖標的方式</p>
-        <p>添加可拖動的設定懸浮按鈕</p>
-        <p>添加設定，切換圓角功能</p>
-        <p>新增語言選項:English</p>
-      `,
-      btn: "⚙ 前往設定",
-      dontShow: "下次更新前不再顯示",
-      closeHint: "點擊空白處即可關閉此視窗"
+      content: `<b style="color:#FF0000;"># DLC內容暫不可用</b><br>
+				<b style="color:#0000FF;"># 建議使用鍵鼠模式</b><br>
+				<p>視覺優化：果凍按鍵動畫</p><br>
+				<p>為觸控模式添加了拖動放置圖標的方式</p><br>
+				<p>新增語言選項:English</p>`,
+      btn: "⚙ 前往設定", dontShow: "下次更新前不再顯示", closeHint: "點擊空白處即可關閉此視窗"
     },
     english: {
       title: "Announcement",
-      content: `
-        <p>Added drag-and-drop icon functionality for touch mode</p>
-        <p>Added draggable floating settings button</p>
-        <p>Added setting to toggle round corners</p>
-        <p>Added language option: English</p>
-      `,
-      btn: "⚙ Go to Settings",
-      dontShow: "Don’t show again until next update",
-      closeHint: "Click blank area to close this window"
+      content: `<b style="color:#FF0000;"># DLC Content Temporarily Unavailable</b><br>
+				<b style="color:#0000FF;"># We recommend using keyboard and mouse mode.</b><br>
+				<p>Visual Optimization: Jelly Button Animation</p><br>
+				<p>Added drag-and-drop support for icons in touch mode</p><br>
+				<p>New Language Option: English</p>`,
+      btn: "⚙ Go to Settings", dontShow: "Don’t show again until next update", closeHint: "Click blank area to close this window"
     }
   };
 
-  // 根據語言更新內容
   titleEl.textContent = texts[lang].title;
   contentEl.innerHTML = texts[lang].content;
   goToSettingsBtn.textContent = texts[lang].btn;
   dontShowLabel.innerHTML = `<input type="checkbox" id="dontShowAgain"> ${texts[lang].dontShow}`;
   closeHint.textContent = texts[lang].closeHint;
-
-  // 插入 Switch to English 按鈕到「前往設定」的下方
   goToSettingsBtn.insertAdjacentElement("afterend", switchToEnglishBtn);
 
-  // 讀取紀錄
   const savedVersion = localStorage.getItem("hideAnnouncementUntil");
-
-  // 顯示公告
-  if (savedVersion !== ANNOUNCEMENT_VERSION) {
-    overlay.style.display = "block";
-    modal.style.display = "block";
+  if (savedVersion !== ANNOUNCEMENT_VERSION) { 
+      overlay.style.display = "block"; 
+      modal.style.display = "block"; 
+      floatingBtn.style.display = "none";
   }
 
-  // 點擊空白處關閉
   overlay.addEventListener("click", () => {
-    overlay.style.display = "none";
-    modal.style.display = "none";
+    overlay.style.display = "none"; modal.style.display = "none";
+    floatingBtn.style.display = "block";
+    floatingBtn.classList.remove('gear-reverse-anim', 'btn-enter');
+    void floatingBtn.offsetWidth;
+    floatingBtn.classList.add('btn-enter'); // 改回標準進場
+    
+    // 這裡我們還是可以加反向動畫，但要小心
+    floatingBtn.classList.add("gear-reverse-anim");
+    setTimeout(() => floatingBtn.classList.remove("gear-reverse-anim"), 600);
 
-    const newCheckbox = document.getElementById("dontShowAgain");
-    if (newCheckbox && newCheckbox.checked) {
-      localStorage.setItem("hideAnnouncementUntil", ANNOUNCEMENT_VERSION);
-    }
+    if (document.getElementById("dontShowAgain").checked) localStorage.setItem("hideAnnouncementUntil", ANNOUNCEMENT_VERSION);
   });
 
-  // 點擊「前往設定」按鈕
   goToSettingsBtn.addEventListener("click", () => {
-    overlay.style.display = "none";
-    modal.style.display = "none";
-
-    const settingsOverlay = document.getElementById("modalOverlay");
-    const settingsModal = document.getElementById("modalWindow");
-    if (settingsOverlay && settingsModal) {
-      settingsOverlay.style.display = "block";
-      settingsModal.style.display = "block";
-    }
+    overlay.style.display = "none"; modal.style.display = "none";
+    floatingBtn.style.display = "block";
+    floatingBtn.classList.add("btn-enter");
+    document.getElementById("modalOverlay").style.display = "block";
+    document.getElementById("modalWindow").style.display = "block";
   });
 
-  // 點擊「Switch to English」按鈕 → 切換語言
-  switchToEnglishBtn.addEventListener("click", () => {
+  switchToEnglishBtn.addEventListener("click", (e) => {
+    e.stopPropagation();
     localStorage.setItem("lang", "english");
-    if (typeof setLanguage === "function") {
-      setLanguage("english");
-    }
-    overlay.style.display = "none";
-    modal.style.display = "none";
+    if (typeof setLanguage === "function") setLanguage("english");
+    titleEl.textContent = texts.english.title;
+    contentEl.innerHTML = texts.english.content;
+    goToSettingsBtn.textContent = texts.english.btn;
+    closeHint.textContent = texts.english.closeHint;
   });
 });
 
-</script>
-
-<script>
-
-/* ---------------------------
-   將設定狀態儲存在伺服器
-   --------------------------- */
 window.addEventListener('DOMContentLoaded', () => {
   const btnSquare = document.getElementById('styleSquare');
   const btnRound = document.getElementById('styleRound');
-
-  // 先清除兩個按鈕的 active
   if (btnSquare) btnSquare.classList.remove('active');
   if (btnRound) btnRound.classList.remove('active');
-
-  // 根據 localStorage 設定加上 active
   const style = localStorage.getItem('style');
   if (style === 'round') {
     document.body.classList.add('roundStyle');
@@ -844,60 +940,27 @@ window.addEventListener('DOMContentLoaded', () => {
     document.body.classList.add('squareStyle');
     if (btnSquare) btnSquare.classList.add('active');
   }
-
-  // 點擊按鈕儲存設定
-  if (btnSquare) {
-    btnSquare.addEventListener('click', () => {
-      document.body.classList.remove('roundStyle');
-      document.body.classList.add('squareStyle');
-      localStorage.setItem('style', 'square');
-      btnSquare.classList.add('active');
-      if (btnRound) btnRound.classList.remove('active');
-    });
-  }
-
-  if (btnRound) {
-    btnRound.addEventListener('click', () => {
-      document.body.classList.remove('squareStyle');
-      document.body.classList.add('roundStyle');
-      localStorage.setItem('style', 'round');
-      btnRound.classList.add('active');
-      if (btnSquare) btnSquare.classList.remove('active');
-    });
-  }
+  if (btnSquare) btnSquare.addEventListener('click', () => {
+      document.body.classList.remove('roundStyle'); document.body.classList.add('squareStyle');
+      localStorage.setItem('style', 'square'); btnSquare.classList.add('active'); btnRound.classList.remove('active');
+  });
+  if (btnRound) btnRound.addEventListener('click', () => {
+      document.body.classList.remove('squareStyle'); document.body.classList.add('roundStyle');
+      localStorage.setItem('style', 'round'); btnRound.classList.add('active'); btnSquare.classList.remove('active');
+  });
 });
-
-	
-	
-// -----------------------------
-// 語言切換功能
-// -----------------------------
 
 const langChineseBtn = document.getElementById('chinese');
 const langEnglishBtn = document.getElementById('english');
 
-// -----------------------------
-// 更新黑夜名稱、地圖名字、infoMsg
-// -----------------------------
 function updateNamesAndNights(lang) {
-  // 黑夜名稱
-  document.querySelectorAll('.黑夜').forEach(el => {
-    el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
-  });
-
-  // 地圖名字 td
-  document.querySelectorAll('.名字').forEach(el => {
-    el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
-  });
-
-  // infoMsg
+  document.querySelectorAll('.黑夜').forEach(el => el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh);
+  document.querySelectorAll('.名字').forEach(el => el.textContent = (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh);
   const infoMsgEl = document.getElementById('infoMsg');
   if (!infoMsgEl) return;
-
   const total = selectedNightsMulti.length;
-  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
+  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王','安定者們','廢棄物之王'];
   const isAll = total === allNights.length;
-
   if (lang === 'english') {
     if (total === 0) infoMsgEl.textContent = "Please select a terrain first, then place icons and choose target lords.";
     else if (isAll) infoMsgEl.textContent = "All Night Lords selected. Tap on the map icons to set their locations.";
@@ -918,366 +981,185 @@ function getNightName(id) {
   return (lang === 'english' && el.dataset.en) ? el.dataset.en : el.dataset.zh;
 }
 
-// -----------------------------
-// 切換語言
-// -----------------------------
 function setLanguage(lang) {
-  // 按鈕亮起
   if (lang === 'english') {
-    langEnglishBtn.classList.add('active');
-    langChineseBtn.classList.remove('active');
-    document.body.classList.add('lang-en');
-  } else {
-    langChineseBtn.classList.add('active');
-    langEnglishBtn.classList.remove('active');
-    document.body.classList.remove('lang-en');
-  }
-
-  // 全局文字替換
-  if (lang === 'english') {
-    document.documentElement.lang = 'en';
-    document.title = 'Elden Ring Nightreign Map Seed';
+    langEnglishBtn.classList.add('active'); langChineseBtn.classList.remove('active'); document.body.classList.add('lang-en');
+    document.documentElement.lang = 'en'; document.title = 'Elden Ring Nightreign Map Seed';
     replaceText({
-      '外觀：': 'Style:',
-      '方': 'Square',
-      '圓': 'Round',
-      '語言：': 'Language:',
-      '正體中文': '正體中文',
-	  '預設：': 'Default:',
-	  '鍵鼠模式': 'Mouse & Keyboard Mode',
-	  '觸控模式': 'Touch Mode',
-      '清除所有圖標狀態': 'Clear All Icon States',
-      '重置頁面': 'Reset Page',
+      '外觀：': 'Style:', '方': 'Square', '圓': 'Round', '語言：': 'Language:', '正體中文': '正體中文',
+	  '預設：': 'Default:', '鍵鼠模式': 'Mouse & Keyboard Mode', '觸控模式': 'Touch Mode',
+      '清除所有圖標狀態': 'Clear All Icon States', '重置頁面': 'Reset Page',
       '左鍵放置教堂/右鍵放置法師塔': 'Left click: Place Church / Right click: Place Wizard Tower',
-      '切換為觸控模式': 'Switch to Touch Mode',
-      '設定': 'Settings',
-      '更新日誌': 'Changelog',
-      '點擊空白處關閉': 'Click blank area to close'
+      '切換為觸控模式': 'Switch to Touch Mode', '設定': 'Settings', '更新日誌': 'Changelog', '點擊空白處關閉': 'Click blank area to close'
     });
   } else {
-    document.documentElement.lang = 'zh-ROC';
-    document.title = 'Elden Ring Nightreign Map Seed';
+    langChineseBtn.classList.add('active'); langEnglishBtn.classList.remove('active'); document.body.classList.remove('lang-en');
+    document.documentElement.lang = 'zh-ROC'; document.title = 'Elden Ring Nightreign Map Seed';
     replaceText({
-      'Style:': '外觀：',
-      'Square': '方',
-      'Round': '圓',
-      'Language:': '語言：',
-      'Traditional Chinese': '正體中文',
-	  'Default:': '預設：',
-	  'Mouse & Keyboard Mode': '鍵鼠模式',
-	  'Touch Mode': '觸控模式',
-      'Clear All Icon States': '清除所有圖標狀態',
-      'Reset Page': '重置頁面',
+      'Style:': '外觀：', 'Square': '方', 'Round': '圓', 'Language:': '語言：', 'Traditional Chinese': '正體中文',
+	  'Default:': '預設：', 'Mouse & Keyboard Mode': '鍵鼠模式', 'Touch Mode': '觸控模式',
+      'Clear All Icon States': '清除所有圖標狀態', 'Reset Page': '重置頁面',
       'Left click: Place Church / Right click: Place Wizard Tower': '左鍵放置教堂/右鍵放置法師塔',
-      'Switch to Touch Mode': '切換為觸控模式',
-      'Settings': '設定',
-      'Changelog': '更新日誌',
-      'Click blank area to close': '點擊空白處關閉'
+      'Switch to Touch Mode': '切換為觸控模式', 'Settings': '設定', 'Changelog': '更新日誌', 'Click blank area to close': '點擊空白處關閉'
     });
   }
-
-  // 更新地圖資料文字
   const imageTextsEn = {};
   for (const file in imageTexts) {
     imageTextsEn[file] = {};
     for (const key in imageTexts[file]) {
-      const zh = imageTexts[file][key];
-      imageTextsEn[file][key] = zhToEn[zh] || zh;
+      const zh = imageTexts[file][key]; imageTextsEn[file][key] = zhToEn[zh] || zh;
     }
   }
   function updateImageText(file) {
     const texts = lang === 'english' ? imageTextsEn : imageTexts;
     const textObj = texts[file];
-    for (const key in textObj) {
-      const el = document.getElementById(key + "_" + file);
-      if (el) el.textContent = textObj[key];
-    }
+    for (const key in textObj) { const el = document.getElementById(key + "_" + file); if (el) el.textContent = textObj[key]; }
   }
   for (const file in imageTexts) updateImageText(file);
-
-  // 更新夜晚、地圖名稱
   updateNamesAndNights(lang);
-
-  // 更新頁面動態欄位（城堡、夜晚、特殊...）
   updateText(true);
-
-  // 更新模式顯示文字，但不改變模式
   applyMode();
-
-  // 更新當前夜晚資訊區
   updateNightInfo();
-
-  // 更新更新日誌語言
   updateChangelogLanguage(lang);
 }
-	
-// -----------------------------
-// 更新更新日誌語言 (Changelog)
-// -----------------------------
-function updateChangelogLanguage(lang) {
-  document.querySelectorAll('#changelog [data-zh][data-en]').forEach(el => {
-    el.textContent = (lang === 'english') ? el.dataset.en : el.dataset.zh;
-  });
 
+function updateChangelogLanguage(lang) {
+  document.querySelectorAll('#changelog [data-zh][data-en]').forEach(el => el.textContent = (lang === 'english') ? el.dataset.en : el.dataset.zh);
   const changelogTitle = document.getElementById('changelogTitle');
-  if (changelogTitle) {
-    changelogTitle.textContent = (lang === 'english') ? 'Changelog' : '更新日誌';
-  }
+  if (changelogTitle) changelogTitle.textContent = (lang === 'english') ? 'Changelog' : '更新日誌';
 }
-	
-// -----------------------------
-// 批次替換文字
-// -----------------------------
+
 function replaceText(map) {
   const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, null, false);
   while (walker.nextNode()) {
-    const node = walker.currentNode;
-    const text = node.nodeValue.trim();
+    const node = walker.currentNode; const text = node.nodeValue.trim();
     if (map[text]) node.nodeValue = map[text];
   }
 }
 
-// -----------------------------
-// 綁定事件
-// -----------------------------
-langChineseBtn.addEventListener('click', () => {
-  localStorage.setItem('lang', 'chinese');
-  setLanguage('chinese');
-  updateNightInfo();
-});
-
-langEnglishBtn.addEventListener('click', () => {
-  localStorage.setItem('lang', 'english');
-  setLanguage('english');
-  updateNightInfo();
-});
-
-// -----------------------------
-// DOM ready 初始化
-// -----------------------------
+langChineseBtn.addEventListener('click', () => { localStorage.setItem('lang', 'chinese'); setLanguage('chinese'); updateNightInfo(); });
+langEnglishBtn.addEventListener('click', () => { localStorage.setItem('lang', 'english'); setLanguage('english'); updateNightInfo(); });
 window.addEventListener('load', () => {
-  const savedLang = localStorage.getItem('lang') || 'chinese';
-  setLanguage(savedLang);
-  updateNightInfo();
-
-  // 預設鍵鼠模式
-  isTouchMode = false;
-  toggleMode(false); // false 表示鍵鼠模式
-
-  // 強制刷新頁面文字
+  const savedLang = localStorage.getItem('lang') || 'chinese'; setLanguage(savedLang); updateNightInfo();
   updateText(true);
 });
 
-/* ---------------------------
-   模式狀態
---------------------------- */
-let currentMode = 'mouse'; // 預設模式
-let isTouchMode = false;
-
-// DOM Ready
+let currentMode = 'mouse'; let isTouchMode = false;
 document.addEventListener("DOMContentLoaded", () => {
-    const btnMouse = document.getElementById("modeMouse");
-    const btnTouch = document.getElementById("modeTouch");
-    const modeBtn = document.getElementById("modeToggleBtn");
-
-    // 綁定模式選擇按鈕
-    if (btnMouse) btnMouse.addEventListener("click", () => setDefaultMode('mouse'));
-    if (btnTouch) btnTouch.addEventListener("click", () => setDefaultMode('touch'));
-
-    // 綁定切換模式按鈕
-    if (modeBtn) modeBtn.addEventListener("click", () => toggleMode());
-
-    // 讀取已保存的模式
+    const btnMouse = document.getElementById("modeMouse"); const btnTouch = document.getElementById("modeTouch"); const modeBtn = document.getElementById("modeToggleBtn");
+    
+    // 修正 3: 這裡讀取並強制更新，解決不儲存問題
     const savedMode = localStorage.getItem('defaultMode') || 'mouse';
     setDefaultMode(savedMode);
 
-    // 先綁定拖動事件，但不啟用
+    if (btnMouse) btnMouse.addEventListener("click", () => setDefaultMode('mouse'));
+    if (btnTouch) btnTouch.addEventListener("click", () => setDefaultMode('touch'));
+    if (modeBtn) modeBtn.addEventListener("click", () => toggleMode());
+    
     if (typeof enableTouchDrag === "function") enableTouchDrag();
 });
-
-function setDefaultMode(mode) {
-    currentMode = mode;
-    isTouchMode = (mode === 'touch');
-
-    // 保存狀態
-    localStorage.setItem('defaultMode', mode);
-
-    updateModeUI();
-    applyMode();
-}
-
-// 切換模式按鈕
-function toggleMode() {
-    isTouchMode = !isTouchMode;
-    currentMode = isTouchMode ? 'touch' : 'mouse';
-    localStorage.setItem('defaultMode', currentMode);
-
-    updateModeUI();
-    applyMode();
-}
-
-// 只更新按鈕樣式
+function setDefaultMode(mode) { currentMode = mode; isTouchMode = (mode === 'touch'); localStorage.setItem('defaultMode', mode); updateModeUI(); applyMode(); }
+function toggleMode() { isTouchMode = !isTouchMode; currentMode = isTouchMode ? 'touch' : 'mouse'; localStorage.setItem('defaultMode', currentMode); updateModeUI(); applyMode(); }
 function updateModeUI() {
-    const btnMouse = document.getElementById("modeMouse");
-    const btnTouch = document.getElementById("modeTouch");
-
-    if (btnMouse) btnMouse.classList.toggle('active', !isTouchMode);
-    if (btnTouch) btnTouch.classList.toggle('active', isTouchMode);
+    const btnMouse = document.getElementById("modeMouse"); const btnTouch = document.getElementById("modeTouch");
+    if (btnMouse) btnMouse.classList.toggle('active', !isTouchMode); if (btnTouch) btnTouch.classList.toggle('active', isTouchMode);
 }
-
-/**
- * applyMode() 套用當前模式，不翻轉
- */
+/* applyMode 使用 toggleDragUI */
 function applyMode() {
-    const lang = localStorage.getItem('lang') || 'chinese';
-    const modeBtn = document.getElementById("modeToggleBtn");
-    const nightGuide = document.getElementById("nightGuide");
-    const mapGuide = document.getElementById("mapGuide");
-    const infoMsg = document.getElementById("infoMsg");
-
+    const lang = localStorage.getItem('lang') || 'chinese'; const modeBtn = document.getElementById("modeToggleBtn");
+    const nightGuide = document.getElementById("nightGuide"); const mapGuide = document.getElementById("mapGuide"); const infoMsg = document.getElementById("infoMsg");
     const touch = isTouchMode;
-
-    // 控制觸控圖示顯示
-    const touchIcons = [
-        document.getElementById("觸控模式拖動框"),
-        document.getElementById("觸控模式拖動框教堂"),
-        document.getElementById("觸控模式拖動框法師塔")
-    ];
-    touchIcons.forEach(el => {
-        if (el) el.style.display = touch ? "block" : "none";
-    });
+    
+    // 初始化切換，先隱藏
+    toggleDragUI(false); 
 
     if (touch) {
         if (modeBtn) modeBtn.textContent = (lang === 'english') ? "Switch to Mouse & Keyboard Mode" : "切換為鍵鼠模式";
-        if (nightGuide) nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Tap icons or names to select BOSS</p><p>&gt;Tap again to deselect</p><p>&gt;Tap other BOSS to multi-select</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;再次點擊取消選擇</p><p>&gt;點擊其他夜王多選</p>";
-        if (mapGuide) mapGuide.textContent = (lang === 'english')
-            ? "Drag icons from left to place / Tap to place Church, tap again to switch to Wizard Tower"
-            : "拖動左側圖標放置/或點擊放置教堂，再次點擊切換法師塔";
+        if (nightGuide) nightGuide.innerHTML = (lang === 'english') ? "<p>&gt;Tap icons or names to select BOSS</p><p>&gt;Tap again to deselect</p><p>&gt;Tap other BOSS to multi-select</p>" : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;再次點擊取消選擇</p><p>&gt;點擊其他夜王多選</p>";
+        if (mapGuide) mapGuide.textContent = (lang === 'english') ? "Drag icons from left to place / Tap to place Church, tap again to switch to Wizard Tower" : "拖動左側圖標放置/或點擊放置教堂，再次點擊切換法師塔";
         if (infoMsg) infoMsg.textContent = (lang === 'english') ? "Switched to Touch Mode" : "已切換為觸控模式";
-
-        // 啟用拖動
         if (typeof enableTouchDrag === "function") enableTouchDrag();
-
+        
+        // 檢查是否需要顯示拖動框
+        runFilter();
+        
     } else {
         if (modeBtn) modeBtn.textContent = (lang === 'english') ? "Switch to Touch Mode" : "切換為觸控模式";
-        if (nightGuide) nightGuide.innerHTML = (lang === 'english')
-            ? "<p>&gt;Click icons or names to select BOSS</p><p>&gt;Hold Ctrl to multi-select or deselect</p><p>&gt;Hold Ctrl+Shift to select all</p>"
-            : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;按住Ctrl並點擊多選或取消選擇</p><p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
-        if (mapGuide) mapGuide.textContent = (lang === 'english')
-            ? "Left click: Place Church / Right click: Place Wizard Tower"
-            : "左鍵放置教堂/右鍵放置法師塔";
+        if (nightGuide) nightGuide.innerHTML = (lang === 'english') ? "<p>&gt;Click icons or names to select BOSS</p><p>&gt;Hold Ctrl to multi-select or deselect</p><p>&gt;Hold Ctrl+Shift to select all</p>" : "<p>&gt;點擊圖標或文字選擇夜王</p><p>&gt;按住Ctrl並點擊多選或取消選擇</p><p>&gt;按住Ctrl+Shift並任意點擊全選</p>";
+        if (mapGuide) mapGuide.textContent = (lang === 'english') ? "Left click: Place Church / Right click: Place Wizard Tower" : "左鍵放置教堂/右鍵放置法師塔";
         if (infoMsg) infoMsg.textContent = (lang === 'english') ? "Switched to Mouse & Keyboard Mode" : "已切換為鍵鼠模式";
     }
 }
-
-
-/* ---------------------------
-   禁止圖片被拖動
-   --------------------------- */
-document.querySelectorAll('img').forEach(img => {
-  img.ondragstart = e => e.preventDefault();
-});
-
-
-const btn = document.getElementById('floatingBtn');
-let isDragging = false;
-let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
-
-// ---- 滑鼠拖動 ----
+document.querySelectorAll('img').forEach(img => { img.ondragstart = e => e.preventDefault(); });
+const btn = document.getElementById('floatingBtn'); let isDragging = false; let startX = 0, startY = 0, offsetX = 0, offsetY = 0;
 btn.addEventListener('mousedown', e => {
-    e.preventDefault();
-    isDragging = false;
-    startX = e.clientX;
-    startY = e.clientY;
-    offsetX = e.clientX - btn.getBoundingClientRect().left;
-    offsetY = e.clientY - btn.getBoundingClientRect().top;
+    e.preventDefault(); isDragging = false; startX = e.clientX; startY = e.clientY;
+    offsetX = e.clientX - btn.getBoundingClientRect().left; offsetY = e.clientY - btn.getBoundingClientRect().top;
     btn.style.cursor = 'grabbing';
-
     const onMouseMove = e => {
-        const dx = e.clientX - startX;
-        const dy = e.clientY - startY;
-        if (Math.sqrt(dx * dx + dy * dy) > 5) isDragging = true;
+        const dx = e.clientX - startX; const dy = e.clientY - startY; if (Math.sqrt(dx * dx + dy * dy) > 5) isDragging = true;
         if (isDragging) {
-            let x = e.clientX - offsetX;
-            let y = e.clientY - offsetY;
-            x = Math.max(0, Math.min(window.innerWidth - btn.offsetWidth, x));
-            y = Math.max(0, Math.min(window.innerHeight - btn.offsetHeight, y));
-            btn.style.left = x + 'px';
-            btn.style.top = y + 'px';
+            let x = e.clientX - offsetX; let y = e.clientY - offsetY;
+            x = Math.max(0, Math.min(window.innerWidth - btn.offsetWidth, x)); y = Math.max(0, Math.min(window.innerHeight - btn.offsetHeight, y));
+            btn.style.left = x + 'px'; btn.style.top = y + 'px';
         }
     };
-
     const onMouseUp = e => {
-        btn.style.cursor = 'grab';
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-        // 只在沒有拖動的情況下才開設定
+        btn.style.cursor = 'pointer'; document.removeEventListener('mousemove', onMouseMove); document.removeEventListener('mouseup', onMouseUp);
         if (!isDragging) openSettings();
     };
-
-    document.addEventListener('mousemove', onMouseMove);
-    document.addEventListener('mouseup', onMouseUp);
+    document.addEventListener('mousemove', onMouseMove); document.addEventListener('mouseup', onMouseUp);
 });
-
-// ---- 觸控拖動（手機/平板）----
 btn.addEventListener('touchstart', e => {
-    const touch = e.touches[0];
-    isDragging = false;
-    startX = touch.clientX;
-    startY = touch.clientY;
-    offsetX = touch.clientX - btn.getBoundingClientRect().left;
-    offsetY = touch.clientY - btn.getBoundingClientRect().top;
+    const touch = e.touches[0]; isDragging = false; startX = touch.clientX; startY = touch.clientY;
+    offsetX = touch.clientX - btn.getBoundingClientRect().left; offsetY = touch.clientY - btn.getBoundingClientRect().top;
 }, { passive: true });
 
 btn.addEventListener('touchmove', e => {
-    const touch = e.touches[0];
-    const dx = touch.clientX - startX;
-    const dy = touch.clientY - startY;
+    const touch = e.touches[0]; const dx = touch.clientX - startX; const dy = touch.clientY - startY;
     if (Math.sqrt(dx * dx + dy * dy) > 5) isDragging = true;
     if (isDragging) {
-        let x = touch.clientX - offsetX;
-        let y = touch.clientY - offsetY;
-        x = Math.max(0, Math.min(window.innerWidth - btn.offsetWidth, x));
-        y = Math.max(0, Math.min(window.innerHeight - btn.offsetHeight, y));
-        btn.style.left = x + 'px';
-        btn.style.top = y + 'px';
+        let x = touch.clientX - offsetX; let y = touch.clientY - offsetY;
+        x = Math.max(0, Math.min(window.innerWidth - btn.offsetWidth, x)); y = Math.max(0, Math.min(window.innerHeight - btn.offsetHeight, y));
+        btn.style.left = x + 'px'; btn.style.top = y + 'px';
     }
 }, { passive: true });
-
-btn.addEventListener('touchend', e => {
-    // 只在沒有拖動的情況下才開設定
-    if (!isDragging) openSettings();
-});
-
-// ---- 開啟設定視窗 ----
-function openSettings() {
-    document.getElementById('modalOverlay').style.display = 'block';
-    document.getElementById('modalWindow').style.display = 'block';
+btn.addEventListener('touchend', e => { if (!isDragging) openSettings(); });
+function openSettings() { 
+    // 修正: 強制清除反向動畫，確保點擊動畫執行
+    const btn = document.getElementById('floatingBtn');
+    btn.classList.remove('gear-reverse-anim', 'btn-enter'); 
+    void btn.offsetWidth; // 觸發重繪
+    btn.classList.add('gear-clicked'); // 啟動點擊動畫
+    
+    // 延遲打開，讓動畫可見 (300ms)
+    setTimeout(() => {
+        btn.classList.remove('gear-clicked'); // 動畫結束後移除
+        document.getElementById('modalOverlay').style.display = 'block'; 
+        document.getElementById('modalWindow').style.display = 'block'; 
+    }, 300);
 }
-
-
-// ---------- 點擊打開模態 ----------
-btn.addEventListener('click', e => {
-    if (isDragging) return; // 拖動時不觸發點擊
-    document.getElementById('modalOverlay').style.display = 'block';
-    document.getElementById('modalWindow').style.display = 'block';
-});
-
-// ---------- 關閉模態 ----------
-document.getElementById('closeModalBtn').addEventListener('click', () => {
-    document.getElementById('modalOverlay').style.display = 'none';
+btn.addEventListener('click', e => { if (isDragging) return; openSettings(); });
+document.getElementById('closeModalBtn').addEventListener('click', () => { 
+    document.getElementById('modalOverlay').style.display = 'none'; 
     document.getElementById('modalWindow').style.display = 'none';
+    
+    // 關閉時觸發反向動畫
+    const btn = document.getElementById('floatingBtn');
+    btn.classList.remove('gear-clicked', 'btn-enter', 'gear-reverse-anim');
+    void btn.offsetWidth;
+    btn.classList.add('gear-reverse-anim');
 });
-
-// 點擊背景也可以關閉
-document.getElementById('modalOverlay').addEventListener('click', () => {
-    document.getElementById('modalOverlay').style.display = 'none';
+document.getElementById('modalOverlay').addEventListener('click', () => { 
+    document.getElementById('modalOverlay').style.display = 'none'; 
     document.getElementById('modalWindow').style.display = 'none';
+    
+    // 點擊背景關閉時也觸發反向動畫
+    const btn = document.getElementById('floatingBtn');
+    btn.classList.remove('gear-clicked', 'btn-enter', 'gear-reverse-anim');
+    void btn.offsetWidth;
+    btn.classList.add('gear-reverse-anim');
 });
-	
-
 /* ---------------------------
    資料：320 張圖與每張圖的 8~11 個點屬性
    屬性用字串 '教堂' / '法師塔' / '無'
@@ -4577,76 +4459,95 @@ const imageTexts = {
 /* ---------------------------
    參數與狀態
    --------------------------- */
-// 每個地形都有自己的 iconStates 陣列
 let iconStates = {
   "普通地形": Array(12).fill(null),
   "山頂地形": Array(12).fill(null),
   "火山地形": Array(12).fill(null),
   "腐敗地形": Array(12).fill(null),
-  "隱城地形": Array(12).fill(null)
+  "隱城地形": Array(12).fill(null),
+  "大空洞": Array(12).fill(null)
 };
 
-let selectedTerrain = "普通地形"; // 預設地形
+let selectedTerrain = "普通地形";
 let selectedNightsMulti = [];
 
-// 各地形對應 nightRanges
 const terrainNightRanges = {
-  "普通地形": { "黑夜野獸":[0,19], "黑夜之爵":[40,59], "黑夜之智":[80,99], "深海黑夜":[120,139], "黑夜之魔":[160,179], "黑夜光騎士":[200,219], "黑夜霧霾":[240,259], "黑夜王":[280,299]},
-  "山頂地形": { "黑夜野獸":[20,24], "黑夜之爵":[60,64], "黑夜之智":[100,104], "深海黑夜":[140,144], "黑夜之魔":[180,184], "黑夜光騎士":[220,224], "黑夜霧霾":[260,264], "黑夜王":[300,304]},
-  "火山地形": { "黑夜野獸":[25,29], "黑夜之爵":[65,69], "黑夜之智":[105,109], "深海黑夜":[145,149], "黑夜之魔":[185,189], "黑夜光騎士":[225,229], "黑夜霧霾":[265,269], "黑夜王":[305,309]},
-  "腐敗地形": { "黑夜野獸":[30,34], "黑夜之爵":[70,74], "黑夜之智":[110,114], "深海黑夜":[150,154], "黑夜之魔":[190,194], "黑夜光騎士":[230,234], "黑夜霧霾":[270,274], "黑夜王":[310,314]},
-  "隱城地形": { "黑夜野獸":[35,39], "黑夜之爵":[75,79], "黑夜之智":[115,119], "深海黑夜":[155,159], "黑夜之魔":[195,199], "黑夜光騎士":[235,239], "黑夜霧霾":[275,279], "黑夜王":[315,319]}
+  "普通地形": { "黑夜野獸":[0,19], "黑夜之爵":[40,59], "黑夜之智":[80,99], "深海黑夜":[120,139], "黑夜之魔":[160,179], "黑夜光騎士":[200,219], "黑夜霧霾":[240,259], "黑夜王":[280,299], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "山頂地形": { "黑夜野獸":[20,24], "黑夜之爵":[60,64], "黑夜之智":[100,104], "深海黑夜":[140,144], "黑夜之魔":[180,184], "黑夜光騎士":[220,224], "黑夜霧霾":[260,264], "黑夜王":[300,304], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "火山地形": { "黑夜野獸":[25,29], "黑夜之爵":[65,69], "黑夜之智":[105,109], "深海黑夜":[145,149], "黑夜之魔":[185,189], "黑夜光騎士":[225,229], "黑夜霧霾":[265,269], "黑夜王":[305,309], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "腐敗地形": { "黑夜野獸":[30,34], "黑夜之爵":[70,74], "黑夜之智":[110,114], "深海黑夜":[150,154], "黑夜之魔":[190,194], "黑夜光騎士":[230,234], "黑夜霧霾":[270,274], "黑夜王":[310,314], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "隱城地形": { "黑夜野獸":[35,39], "黑夜之爵":[75,79], "黑夜之智":[115,119], "深海黑夜":[155,159], "黑夜之魔":[195,199], "黑夜光騎士":[235,239], "黑夜霧霾":[275,279], "黑夜王":[315,319], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "大空洞": { "黑夜野獸":[0,0], "黑夜之爵":[0,0], "黑夜之智":[0,0], "深海黑夜":[0,0], "黑夜之魔":[0,0], "黑夜光騎士":[0,0], "黑夜霧霾":[0,0], "黑夜王":[0,0], "安定者們":[0,0], "廢棄物之王":[0,0]}
 };
 
-/* ---------------------------
-   取得/設置當前地形圖標狀態
-   --------------------------- */
 function getCurrentIconState(i){ return iconStates[selectedTerrain][i]; }
 function setCurrentIconState(i,value){ iconStates[selectedTerrain][i]=value; }
-
-/* ---------------------------
-   取得當前地形圖標元素
-   --------------------------- */
 function getCurrentTerrainIcon(i){ return document.getElementById(selectedTerrain+'圖標位置'+i); }
 
-/* ---------------------------
-   更新圖標顯示
-   --------------------------- */
-function updateIconVisual(i){
+function updateIconVisual(i, skipAnimation = false){
   const el=getCurrentTerrainIcon(i);
   if(!el) return;
   const state=getCurrentIconState(i);
-  if(state==='教堂') el.src='教堂圖標.png';
-  else if(state==='法師塔') el.src='法師塔圖標.png';
-  else el.src='圖標位置.png';
+  
+  // 先移除，防止疊加
+  el.classList.remove('pop-effect');
+  
+  if(!skipAnimation && state) {
+    void el.offsetWidth; // 觸發重繪
+  }
+
+  if(state==='教堂') {
+    el.src='教堂圖標.png';
+    // 這裡加入自動銷毀邏輯，解決重複播放問題
+    if(!skipAnimation) {
+        el.classList.add('pop-effect');
+        setTimeout(() => el.classList.remove('pop-effect'), 600);
+    }
+  } else if(state==='法師塔') {
+    el.src='法師塔圖標.png';
+    if(!skipAnimation) {
+        el.classList.add('pop-effect');
+        setTimeout(() => el.classList.remove('pop-effect'), 600);
+    }
+  } else {
+    el.src='圖標位置.png';
+  }
 }
 
-/* ---------------------------
-   切換圖標
-   --------------------------- */
 function toggleIcon(i, button) {
   if (isTouchMode) {
-    // 觸控模式：單點交替切換
     const current = getCurrentIconState(i);
     if (current === null) setCurrentIconState(i, '教堂');
     else if (current === '教堂') setCurrentIconState(i, '法師塔');
     else setCurrentIconState(i, null);
   } else {
-    // 鍵鼠模式：左鍵教堂、右鍵法師塔
     if (button === 0) setCurrentIconState(i, '教堂');
     else if (button === 2) setCurrentIconState(i, '法師塔');
     else return;
   }
-  updateIconVisual(i);
+  updateIconVisual(i, false);
   runFilter();
 }
-/* ---------------------------
-   顯示/隱藏地形圖標
-   --------------------------- */
+
+function toggleDragUI(show) {
+    const touchDragUI = document.querySelectorAll('#觸控模式拖動框, #觸控模式拖動框教堂, #觸控模式拖動框法師塔');
+    touchDragUI.forEach(el => {
+        if(show) {
+            if(el.style.display !== 'block') {
+                el.style.display = 'block';
+                el.classList.add('pop-enter');
+            }
+        } else {
+            el.style.display = 'none';
+            el.classList.remove('pop-enter');
+        }
+    });
+}
+
 function showTerrainIcons(name){
-  const terrains=["普通地形","山頂地形","火山地形","腐敗地形","隱城地形"];
+  const terrains=["普通地形","山頂地形","火山地形","腐敗地形","隱城地形","大空洞"];
   terrains.forEach(t=>{
-    const count=t==='山頂地形'||t==='火山地形'?9:(t==='腐敗地形'||t==='隱城地形'?8:11);
+    const count = (t==='山頂地形'||t==='火山地形') ? 9 : (t==='腐敗地形'||t==='隱城地形') ? 8 : 11;
     for(let i=1;i<=count;i++){
       const el=document.getElementById(t+'圖標位置'+i);
       if(el) el.style.display=(t===name?'':'none');
@@ -4654,9 +4555,6 @@ function showTerrainIcons(name){
   });
 }
 
-/* ---------------------------
-   顯示/隱藏全部圖標
-   --------------------------- */
 function showAllIcons(){
   const count=getCurrentTerrainCount();
   for(let i=1;i<=count;i++){
@@ -4673,23 +4571,15 @@ function hideAllIcons(){
   }
 }
 
-/* ---------------------------
-   當前地形圖標數量
-   --------------------------- */
 function getCurrentTerrainCount(){
   if(selectedTerrain==='山頂地形'||selectedTerrain==='火山地形') return 9;
   if(selectedTerrain==='腐敗地形'||selectedTerrain==='隱城地形') return 8;
   return 11;
 }
 
-/* ---------------------------
-   選擇黑夜（支援鍵鼠/觸控 + 多語提示）
-   --------------------------- */
-
-// 更新訊息（可重用）
 function updateNightInfo() {
   const infoMsgEl = document.getElementById('infoMsg');
-  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
+  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王','安定者們','廢棄物之王'];
   const total = selectedNightsMulti.length;
   const isAll = total === allNights.length;
   const lang = localStorage.getItem('lang') || 'chinese';
@@ -4714,9 +4604,7 @@ function updateNightInfo() {
 }
 
 function selectNight(name, event) {
-  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
-
-  // 鍵鼠/觸控選取邏輯
+  const allNights = ['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王','安定者們','廢棄物之王'];
   if (isTouchMode) {
     if (selectedNightsMulti.includes(name)) {
       selectedNightsMulti = selectedNightsMulti.filter(n => n !== name);
@@ -4731,123 +4619,38 @@ function selectNight(name, event) {
       else selectedNightsMulti.push(name);
     } else selectedNightsMulti = [name];
   }
-
-  // 更新樣式
   document.querySelectorAll('.黑夜').forEach(el => el.classList.remove('selected'));
   selectedNightsMulti.forEach(n => {
     const el = document.getElementById(n);
     if (el) el.classList.add('selected');
   });
-
-  // 更新訊息
   updateNightInfo();
-
   hideFail();
   showAllIcons();
   runFilter();
 }
 
-/* ---------------------------
-   篩選邏輯
-   - 先從 IMAGES 中找出屬於該夜的圖片（range）
-
-   - 對每張圖片，檢查所有「使用者已指定」的圖標位 i（iconStates[i] !== null）
-     - 若 user 指定為 '無' -> 圖片該位須為 '無'
-     - 若 user 指定為 '教堂'/'法師塔' -> 圖片該位須相同
-   --------------------------- */
-/* ---------------------------
-   篩選成功/失敗更新文字
-   flag: true = 更新文字，false = 清空文字
-   --------------------------- */
-// 中文 → 英文對照表
 const zhToEn = {
-  // 區塊標題
-  "城堡": "CASTLE",
-  "夜晚": "NIGHT",
-  "特殊": "EVENT",
-
-  // 欄位名稱（冒號前）
-  "地下": "Basement",
-  "主要": "Main",
-  "樓頂": "Rooftop",
-  "第一夜": "Night 1",
-  "第二夜": "Night 2",
-  "第一天": "Day 1",
-  "第二天": "Day 2",
-
-  // 內容（冒號後）
-	
-  //地下
-  "鈴珠獵人": "Bell Bearing Hunter",
-  "接肢貴族": "Grafted Scion",
-  "薩米爾的古英雄": "Ancient Hero of Zamor",
-  "黑刀刺客": "Black Knife Assassin",
-  "獅子混種": "Leonine Misbegotten",
-  "王夫的紅狼": "Red Wolf of the King Consort",
-  "王室幽魂": "Royal Revenant",
-  "無": "None",
-	
-  //主要
-  "山妖": "Troll",
-  "熔爐騎士": "Crucible Knight",
-  "失鄉騎士": "Banished Knight",
-  "無": "None",
-	
-  //樓頂
-  "鈴珠獵人": "Bell Bearing Hunter",
-  "羅蕾塔": "Royal Carian Knight",
-  "祖靈": "Ancestor Spirit",
-  "大樹守衛": "Tree Sentinel",
-  "黑劍眷屬": "Black Blade Kindred",
-  "死亡儀式鳥": "Death Rite Bird",
-  "龍裝大樹守衛": "Draconic Tree Sentinel",
-  "熔岩土龍": "Magma Wyrm",
-  "黃金樹的化身": "Erdtree Avatar",
-  "腐爛樹靈": "Ulcerated Tree Spirit",
-  "無": "None",
-
-  //第一夜
-  "亞人雙人組": "Demi-Human Queen & Demi-Human Swordmaster",
-  "鈴珠獵人": "Bell Bearing Hunter",
-  "貪食魔龍": "Gaping Dragon",
-  "蚯蚓臉": "Wormface",
-  "英雄石像鬼": "Valiant Gargoyle",
-  "公爵的夫雷迪亞": "The Duke's Dear Freja",
-  "黑夜騎兵": "Night's Cavalry",
-  "熔鐵惡魔": "Smelter Demon",
-  "戰場老將": "Battlefield Commander",
-  "百足惡魔": "Centipede Demon",
-  "提比亞的喚聲船": "Tibia Mariner",
-  "腐爛樹靈": "Ulcerated Tree Spirit",
-  "接肢君王": "Grafted Monarch",
-  "王室幽魂": "Royal Revenant",
-	
-  //第二夜
-  "蒙葛特": "Fell Omen",
-  "大樹守衛": "Tree Sentinel & Royal Cavalrymen",
-  "古龍": "Ancient Dragon",
-  "熔爐河馬": "Crucible Knight & Golden Hippopotamus",
-  "偏地老將": "Outland Commander",
-  "大土龍": "Great Wyrm",
-  "龍人士兵": "Nox Dragonkin Soldier",
-  "龍裝大樹守衛": "Draconic Tree Sentinel & Royal Cavalrymen",
-  "墜星成獸": "Full-Grown Fallingstar Beast",
-  "死亡儀式鳥": "Death Rite Bird",
-  "無名王者": "Nameless King",
-  "冷冽谷的舞孃": "Dancer of the Boreal Valley",
-  "神皮雙人組": "Godskin Duo",
-	
-  //特殊事件
-  "黑夜勢力": "Night Horde",
-  "隕石墜落": "Meteor Strike",
-  "蒙葛特入侵": "Morgott Invasion",
-  "巨大水泡現蹤": "Morgott Invasion",
-  "癲火現蹤": "frenzy tower",
-  "古老魔師塔": "Difficult Sorcerer's Rise",
-  "蟲群大量出現": "Gnoster Plague",
-  "惡魔詛咒": "Libra Curse",
-	
-  "額外BOSS:蒙葛特": "Extra Night Boss: Fell Omen",
+  "城堡": "CASTLE", "夜晚": "NIGHT", "特殊": "EVENT",
+  "地下": "Basement", "主要": "Main", "樓頂": "Rooftop",
+  "第一夜": "Night 1", "第二夜": "Night 2", "第一天": "Day 1", "第二天": "Day 2",
+  "鈴珠獵人": "Bell Bearing Hunter", "接肢貴族": "Grafted Scion", "薩米爾的古英雄": "Ancient Hero of Zamor",
+  "黑刀刺客": "Black Knife Assassin", "獅子混種": "Leonine Misbegotten", "王夫的紅狼": "Red Wolf of the King Consort",
+  "王室幽魂": "Royal Revenant", "無": "None", "山妖": "Troll", "熔爐騎士": "Crucible Knight",
+  "失鄉騎士": "Banished Knight", "羅蕾塔": "Royal Carian Knight", "祖靈": "Ancestor Spirit",
+  "大樹守衛": "Tree Sentinel", "黑劍眷屬": "Black Blade Kindred", "死亡儀式鳥": "Death Rite Bird",
+  "龍裝大樹守衛": "Draconic Tree Sentinel", "熔岩土龍": "Magma Wyrm", "黃金樹的化身": "Erdtree Avatar",
+  "腐爛樹靈": "Ulcerated Tree Spirit", "亞人雙人組": "Demi-Human Queen & Demi-Human Swordmaster",
+  "貪食魔龍": "Gaping Dragon", "蚯蚓臉": "Wormface", "英雄石像鬼": "Valiant Gargoyle",
+  "公爵的夫雷迪亞": "The Duke's Dear Freja", "黑夜騎兵": "Night's Cavalry", "熔鐵惡魔": "Smelter Demon",
+  "戰場老將": "Battlefield Commander", "百足惡魔": "Centipede Demon", "提比亞的喚聲船": "Tibia Mariner",
+  "接肢君王": "Grafted Monarch", "蒙葛特": "Fell Omen", "古龍": "Ancient Dragon",
+  "熔爐河馬": "Crucible Knight & Golden Hippopotamus", "偏地老將": "Outland Commander", "大土龍": "Great Wyrm",
+  "龍人士兵": "Nox Dragonkin Soldier", "墜星成獸": "Full-Grown Fallingstar Beast", "無名王者": "Nameless King",
+  "冷冽谷的舞孃": "Dancer of the Boreal Valley", "神皮雙人組": "Godskin Duo", "黑夜勢力": "Night Horde",
+  "隕石墜落": "Meteor Strike", "蒙葛特入侵": "Morgott Invasion", "巨大水泡現蹤": "Morgott Invasion",
+  "癲火現蹤": "frenzy tower", "古老魔師塔": "Difficult Sorcerer's Rise", "蟲群大量出現": "Gnoster Plague",
+  "惡魔詛咒": "Libra Curse", "額外BOSS:蒙葛特": "Extra Night Boss: Fell Omen",
   "額外BOSS:大樹守衛": "Extra Night Boss: Tree Sentinel & Royal Cavalrymen",
   "額外BOSS:古龍": "Extra Night Boss: Ancient Dragon",
   "額外BOSS:熔爐河馬": "Extra Night Boss: Crucible Knight & Golden Hippopotamus",
@@ -4864,21 +4667,14 @@ const zhToEn = {
 
 window.addEventListener('load', () => {
   const savedLang = localStorage.getItem('lang') || 'chinese';
-  setLanguage(savedLang);
-  updateNightInfo();
-  refreshModeText();  
-
-  // 強制更新頁面文字
-  updateAllText(savedLang);
+  setLanguage(savedLang); updateNightInfo(); refreshModeText(); updateAllText(savedLang);
 });
 
 function updateAllText(lang) {
-  // 更新欄位文字
   document.querySelectorAll('strong[data-key]').forEach(el => {
     const key = el.dataset.key;
     if(lang === 'english'){
       const enKey = zhToEn[key] || key;
-      // 冒號後如果有 imageTexts 可以更新
       const mapEl = document.getElementById('大地圖');
       const file = mapEl ? mapEl.src.split('/').pop() : null;
       const value = file && imageTexts[file] ? imageTexts[file][key] : "";
@@ -4891,14 +4687,11 @@ function updateAllText(lang) {
       el.textContent = `${key}: ${value}`;
     }
   });
-
-  // 更新區塊標題
   document.querySelectorAll('em[data-key]').forEach(el => {
     const zh = el.dataset.key;
     el.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
   });
 }
-
 	
 function updateText(flag = true) {
   try {
@@ -4906,377 +4699,217 @@ function updateText(flag = true) {
     const file = mapEl ? mapEl.src.split('/').pop() : null;
     const texts = file && imageTexts[file] ? imageTexts[file] : {};
     const lang = localStorage.getItem('lang') || 'chinese';
-
-    // 更新欄位文字（strong[data-key]）
     document.querySelectorAll('strong[data-key]').forEach(el => {
       const key = el.dataset.key;
       const value = texts[key] || "";
-
       if (flag) {
         if (lang === 'english') {
-          const enKey = zhToEn[key] || key;
-          const enValue = zhToEn[value] || value;
-          el.textContent = `${enKey}: ${enValue}`;
-        } else {
-          el.textContent = `${key}: ${value}`;
-        }
+          const enKey = zhToEn[key] || key; const enValue = zhToEn[value] || value; el.textContent = `${enKey}: ${enValue}`;
+        } else { el.textContent = `${key}: ${value}`; }
       } else {
-        // 清空冒號後內容
-        if (lang === 'english') {
-          const enKey = zhToEn[key] || key;
-          el.textContent = `${enKey}:`;
-        } else {
-          el.textContent = `${key}:`;
-        }
+        if (lang === 'english') { const enKey = zhToEn[key] || key; el.textContent = `${enKey}:`; } else { el.textContent = `${key}:`; }
       }
     });
-
-    // 更新區塊小標題（data-section）
     document.querySelectorAll('[data-section]').forEach(s => {
-      const zh = s.dataset.section;
-      s.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
+      const zh = s.dataset.section; s.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
     });
-
-    // 更新主標題（城堡、夜晚、特殊）
     document.querySelectorAll('em[data-key]').forEach(el => {
-      const zh = el.dataset.key;
-      el.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
+      const zh = el.dataset.key; el.textContent = (lang === 'english') ? (zhToEn[zh] || zh) : zh;
     });
-
-  } catch (e) {
-    console.warn('更新文字失敗：', e);
-  }
+  } catch (e) { console.warn('更新文字失敗：', e); }
 }
 
-// -----------------------------
-// 網頁載入初始化
-// -----------------------------
 window.addEventListener('load', () => {
   const savedLang = localStorage.getItem('lang') || 'chinese';
-  setLanguage(savedLang);
-  updateNightInfo();
-  toggleMode(true);
-
-  // 強制刷新頁面文字
-  updateText(true);
+  setLanguage(savedLang); updateNightInfo(); updateText(true);
 });
 
-// -----------------------------
-// 清除圖標時呼叫
-// -----------------------------
 function clearAllIcons() {
   const count = getCurrentTerrainCount();
   for (let i = 1; i <= count; i++) {
-    setCurrentIconState(i, null);
-    updateIconVisual(i);
-    const el = getCurrentTerrainIcon(i);
-    if (el) el.style.display = '';
-    if (el) el.oncontextmenu = e => e.preventDefault();
+    setCurrentIconState(i, null); 
+    updateIconVisual(i, true);
+    const el = getCurrentTerrainIcon(i); if (el) el.style.display = ''; if (el) el.oncontextmenu = e => e.preventDefault();
   }
-
   const lang = localStorage.getItem('lang') || 'chinese';
   const infoMsgEl = document.getElementById('infoMsg');
-  if (infoMsgEl) {
-    infoMsgEl.textContent = (lang === 'english') 
-      ? 'All icon states cleared.' 
-      : '已清除圖標狀態。';
-  }
-
-  const mapEl = document.getElementById('大地圖');
-  mapEl.src = selectedTerrain + '.png';
-  mapEl.style.display = '';
-  hideFail();
-  showAllIcons();
-
-  // 刷新頁面文字，清空冒號後內容
-  updateText(false);
+  if (infoMsgEl) infoMsgEl.textContent = (lang === 'english') ? 'All icon states cleared.' : '已清除圖標狀態。';
+  const mapEl = document.getElementById('大地圖'); mapEl.src = selectedTerrain + '.png'; mapEl.style.display = '';
+  hideFail(); showAllIcons(); updateText(false);
+  
+  if(isTouchMode) toggleDragUI(true);
+  disableRightClickAll();
 }
 
-/* ---------------------------
-   切換地形（自動清除所有圖標 + 多語支援）
-   --------------------------- */
 function switchTerrain(name) {
   const lang = localStorage.getItem('lang') || 'chinese';
   const mapEl = document.getElementById('大地圖');
-  const terrainOrder = {
-    "普通地形": ["山頂地形", "火山地形", "腐敗地形", "隱城地形"],
-    "山頂地形": ["普通地形", "火山地形", "腐敗地形", "隱城地形"],
-    "火山地形": ["普通地形", "山頂地形", "腐敗地形", "隱城地形"],
-    "腐敗地形": ["普通地形", "山頂地形", "火山地形", "隱城地形"],
-    "隱城地形": ["普通地形", "山頂地形", "火山地形", "腐敗地形"]
-  };
+  
+  mapEl.classList.add('fading-out');
 
-  selectedTerrain = name;
-
-  // 切換地形時先清除所有圖標狀態
-  clearAllIcons();
-
-  // 更新地圖
-  mapEl.src = name + ".png";
-  mapEl.style.display = "";
-
-  // 更新右側地形按鈕
-  const order = terrainOrder[name];
-  for (let i = 0; i < 4; i++) {
-    const img = document.getElementById('縮圖' + (i + 1));
-    if (img) {
-      img.src = order[i] + ".png";
-      img.onclick = () => switchTerrain(order[i]);
-    }
-  }
-
-  // 更新提示訊息（多語支援）
-  const infoBox = document.getElementById('infoMsg');
-  if (infoBox) {
-    const terrainNamesEn = {
-      "普通地形": "Default",
-      "山頂地形": "Mountaintop",
-      "火山地形": "Crater",
-      "腐敗地形": "Rotted Woods",
-      "隱城地形": "Noklateo"
+  setTimeout(() => {
+    const terrainOrder = {
+      "普通地形": ["山頂地形", "火山地形", "腐敗地形", "隱城地形","大空洞"],
+      "山頂地形": ["普通地形", "火山地形", "腐敗地形", "隱城地形","大空洞"],
+      "火山地形": ["普通地形", "山頂地形", "腐敗地形", "隱城地形","大空洞"],
+      "腐敗地形": ["普通地形", "山頂地形", "火山地形", "隱城地形","大空洞"],
+      "隱城地形": ["普通地形", "山頂地形", "火山地形", "腐敗地形","大空洞"],
+      "大空洞": ["普通地形", "山頂地形", "火山地形", "腐敗地形","隱城地形"]
     };
-    if (lang === 'english') {
-      infoBox.textContent = "Switched to: " + (terrainNamesEn[name] || name);
-    } else {
-      infoBox.textContent = "已切換至：" + name;
+    selectedTerrain = name;
+    clearAllIcons();
+    mapEl.src = name + ".png";
+    mapEl.style.display = "";
+
+    mapEl.onload = () => { mapEl.classList.remove('fading-out'); };
+    setTimeout(() => mapEl.classList.remove('fading-out'), 50);
+
+    const order = terrainOrder[name];
+    for (let i = 0; i < 5; i++) {
+      const img = document.getElementById('縮圖' + (i + 1));
+      if (img && order[i]) { img.src = order[i] + ".png"; img.onclick = () => switchTerrain(order[i]); }
     }
-  }
-
-  // 顯示該地形圖標
-  showTerrainIcons(name);
-
-  // 重新篩選（確保顯示狀態正確）
-  runFilter();
-}
-
-
-
-/* ---------------------------
-   顯示失敗訊息
-   --------------------------- */
-function showFail(msg){
-  const failEl = document.getElementById('failMsg');
-  failEl.textContent = msg;      // 更新文字
-  failEl.style.display = 'block'; // 顯示 div
-}
-
-/* ---------------------------
-   隱藏失敗訊息
-   --------------------------- */
-function hideFail(){
-  const failEl = document.getElementById('failMsg');
-  failEl.style.display = 'none';
-}
-
-/* ---------------------------
-   核心篩選邏輯
-   --------------------------- */
-function runFilter() {
-  const mapEl = document.getElementById('大地圖');
-  const defaultMap = selectedTerrain + '.png';
-  const nightRanges = terrainNightRanges[selectedTerrain];
-  const nightsToCheck = selectedNightsMulti.length > 0 ? selectedNightsMulti : [];
-  const lang = localStorage.getItem('lang') || 'chinese';
-  const infoBox = document.getElementById('infoMsg');
-
-  // 如果沒選夜王
-  if (nightsToCheck.length === 0) {
-    mapEl.src = defaultMap;
-    mapEl.style.display = '';
-    showAllIcons();
-    updateText(false);
-    hideFail();
+    const infoBox = document.getElementById('infoMsg');
     if (infoBox) {
-      infoBox.textContent = (lang === 'english') 
-        ? 'Please select target BOSS(s).' 
-        : '請選擇目標王';
+      const terrainNamesEn = { "普通地形": "Default", "山頂地形": "Mountaintop", "火山地形": "Crater", "腐敗地形": "Rotted Woods", "隱城地形": "Noklateo", "大空洞": "Great Hollow" };
+      if (lang === 'english') { infoBox.textContent = "Switched to: " + (terrainNamesEn[name] || name); } else { infoBox.textContent = "已切換至：" + name; }
     }
+    showTerrainIcons(name); runFilter();
+  }, 200);
+}
+
+function showFail(msg){ 
+    const failEl = document.getElementById('failMsg'); 
+    failEl.textContent = msg; 
+    failEl.style.display = 'block'; 
+}
+function hideFail(){ const failEl = document.getElementById('failMsg'); failEl.style.display = 'none'; }
+
+function runFilter() {
+  const mapEl = document.getElementById('大地圖'); const defaultMap = selectedTerrain + '.png';
+  const nightRanges = terrainNightRanges[selectedTerrain]; const nightsToCheck = selectedNightsMulti.length > 0 ? selectedNightsMulti : [];
+  const lang = localStorage.getItem('lang') || 'chinese'; const infoBox = document.getElementById('infoMsg');
+
+  if (nightsToCheck.length === 0) {
+    mapEl.src = defaultMap; mapEl.style.display = ''; showAllIcons(); updateText(false); hideFail();
+    if (infoBox) infoBox.textContent = (lang === 'english') ? 'Please select target BOSS(s).' : '請選擇目標王';
+    
+    disableRightClickAll();
+    if(isTouchMode) toggleDragUI(true);
     return;
   }
-
-  const activeIndices = [];
-  const count = getCurrentTerrainCount();
-  for (let i = 1; i <= count; i++) {
-    if (getCurrentIconState(i) !== null) activeIndices.push(i);
-  }
-
+  const activeIndices = []; const count = getCurrentTerrainCount();
+  for (let i = 1; i <= count; i++) { if (getCurrentIconState(i) !== null) activeIndices.push(i); }
   let filteredResults = [];
   for (const night of nightsToCheck) {
-    const range = nightRanges[night];
-    if (!range) continue;
-    let candidates = IMAGES.filter(img => {
-      const num = parseInt(img.file, 10);
-      return num >= range[0] && num <= range[1];
-    });
-
+    const range = nightRanges[night]; if (!range) continue;
+    let candidates = IMAGES.filter(img => { const num = parseInt(img.file, 10); return num >= range[0] && num <= range[1]; });
     candidates = candidates.filter(img => {
       for (const i of activeIndices) {
-        const need = getCurrentIconState(i);
-        const actual = img.points[i - 1] || '無';
-        if (need === '無') {
-          if (actual !== '無') return false;
-        } else if (need !== actual) return false;
+        const need = getCurrentIconState(i); const actual = img.points[i - 1] || '無';
+        if (need === '無') { if (actual !== '無') return false; } else if (need !== actual) return false;
       }
       return true;
     });
-
-    if (candidates.length > 0) {
-      candidates.forEach(c => (c._night = night));
-      filteredResults.push(...candidates);
-    }
+    if (candidates.length > 0) { candidates.forEach(c => (c._night = night)); filteredResults.push(...candidates); }
   }
-
-  const uniqueFiltered = Array.from(new Set(filteredResults.map(img => img.file)))
-    .map(f => filteredResults.find(img => img.file === f));
+  const uniqueFiltered = Array.from(new Set(filteredResults.map(img => img.file))).map(f => filteredResults.find(img => img.file === f));
 
   setTimeout(() => {
-    hideFail(); // 先隱藏失敗訊息
-
+    hideFail();
     if (uniqueFiltered.length === 0) {
-      mapEl.src = defaultMap;
-      mapEl.style.display = 'none';
-      hideAllIcons();
-      updateText(false);
-      showFail(lang === 'english' 
-        ? 'Filter failed — no matching seed found.' 
-        : '篩選失敗 — 沒有符合的種子。');
+      mapEl.src = defaultMap; mapEl.style.display = 'none'; hideAllIcons(); updateText(false);
+      showFail(lang === 'english' ? 'Filter failed — no matching seed found.' : '篩選失敗 — 沒有符合的種子。');
       if (infoBox) infoBox.textContent = '';
-    } else if (uniqueFiltered.length === 1) {
-      const result = uniqueFiltered[0];
-      mapEl.src = result.file;
-      mapEl.style.display = '';
-      hideAllIcons();
-      updateText(true);
+      
+      if(isTouchMode) toggleDragUI(true);
+      disableRightClickAll();
 
+    } else if (uniqueFiltered.length === 1) {
+      const result = uniqueFiltered[0]; mapEl.src = result.file; mapEl.style.display = ''; hideAllIcons(); updateText(true);
       if (infoBox) {
         if (selectedNightsMulti.length > 1 && result._night) {
-  		  // 找到對應的 div
 			const nightEl = document.getElementById(result._night);
-  			const nightText = (lang === 'english' && nightEl) 
-			? nightEl.dataset.en 
-    		: result._night;
-  		infoBox.textContent = (lang === 'english') 
-			? `Unique matching seed found: ${result.file} | ${nightText}` 
-			: `找到唯一符合種子：${result.file}丨${nightText}`;
+  			const nightText = (lang === 'english' && nightEl) ? nightEl.dataset.en : result._night;
+  		infoBox.textContent = (lang === 'english') ? `Unique matching seed found: ${result.file} | ${nightText}` : `找到唯一符合種子：${result.file}丨${nightText}`;
         } else {
-          infoBox.textContent = (lang === 'english') 
-            ? `Unique matching seed found: ${result.file}` 
-            : `找到唯一符合種子：${result.file}`;
+          infoBox.textContent = (lang === 'english') ? `Unique matching seed found: ${result.file}` : `找到唯一符合種子：${result.file}`;
         }
       }
-    } else {
-      mapEl.src = defaultMap;
-      mapEl.style.display = '';
-      showAllIcons();
-      updateText(false);
+      toggleDragUI(false);
+      enableRightClickAll();
 
+    } else {
+      mapEl.src = defaultMap; mapEl.style.display = ''; showAllIcons(); updateText(false);
       if (infoBox && activeIndices.length > 0) {
-        infoBox.textContent = (lang === 'english') 
-          ? `${uniqueFiltered.length} seeds remaining (continue placing icons to refine the filter)` 
-          : `還剩 ${uniqueFiltered.length} 張（繼續設定圖標可進一步篩選）`;
+        infoBox.textContent = (lang === 'english') ? `${uniqueFiltered.length} seeds remaining (continue placing icons to refine the filter)` : `還剩 ${uniqueFiltered.length} 張（繼續設定圖標可進一步篩選）`;
       }
+      if(isTouchMode) toggleDragUI(true);
+      disableRightClickAll();
     }
   }, 150);
 }
 
-/* ---------------------------
-   切換地形圖標顯示
-   --------------------------- */
 function showTerrainIcons(name){
-  const terrains = ["普通地形","山頂地形","火山地形","腐敗地形","隱城地形"];
+  const terrains = ["普通地形","山頂地形","火山地形","腐敗地形","隱城地形","大空洞"];
   terrains.forEach(t => {
-    for(let i=1;i<=11;i++){
-      const el = document.getElementById(t + '圖標位置' + i);
-      if(el) el.style.display = (t === name ? '' : 'none');
-    }
+    const count = (t==='山頂地形'||t==='火山地形') ? 9 : (t==='腐敗地形'||t==='隱城地形') ? 8 : 11;
+    for(let i=1;i<=count;i++){ const el = document.getElementById(t + '圖標位置' + i); if(el) el.style.display = (t === name ? '' : 'none'); }
   });
 }
 
-
-/* ---------------------------
-   右鍵控制
-   --------------------------- */
-function disableRightClickAll(){
-  for(let i=1;i<=11;i++){
-    const el = getCurrentTerrainIcon(i);
-    if(el) el.oncontextmenu = e => e.preventDefault();
-  }
+function disableRightClickAll(){ 
+    document.oncontextmenu = e => e.preventDefault(); 
+}
+function enableRightClickAll(){ 
+    document.oncontextmenu = null; 
 }
 
-function enableRightClickAll(){
-  for(let i=1;i<=11;i++){
-    const el = getCurrentTerrainIcon(i);
-    if(el) el.oncontextmenu = null;
-  }
-}
-
-/* ---------------------------
-   清除圖標
-   --------------------------- */
-function clearAllIcons() {
-  const count = getCurrentTerrainCount();
-  for (let i = 1; i <= count; i++) {
-    setCurrentIconState(i, null);
-    updateIconVisual(i);
-    const el = getCurrentTerrainIcon(i);
-    if (el) el.style.display = '';
-    if (el) el.oncontextmenu = e => e.preventDefault();
-  }
-
-  const lang = localStorage.getItem('lang') || 'chinese';
-  const infoMsgEl = document.getElementById('infoMsg');
-  if (infoMsgEl) {
-    infoMsgEl.textContent = (lang === 'english') 
-      ? 'All icon states cleared.' 
-      : '已清除圖標狀態。';
-  }
-
-  const mapEl = document.getElementById('大地圖');
-  mapEl.src = selectedTerrain + '.png';
-  mapEl.style.display = '';
-  hideFail();
-  updateText(false);
-  showAllIcons();
-}
-
-
-/* ---------------------------
-   初始化
-   --------------------------- */
 function init(){
-  const nights=['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王'];
-  nights.forEach(n=>{
-    const el=document.getElementById(n);
-    if(el) el.addEventListener('click',e=>selectNight(n,e));
-    const iconEl=document.getElementById(n+'_icon');
-    if(iconEl) iconEl.addEventListener('click',e=>selectNight(n,e));
-  });
+  // 修正 1: 最底層強制讀取，不依賴 DOMContentLoaded，確保變數覆蓋
+  const savedMode = localStorage.getItem('defaultMode') || 'mouse';
+  isTouchMode = (savedMode === 'touch');
+  
+  // 更新 UI 狀態
+  const btnMouse = document.getElementById("modeMouse"); 
+  const btnTouch = document.getElementById("modeTouch");
+  if (btnMouse && btnTouch) {
+      if(isTouchMode) {
+          btnTouch.classList.add('active');
+          btnMouse.classList.remove('active');
+      } else {
+          btnMouse.classList.add('active');
+          btnTouch.classList.remove('active');
+      }
+  }
+  
+  setTimeout(() => applyMode(), 0);
 
-  const terrains=['普通地形','山頂地形','火山地形','腐敗地形','隱城地形'];
+  const nights=['黑夜野獸','黑夜之爵','黑夜之智','深海黑夜','黑夜之魔','黑夜光騎士','黑夜霧霾','黑夜王','安定者們','廢棄物之王'];
+  nights.forEach(n=>{
+    const el=document.getElementById(n); if(el) el.addEventListener('click',e=>selectNight(n,e));
+    const iconEl=document.getElementById(n+'_icon'); if(iconEl) iconEl.addEventListener('click',e=>selectNight(n,e));
+  });
+  const terrains=['普通地形','山頂地形','火山地形','腐敗地形','隱城地形','大空洞'];
   terrains.forEach(t=>{
-    const count=t==='山頂地形'||t==='火山地形'?9:(t==='腐敗地形'||t==='隱城地形'?8:11);
+    const count = (t==='山頂地形'||t==='火山地形') ? 9 : (t==='腐敗地形'||t==='隱城地形') ? 8 : 11;
     for(let i=1;i<=count;i++){
-      const el=document.getElementById(t+'圖標位置'+i);
-      if(!el) continue;
-      setCurrentIconState(i,null);
-      updateIconVisual(i);
-      el.addEventListener('mousedown',e=>{
-        e.preventDefault();
-        toggleIcon(i,e.button);
-      });
-      el.oncontextmenu=e=>e.preventDefault();
+      const el=document.getElementById(t+'圖標位置'+i); if(!el) continue;
+      setCurrentIconState(i,null); 
+      updateIconVisual(i, true); 
+      el.addEventListener('mousedown',e=>{ 
+          if(e.button === 2 && document.oncontextmenu === null) return; 
+          e.preventDefault(); toggleIcon(i,e.button); 
+      }); 
     }
   });
   showTerrainIcons('普通地形');
-
-  const clearBtn=document.getElementById('clearIconsBtn');
-  if(clearBtn) clearBtn.addEventListener('click',clearAllIcons);
-
+  const clearBtn=document.getElementById('clearIconsBtn'); if(clearBtn) clearBtn.addEventListener('click',clearAllIcons);
   document.getElementById('infoMsg').textContent='請先選擇地形，再放置圖標、選擇目標王';
+  
+  disableRightClickAll();
 }
-
 document.addEventListener('DOMContentLoaded',init);
-
 </script>
 </body>
 </html>
