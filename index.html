@@ -868,6 +868,8 @@ function switchTerrain(id) {
                     icon.style.animationDelay = '';
                 });
             }
+            // 修正：執行完畢後清除 onload，避免後續篩選更換圖片時再次觸發此邏輯
+            mapImg.onload = null;
         };
     }, 300);
 }
@@ -1060,7 +1062,7 @@ function runFilter(silentMode = false) {
     document.oncontextmenu = (e) => e.preventDefault();
     mapEl.style.pointerEvents = 'none';
 
-    // 狀態文字更新 (使用變數，避免重複字串)
+    // 狀態文字更新
     const touchMsg = isEn ? zhToEn["請選擇工具，點擊地圖"] : "點擊工具切換，長按可拖曳";
     const mouseMsg = isEn ? zhToEn["請選擇地形，放置圖標"] : "請選擇地形，放置圖標";
     const defaultMsg = state.mode === 'touch' ? touchMsg : mouseMsg;
@@ -1069,7 +1071,12 @@ function runFilter(silentMode = false) {
         toast.textContent = isEn ? zhToEn["請選擇目標王"] : "請選擇目標王";
         resetDataDisplay();
         mapEl.src = defaultMap;
-        if (!silentMode) wrapper.querySelectorAll('.icon').forEach(i => i.style.display = 'block');
+        if (!silentMode) {
+            wrapper.querySelectorAll('.icon').forEach(i => {
+                i.style.removeProperty('display'); // 清除強制的隱藏設定
+                i.style.display = 'block';
+            });
+        }
         return;
     }
 
@@ -1124,7 +1131,10 @@ function runFilter(silentMode = false) {
             mapEl.src = defaultMap;
             toast.textContent = isEn ? zhToEn["篩選失敗 — 沒有符合的種子。"] : "篩選失敗 — 沒有符合的種子。";
             resetDataDisplay();
-            wrapper.querySelectorAll('.icon').forEach(i => i.style.display = 'block');
+            wrapper.querySelectorAll('.icon').forEach(i => {
+                i.style.removeProperty('display');
+                i.style.display = 'block';
+            });
         } 
         else if (uniqueFiltered.length === 1) {
             const result = uniqueFiltered[0];
@@ -1144,7 +1154,12 @@ function runFilter(silentMode = false) {
                 e.preventDefault();
             };
             mapEl.style.pointerEvents = 'auto';
-            wrapper.querySelectorAll('.icon').forEach(i => i.style.display = 'none');
+            
+            // [修正重點] 使用 setProperty 加上 important 來覆蓋 CSS 動畫的 !important
+            wrapper.querySelectorAll('.icon').forEach(i => {
+                i.classList.remove('pop-effect'); // 嘗試移除動畫 class
+                i.style.setProperty('display', 'none', 'important'); // 強制隱藏
+            });
 
         } else {
             mapEl.src = defaultMap;
@@ -1153,14 +1168,16 @@ function runFilter(silentMode = false) {
             const remainingTxt = isEn ? zhToEn["還剩"] : "還剩";
             const suffix = isEn ? zhToEn["張（繼續設定圖標可進一步篩選）"] : "張（繼續設定圖標可進一步篩選）";
             toast.textContent = `${remainingTxt} ${count} ${suffix}`;
-            wrapper.querySelectorAll('.icon').forEach(i => i.style.display = 'block');
+            wrapper.querySelectorAll('.icon').forEach(i => {
+                i.style.removeProperty('display'); // 清除強制的隱藏設定
+                i.style.display = 'block';
+            });
         }
     };
 
     if (!silentMode) setTimeout(handleResult, 100);
     else handleResult();
 }
-
 function updateDataDisplay(imgData) {
     if (!imgData) return;
     const isEn = state.lang === 'en';
