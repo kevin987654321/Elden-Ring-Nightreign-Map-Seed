@@ -4,10 +4,10 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="google" content="notranslate"> 
-<title>Elden Ring Nightreign Map Seed - Compact</title>
+<title>Elden Ring Nightreign Map Seed</title>
 <style>
 /* =========================================
-   全域設定 & 變數 (Compact Mode)
+   全域設定 & 變數
    ========================================= */
 :root {
     --bg-color: #0f0f0f;
@@ -32,31 +32,46 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
-    /* [縮放調整] 稍微縮小基礎字體大小 */
     font-size: 14px; 
 }
 
 /* =========================================
-   佈局容器 (Compact Mode)
+   強制橫屏提示層 (預設隱藏)
+   ========================================= */
+#orientation-lock {
+    display: none;
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background-color: #1a1a1a;
+    z-index: 99999;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+#orientation-lock img {
+    width: 66%;
+    max-width: 500px;
+    height: auto;
+    object-fit: contain;
+}
+
+/* =========================================
+   佈局容器
    ========================================= */
 #app-container {
     display: grid;
-    /* [縮放調整] 縮小左右面板寬度 (320->290, 200->180) */
     grid-template-columns: 290px 1fr 180px;
     width: 100%;
     height: 100%;
     max-width: 1920px;
     gap: 0;
+    transition: opacity 0.3s;
 }
 
-@media (max-width: 900px) {
-    #app-container {
-        grid-template-columns: 1fr;
-        grid-template-rows: auto 1fr auto;
-    }
-    #left-panel { display: none; }
-    #right-panel { display: none; }
-}
+/* 手機版按鈕預設隱藏 */
+#mobile-menu-trigger { display: none; }
+.mobile-close-btn { display: none; }
 
 /* =========================================
    通用：流光邊框卡片
@@ -93,16 +108,29 @@ body {
    左側面板
    ========================================= */
 #left-panel {
-    padding: 18px; /* Slightly reduced padding */
+    padding: 18px;
     display: flex;
     flex-direction: column;
-    gap: 15px;     /* Reduced gap */
+    gap: 15px;
     border-right: 1px solid var(--border-color);
     overflow-y: auto;
     z-index: 10;
+    background: var(--bg-color);
 }
 #left-panel::-webkit-scrollbar { width: 4px; }
 #left-panel::-webkit-scrollbar-thumb { background: #333; border-radius: 2px; }
+
+.quick-filters-group {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+.drawer-content {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+}
 
 .logo-area { font-size: 16px; font-weight: bold; letter-spacing: 2px; color: #fff; opacity: 0.8; margin-bottom: 5px; }
 
@@ -118,7 +146,6 @@ body {
 .info-content strong { color: var(--text-sub); font-weight: normal; margin-right: 15px; white-space: nowrap; flex-shrink: 0; }
 .info-content span { text-align: right; word-break: break-word; line-height: 1.4; }
 
-/* [縮放調整] Boss 列表更緊湊 */
 .boss-list { display: grid; grid-template-columns: 1fr; gap: 6px; margin-top: 8px; }
 .boss-item {
     display: flex; align-items: center; padding: 6px; cursor: pointer; border-radius: 4px;
@@ -127,14 +154,13 @@ body {
 .boss-item:hover { background: rgba(255,255,255,0.03); }
 .boss-item.selected { background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.3); }
 
-/* [縮放調整] 圖標尺寸縮小 (36->32) */
 .boss-icon-frame { width: 32px; height: 32px; overflow: hidden; margin-right: 10px; border: 1px solid #333; border-radius: 4px; }
 .boss-icon-frame img { width: 100%; height: 100%; object-fit: cover; }
 .boss-info { display: flex; flex-direction: column; justify-content: center; }
 .boss-alias { font-size: 12px; color: #ddd; font-weight: 500; }
 .boss-realname { font-size: 10px; color: #666; margin-top: 1px; }
 
-.action-bar { display: flex; gap: 8px; margin-top: auto; }
+.action-bar { display: flex; gap: 8px; margin-top: auto; padding-bottom: 20px;}
 .btn-minimal {
     flex: 1; padding: 10px; background: transparent; color: #888;
     border: 1px solid var(--border-color); font-size: 12px; cursor: pointer;
@@ -152,6 +178,7 @@ body {
     align-items: center;
     background: radial-gradient(circle at center, #1a1a1a 0%, #0f0f0f 70%);
     overflow: hidden;
+    z-index: 1;
 }
 
 #mapWrapper {
@@ -159,7 +186,7 @@ body {
     width: 400px;
     height: 400px;
     transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* [縮放調整] 地圖縮放比例從 1.6 降至 1.45 */
+    /* [電腦版] 保持原始縮放比例 1.45 */
     transform: scale(1.45);
 }
 
@@ -170,7 +197,6 @@ body {
 }
 #大地圖.fade-out { opacity: 0; filter: blur(10px); transform: scale(0.95); }
 
-/* 圖標樣式 */
 .icon {
     position: absolute; width: 30px; height: 30px;
     cursor: pointer; z-index: 20;
@@ -181,7 +207,6 @@ body {
 }
 .icon:hover { filter: brightness(1.3) drop-shadow(0 0 5px rgba(255,255,255,0.4)); z-index: 30; }
 
-/* 落子動畫 */
 .icon.pop-effect {
     animation: chess-impact 0.6s forwards !important; 
     filter: brightness(1.1); 
@@ -198,7 +223,6 @@ body {
   100% { transform: translateY(0) scale(1); }
 }
 
-/* 狀態訊息 */
 #status-toast {
     position: absolute; bottom: 30px; left: 50%; transform: translateX(-50%);
     padding: 8px 20px; 
@@ -215,26 +239,22 @@ body {
 }
 
 /* =========================================
-   垂直側邊觸控工具列 (Touch Toolbar - Compact)
+   垂直側邊觸控工具列
    ========================================= */
 #touch-toolbar {
     position: absolute;
     top: 50%;
     left: 20px;
     transform: translateY(-50%) translateX(-60px); 
-    
     display: flex;
     flex-direction: column;
-    /* [縮放調整] 寬度縮小 (50->44) */
     width: 44px; 
-    
     background: rgba(30, 30, 30, 0.4); 
     border: 1px solid rgba(255, 255, 255, 0.08); 
     backdrop-filter: blur(8px);
     -webkit-backdrop-filter: blur(8px);
     border-radius: 22px;
     z-index: 90;
-    
     opacity: 0;
     pointer-events: none;
     transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
@@ -249,7 +269,6 @@ body {
 
 .tool-btn {
     width: 100%;
-    /* [縮放調整] 高度縮小 (60->52) */
     height: 52px;
     display: flex;
     justify-content: center;
@@ -261,26 +280,14 @@ body {
     touch-action: none; 
     -webkit-tap-highlight-color: transparent;
 }
-
 .tool-btn:first-child { border-radius: 22px 22px 0 0; }
 .tool-btn:last-child { border-radius: 0 0 22px 22px; }
-
 .tool-btn:not(:last-child)::after {
     content: ""; position: absolute; bottom: 0; left: 10px; right: 10px; 
     height: 1px; background: rgba(255, 255, 255, 0.05);
 }
-
-.tool-btn img {
-    /* [縮放調整] 圖標微縮 */
-    width: 24px; height: 24px; object-fit: contain; pointer-events: none;
-    opacity: 0.4; transition: opacity 0.3s;
-}
-
-.tool-btn span {
-    font-size: 20px; color: #fff; font-weight: 300; pointer-events: none;
-    opacity: 0.4; transition: opacity 0.3s;
-}
-
+.tool-btn img { width: 24px; height: 24px; object-fit: contain; pointer-events: none; opacity: 0.4; transition: opacity 0.3s; }
+.tool-btn span { font-size: 20px; color: #fff; font-weight: 300; pointer-events: none; opacity: 0.4; transition: opacity 0.3s; }
 .tool-btn.active { background: rgba(255, 255, 255, 0.1); }
 .tool-btn.active img { opacity: 1; }
 .tool-btn.active span { opacity: 1; }
@@ -294,7 +301,7 @@ body {
 }
 
 /* =========================================
-   右側面板：撥輪 (Wheel - Compact)
+   右側面板：3D 滾輪
    ========================================= */
 #right-panel {
     position: relative;
@@ -303,24 +310,27 @@ body {
     overflow: hidden;
     cursor: grab;
     perspective: 1000px;
+    z-index: 10;
 }
 #right-panel:active { cursor: grabbing; }
 
 .wheel-list {
     position: absolute; top: 50%; left: 0; width: 100%;
     transform-style: preserve-3d;
+    transition: transform 0.1s linear; /* 改為 linear 讓跟手更滑順，移除回彈的 bezier */
+}
+/* 當手指放開需要回彈時，透過 JS 加回這個 class */
+.wheel-list.snapping {
     transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .terrain-item {
-    /* [縮放調整] 高度縮小 (60->52) */
     height: 52px; padding: 12px 10px 12px 25px;
     cursor: pointer; color: #555; font-size: 13px; font-weight: 500;
     transition: all 0.3s ease; transform-origin: left center;
     border-left: 2px solid transparent; position: relative; opacity: 0.6;
     display: flex; align-items: center;
 }
-
 .terrain-item:not(.active) { transform: scale(0.9) translateX(0px); }
 .terrain-item.active {
     color: #fff; font-size: 16px; opacity: 1;
@@ -330,9 +340,7 @@ body {
 }
 .terrain-item:hover:not(.active) { color: #aaa; transform: scale(1) translateX(10px); }
 
-/* =========================================
-   UI 控制按鈕 (設定 & 說明)
-   ========================================= */
+/* UI 控制按鈕 */
 #settings-trigger, #help-trigger {
     position: absolute; width: 36px; height: 36px; border-radius: 50%;
     border: 1px solid #444; background: #1a1a1a; color: #888;
@@ -340,16 +348,12 @@ body {
     cursor: pointer; z-index: 100; transition: transform 0.3s, color 0.3s;
     font-size: 14px;
 }
-
 #settings-trigger { bottom: 20px; left: 20px; }
 #settings-trigger:hover { color: #fff; border-color: #666; transform: rotate(90deg); }
-
 #help-trigger { top: 20px; right: 20px; font-weight: bold; font-family: monospace; }
 #help-trigger:hover { color: #fff; border-color: #666; transform: scale(1.1); }
 
-/* =========================================
-   Modals (通用 - Compact)
-   ========================================= */
+/* Modals */
 .modal-overlay {
     position: fixed; top: 0; left: 0; width: 100%; height: 100%;
     background: rgba(0,0,0,0.8); z-index: 2000; display: none;
@@ -362,16 +366,12 @@ body {
     display: flex; flex-direction: column; gap: 12px;
 }
 .modal-title { font-size: 15px; color: #fff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
-
-/* 設定頁面樣式 */
 .setting-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
 .setting-btn {
     background: #222; border: 1px solid #444; color: #ccc; padding: 5px 10px;
     cursor: pointer; font-size: 12px; margin-left: 5px; border-radius: 3px;
 }
 .setting-btn.active { background: #ccc; color: #000; border-color: #fff; }
-
-/* 公告 & 說明頁面樣式 */
 .content-text { font-size: 13px; line-height: 1.6; color: #ccc; white-space: pre-wrap; margin: 8px 0; }
 .modal-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; font-size: 12px; color: #666; }
 .modal-btn-primary {
@@ -381,48 +381,229 @@ body {
 .modal-btn-primary:hover { opacity: 0.8; }
 .text-btn { cursor: pointer; color: #888; text-decoration: underline; }
 .text-btn:hover { color: #fff; }
-
 input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
+
+
+/* =========================================
+   直向鎖定 (Portrait Lock)
+   ========================================= */
+@media screen and (max-width: 900px) and (orientation: portrait) {
+    #app-container {
+        display: none !important; 
+    }
+    #orientation-lock {
+        display: flex !important; 
+    }
+}
+
+/* =========================================
+   手機版 (橫向) 優化
+   ========================================= */
+@media screen and (max-width: 900px) and (orientation: landscape) {
+    
+    #app-container {
+        display: block;
+        position: relative;
+    }
+
+    /* 左側選單結構重組 */
+    #left-panel {
+        position: absolute;
+        top: 0; left: 0; width: 100%; height: 100%;
+        background: transparent;
+        border: none;
+        padding: 0;
+        pointer-events: none; 
+        z-index: 2000;
+        overflow: visible;
+    }
+
+    /* 懸浮快捷區 (Castle, Night, Special) */
+    .quick-filters-group {
+        position: fixed;
+        top: 10px;
+        left: 10px;
+        pointer-events: auto; 
+        
+        background: rgba(20, 20, 20, 0.65);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        border-radius: 16px;
+        padding: 8px;
+        box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+
+        gap: 6px;
+        width: auto;
+        max-width: 220px; /* [縮小寬度] 避免文字拉太開 */
+        z-index: 2100;
+    }
+    
+    .quick-filters-group .info-title { font-size: 9px; margin-bottom: 2px; }
+    .quick-filters-group .info-content p { font-size: 11px; margin: 2px 0; }
+    .quick-filters-group .info-group { padding: 4px 8px; border: none; background: transparent; }
+    .quick-filters-group .info-group.glow-box { border: none; background: transparent; }
+    .quick-filters-group .glow-box::before, 
+    .quick-filters-group .glow-box::after { display: none; }
+    
+    /* [新增] 強制標籤和內容靠近一點 */
+    .quick-filters-group .info-content p {
+        justify-content: flex-start; /* 靠左對齊 */
+        gap: 10px; /* 設定間距 */
+    }
+    .quick-filters-group .info-content strong {
+        margin-right: 0; /* 移除原本的 margin，改用 gap 控制 */
+        width: 45px; /* 固定寬度讓冒號對齊 */
+    }
+
+    /* 抽屜式選單 */
+    .drawer-content {
+        position: fixed;
+        top: 0;
+        left: -100%; 
+        width: 60%;  
+        height: 100%;
+        background: var(--panel-bg);
+        z-index: 2200;
+        transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        pointer-events: auto;
+        padding: 20px;
+        border-right: 1px solid var(--border-color);
+        box-shadow: 10px 0 30px rgba(0,0,0,0.5);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .drawer-content.open { left: 0; }
+
+    .mobile-close-btn {
+        display: block;
+        position: absolute;
+        top: 15px; right: 15px;
+        background: transparent;
+        border: 1px solid #444;
+        color: #fff;
+        border-radius: 50%;
+        width: 30px; height: 30px;
+        cursor: pointer;
+    }
+
+    /* 展開選單按鈕 */
+    #mobile-menu-trigger {
+        display: block;
+        position: fixed;
+        bottom: 20px;
+        left: 20px;
+        z-index: 1001;
+        padding: 8px 16px;
+        background: var(--bg-color);
+        color: var(--text-main);
+        border: 1px solid var(--border-color);
+        border-radius: 50px;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        font-weight: bold;
+        pointer-events: auto;
+        font-size: 12px;
+    }
+
+    /* 右側地形選擇區 */
+    #right-panel {
+        position: fixed;
+        top: 0;
+        right: 0;
+        width: 160px; 
+        height: 100%;
+        z-index: 1900;
+        /* [修改] 移除深色背景，改回漸層與電腦版一致 */
+        background: linear-gradient(to right, transparent, rgba(0,0,0,0.9)); 
+        border-left: none; /* 移除邊框讓漸層更自然 */
+    }
+
+    /* 中間地圖區 */
+    #center-panel {
+        position: fixed;
+        top: 0; left: 0;
+        width: 100%; height: 100%;
+        z-index: 0; 
+    }
+
+    /* [手機版] 地圖縮放，維持較小尺寸 */
+    #mapWrapper {
+        transform: scale(0.95);
+    }
+    
+    /* 工具列位置：緊貼左側資料區 */
+    #touch-toolbar {
+        top: 10px;            
+        left: 120px;          /* 根據縮小的資料區寬度調整 */
+        bottom: auto;         
+        transform: none;      
+        opacity: 0;           
+        pointer-events: none;
+        z-index: 2150;        
+    }
+    
+    #touch-toolbar.visible {
+        opacity: 1;
+        pointer-events: auto;
+        transform: none;
+    }
+    
+    #settings-trigger { bottom: 60px; left: 20px; width: 32px; height: 32px; }
+    #help-trigger { top: auto; bottom: 60px; right: 170px; width: 32px; height: 32px; }
+}
 
 </style>
 </head>
 <body>
 
+<div id="orientation-lock">
+    <img src="橫向提示.png" alt="請旋轉手機">
+</div>
+
 <div id="app-container">
+    
+    <button id="mobile-menu-trigger">☰ MENU</button>
+
     <div id="left-panel">
-        <div class="logo-area">NIGHTREIGN</div>
         
-        <div class="info-group glow-box">
-            <div class="info-title" data-zh="城堡" data-en="CASTLE">城堡</div> 
-            <div class="info-content">
-                <p><strong data-key="地下">地下</strong><span id="val-地下">-</span></p>
-                <p><strong data-key="主要">主要</strong><span id="val-主要">-</span></p>
-                <p><strong data-key="樓頂">樓頂</strong><span id="val-樓頂">-</span></p>
+        <div class="quick-filters-group">
+            <div class="info-group glow-box">
+                <div class="info-title" data-zh="城堡" data-en="CASTLE">城堡</div> 
+                <div class="info-content">
+                    <p><strong data-key="地下">地下</strong><span id="val-地下">-</span></p>
+                    <p><strong data-key="主要">主要</strong><span id="val-主要">-</span></p>
+                    <p><strong data-key="樓頂">樓頂</strong><span id="val-樓頂">-</span></p>
+                </div>
+            </div>
+
+            <div class="info-group glow-box">
+                <div class="info-title" data-zh="夜晚" data-en="NIGHT">夜晚</div> 
+                <div class="info-content">
+                    <p><strong data-key="第一夜">第一夜</strong><span id="val-第一夜">-</span></p>
+                    <p><strong data-key="第二夜">第二夜</strong><span id="val-第二夜">-</span></p>
+                </div>
+            </div>
+
+            <div class="info-group glow-box">
+                <div class="info-title" data-zh="特殊" data-en="EVENT">特殊</div> 
+                <div class="info-content">
+                    <p><strong data-key="第一天">第一天</strong><span id="val-第一天">-</span></p>
+                    <p><strong data-key="第二天">第二天</strong><span id="val-第二天">-</span></p>
+                </div>
             </div>
         </div>
 
-        <div class="info-group glow-box">
-            <div class="info-title" data-zh="夜晚" data-en="NIGHT">夜晚</div> 
-            <div class="info-content">
-                <p><strong data-key="第一夜">第一夜</strong><span id="val-第一夜">-</span></p>
-                <p><strong data-key="第二夜">第二夜</strong><span id="val-第二夜">-</span></p>
+        <div class="drawer-content" id="drawer">
+            <button class="mobile-close-btn" id="close-drawer-btn">✕</button>
+            <div class="logo-area">NIGHTREIGN</div>
+
+            <div class="info-title" style="margin-top:20px;" data-zh="目標王" data-en="TARGET LORDS">目標王</div>
+            <div class="boss-list" id="bossListContainer"></div>
+
+            <div class="action-bar">
+                <button class="btn-minimal glow-box" id="clearBtn" data-zh="清除地圖" data-en="CLEAR MAP">清除地圖</button>
+                <button class="btn-minimal glow-box" id="resetBtn" data-zh="重置全部" data-en="RESET ALL">重置全部</button>
             </div>
-        </div>
-
-        <div class="info-group glow-box">
-            <div class="info-title" data-zh="特殊" data-en="EVENT">特殊</div> 
-            <div class="info-content">
-                <p><strong data-key="第一天">第一天</strong><span id="val-第一天">-</span></p>
-                <p><strong data-key="第二天">第二天</strong><span id="val-第二天">-</span></p>
-            </div>
-        </div>
-
-        <div class="info-title" style="margin-top:20px;" data-zh="目標王" data-en="TARGET LORDS">目標王</div>
-        <div class="boss-list" id="bossListContainer"></div>
-
-        <div class="action-bar">
-            <button class="btn-minimal glow-box" id="clearBtn" data-zh="清除地圖" data-en="CLEAR MAP">清除地圖</button>
-            <button class="btn-minimal glow-box" id="resetBtn" data-zh="重置全部" data-en="RESET ALL">重置全部</button>
         </div>
     </div>
 
@@ -519,12 +700,43 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
    資料定義
    ========================================= */
 
-const APP_VERSION = "2.1"; // 每次發公告修改此版本號
+const APP_VERSION = "2.6";
 
+/* 完整翻譯字典 */
 const zhToEn = {
-  "城堡": "CASTLE", "夜晚": "NIGHT", "特殊": "EVENT", "目標王": "TARGET LORDS",
+  "城堡": "CASTLE", "夜晚": "NIGHT", "特殊": "EVENT",
   "地下": "Basement", "主要": "Main", "樓頂": "Rooftop",
   "第一夜": "Night 1", "第二夜": "Night 2", "第一天": "Day 1", "第二天": "Day 2",
+  "鈴珠獵人": "Bell Bearing Hunter", "接肢貴族": "Grafted Scion", "薩米爾的古英雄": "Ancient Hero of Zamor",
+  "黑刀刺客": "Black Knife Assassin", "獅子混種": "Leonine Misbegotten", "王夫的紅狼": "Red Wolf of the King Consort",
+  "王室幽魂": "Royal Revenant", "無": "None", "山妖": "Troll", "熔爐騎士": "Crucible Knight",
+  "失鄉騎士": "Banished Knight", "羅蕾塔": "Royal Carian Knight", "祖靈": "Ancestor Spirit",
+  "大樹守衛": "Tree Sentinel", "黑劍眷屬": "Black Blade Kindred", "死亡儀式鳥": "Death Rite Bird",
+  "龍裝大樹守衛": "Draconic Tree Sentinel", "熔岩土龍": "Magma Wyrm", "黃金樹的化身": "Erdtree Avatar",
+  "腐爛樹靈": "Ulcerated Tree Spirit", "亞人雙人組": "Demi-Human Queen & Demi-Human Swordmaster",
+  "貪食魔龍": "Gaping Dragon", "蚯蚓臉": "Wormface", "英雄石像鬼": "Valiant Gargoyle",
+  "公爵的夫雷迪亞": "The Duke's Dear Freja", "黑夜騎兵": "Night's Cavalry", "熔鐵惡魔": "Smelter Demon",
+  "戰場老將": "Battlefield Commander", "百足惡魔": "Centipede Demon", "提比亞的喚聲船": "Tibia Mariner",
+  "接肢君王": "Grafted Monarch", "蒙葛特": "Fell Omen", "古龍": "Ancient Dragon",
+  "熔爐河馬": "Crucible Knight & Golden Hippopotamus", "偏地老將": "Outland Commander", "大土龍": "Great Wyrm",
+  "龍人士兵": "Nox Dragonkin Soldier", "墜星成獸": "Full-Grown Fallingstar Beast", "無名王者": "Nameless King",
+  "冷冽谷的舞孃": "Dancer of the Boreal Valley", "神皮雙人組": "Godskin Duo", "黑夜勢力": "Night Horde",
+  "隕石墜落": "Meteor Strike", "蒙葛特入侵": "Morgott Invasion", "巨大水泡現蹤": "Morgott Invasion",
+  "癲火現蹤": "frenzy tower", "古老魔師塔": "Difficult Sorcerer's Rise", "蟲群大量出現": "Gnoster Plague",
+  "惡魔詛咒": "Libra Curse", "額外BOSS:蒙葛特": "Extra Night Boss: Fell Omen",
+  "額外BOSS:大樹守衛": "Extra Night Boss: Tree Sentinel & Royal Cavalrymen",
+  "額外BOSS:古龍": "Extra Night Boss: Ancient Dragon",
+  "額外BOSS:熔爐河馬": "Extra Night Boss: Crucible Knight & Golden Hippopotamus",
+  "額外BOSS:偏地老將": "Extra Night Boss: Outland Commander",
+  "額外BOSS:大土龍": "Extra Night Boss: Great Wyrm",
+  "額外BOSS:龍人士兵": "Extra Night Boss: Nox Dragonkin Soldier",
+  "額外BOSS:龍裝大樹守衛": "Extra Night Boss: Draconic Tree Sentinel & Royal Cavalrymen",
+  "額外BOSS:墜星成獸": "Extra Night Boss: Full-Grown Fallingstar Beast",
+  "額外BOSS:死亡儀式鳥": "Extra Night Boss: Death Rite Bird",
+  "額外BOSS:無名王者": "Extra Night Boss: Nameless King",
+  "額外BOSS:冷冽谷的舞孃": "Extra Night Boss: Dancer of the Boreal Valley",
+  "額外BOSS:神皮雙人組": "Extra Night Boss: Godskin Duo",
+  "目標王": "TARGET LORDS",
   "清除地圖": "CLEAR MAP", "重置全部": "RESET ALL",
   "普通地形": "Standard", "山頂地形": "Mountaintop", "火山地形": "Crater", 
   "腐敗地形": "Rot", "隱城地形": "Hidden City", "大空洞": "Great Hollow",
@@ -542,11 +754,9 @@ const zhToEn = {
   "開始使用": "START",
   "操作說明": "INSTRUCTIONS",
   
-  // Instructions Mouse
   "mouse_help": "鍵鼠模式\n> 點擊選擇夜王\n> 按住 Ctrl 並點擊多選或取消選擇\n> 按住 Ctrl+Shift 並任意點擊全選\n\n> 點擊地圖放置圖標\n> 右鍵點擊放置法師塔",
   "mouse_help_en": "MOUSE MODE\n> Click to select Lord\n> Hold Ctrl + Click to multi-select/toggle\n> Hold Ctrl + Shift + Click to Select All\n\n> Left Click Map: Place Church\n> Right Click Map: Place Tower",
   
-  // Instructions Touch
   "touch_help": "觸控模式\n> 點擊選擇夜王\n> 再次點擊取消選擇\n> 點擊其他夜王多選\n\n> 切換並放置對應圖標\n> 長按拖曳對應圖標到點位即可放置",
   "touch_help_en": "TOUCH MODE\n> Tap to select Lord\n> Tap again to deselect\n> Tap others to multi-select\n\n> Tap tool to switch & place\n> Long press & drag icon to place"
 };
@@ -632,7 +842,7 @@ TERRAINS.forEach(t => {
 });
 
 /* =========================================
-   UI 初始化 (Welcome / Help / Wheel)
+   UI 初始化
    ========================================= */
 function initWelcome() {
     const welcomeModal = document.getElementById('welcomeModal');
@@ -640,7 +850,6 @@ function initWelcome() {
     const closeBtn = document.getElementById('welcome-close-btn');
     const switchLang = document.getElementById('welcome-switch-lang');
     
-    // Check local storage
     const savedVersion = localStorage.getItem('announcement_read_version');
     if (savedVersion === APP_VERSION) {
         welcomeModal.style.display = 'none';
@@ -683,8 +892,6 @@ function initHelp() {
     };
 
     closeBtn.onclick = () => modal.style.display = 'none';
-
-    // 讓 updateContent 暴露出去，以便切換模式/語言時更新（如果視窗開著）
     window.updateHelpContent = updateContent;
 }
 
@@ -692,6 +899,7 @@ function initWheel() {
     const container = document.getElementById('right-panel');
     const list = document.getElementById('terrainWheel');
     let isLocked = false;
+    const itemHeight = 52; 
 
     list.innerHTML = '';
     TERRAINS.forEach((t, idx) => {
@@ -699,6 +907,7 @@ function initWheel() {
         div.className = `terrain-item`;
         div.dataset.id = t.id;
         div.textContent = state.lang === 'en' ? t.en : t.name;
+        
         div.onclick = (e) => {
             e.stopPropagation();
             if (state.terrainIndex !== idx) snapTo(idx);
@@ -707,19 +916,28 @@ function initWheel() {
     });
 
     const snapTo = (idx) => {
-        if (idx < 0 || idx >= TERRAINS.length) return;
+        if (idx < 0) idx = 0;
+        if (idx >= TERRAINS.length) idx = TERRAINS.length - 1;
         state.terrainIndex = idx;
         
-        const itemHeight = 52; // Compact
         const offset = - (state.terrainIndex * itemHeight) - (itemHeight / 2);
+        
+        // 吸附時加上過渡動畫
+        list.classList.add('snapping');
         list.style.transform = `translateY(${offset}px)`;
 
         const items = list.querySelectorAll('.terrain-item');
         items.forEach((item, i) => item.classList.toggle('active', i === state.terrainIndex));
 
         switchTerrain(TERRAINS[state.terrainIndex].id);
+        
+        // 動畫結束後移除 class，避免干擾下一次拖曳的即時性
+        setTimeout(() => {
+            list.classList.remove('snapping');
+        }, 300);
     };
 
+    // 1. 電腦版滑鼠滾輪
     container.onwheel = (e) => {
         e.preventDefault();
         if (isLocked) return; 
@@ -734,6 +952,48 @@ function initWheel() {
 
         setTimeout(() => { isLocked = false; }, 150); 
     };
+
+    // 2. 手機版觸控拖曳 (跟手滑動)
+    let startY = 0;
+    let currentY = 0;
+    let isDragging = false;
+    let initialOffset = 0;
+
+    container.addEventListener('touchstart', (e) => {
+        isDragging = true;
+        startY = e.touches[0].clientY;
+        // 計算當前 CSS translateY 的數值
+        initialOffset = - (state.terrainIndex * itemHeight) - (itemHeight / 2);
+        // 拖曳開始時，移除過渡效果，確保即時反應
+        list.classList.remove('snapping');
+    }, { passive: false });
+
+    container.addEventListener('touchmove', (e) => {
+        if (!isDragging) return;
+        e.preventDefault(); 
+        
+        const currentTouchY = e.touches[0].clientY;
+        const deltaY = currentTouchY - startY;
+        
+        // 增加阻尼感，讓滑動不那麼靈敏 (例如 0.6 倍距)
+        const resistance = 0.6; 
+        currentY = initialOffset + (deltaY * resistance);
+        
+        list.style.transform = `translateY(${currentY}px)`;
+    }, { passive: false });
+
+    container.addEventListener('touchend', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        
+        // 計算放手時最接近的索引
+        // itemHeight = 52. offset = - (index * 52) - 26
+        // -currentY = index * 52 + 26
+        // (-currentY - 26) / 52 = index
+        let estimatedIdx = Math.round((-currentY - (itemHeight/2)) / itemHeight);
+        
+        snapTo(estimatedIdx);
+    });
 
     snapTo(state.terrainIndex);
 }
@@ -805,27 +1065,21 @@ function renderMapIcons() {
    ========================================= */
 
 function toggleBoss(id, e) {
-    // 判斷是否為「多選」操作
-    // 鍵鼠: 按住 Ctrl
-    // 觸控: 預設就是多選模式 (Click others to multi-select)
     const isTouch = state.mode === 'touch';
     
     if (!isTouch && e.ctrlKey && e.shiftKey) {
-        // [Mouse] Ctrl + Shift + Click = 全選/全不選
         if (state.selectedBosses.length === BOSS_DATA.length) {
             state.selectedBosses = [];
         } else {
             state.selectedBosses = BOSS_DATA.map(b => b.id);
         }
     } else if (isTouch || e.ctrlKey) {
-        // [Touch] 預設多選  OR  [Mouse] 按住 Ctrl 多選
         if (state.selectedBosses.includes(id)) {
             state.selectedBosses = state.selectedBosses.filter(b => b !== id);
         } else {
             state.selectedBosses.push(id);
         }
     } else {
-        // [Mouse] 單選 (點擊後清除其他)
         if (state.selectedBosses.length === 1 && state.selectedBosses[0] === id) {
             state.selectedBosses = [];
         } else {
@@ -868,10 +1122,10 @@ function switchTerrain(id) {
                     icon.style.animationDelay = '';
                 });
             }
-            // 修正：執行完畢後清除 onload，避免後續篩選更換圖片時再次觸發此邏輯
             mapImg.onload = null;
         };
     }, 300);
+
 }
 
 /* =========================================
@@ -891,11 +1145,9 @@ function handleIconClick(idx, e) {
         if (e.button === 0) next = '教堂';
         else if (e.button === 2) next = '法師塔';
     } else {
-        // TOUCH 模式
         if (state.touchTool === null) {
-            next = null; // 橡皮擦
+            next = null; 
         } else {
-            // 筆刷 
             if (current === state.touchTool) next = null; 
             else next = state.touchTool;
         }
@@ -1016,7 +1268,7 @@ function initTouchDrag() {
 
 function findAndSetNearestIcon(x, y, type) {
     const icons = document.querySelectorAll('#mapWrapper .icon');
-    let minDist = 60; // 吸附半徑
+    let minDist = 60;
     let target = null;
     let targetIdx = -1;
 
@@ -1056,16 +1308,12 @@ function runFilter(silentMode = false) {
     const mapEl = document.getElementById('大地圖');
     const toast = document.getElementById('status-toast');
     const wrapper = document.getElementById('mapWrapper');
+    const toolbar = document.getElementById('touch-toolbar');
     const isEn = state.lang === 'en';
     const defaultMap = state.terrain + '.png';
 
     document.oncontextmenu = (e) => e.preventDefault();
     mapEl.style.pointerEvents = 'none';
-
-    // 狀態文字更新
-    const touchMsg = isEn ? zhToEn["請選擇工具，點擊地圖"] : "點擊工具切換，長按可拖曳";
-    const mouseMsg = isEn ? zhToEn["請選擇地形，放置圖標"] : "請選擇地形，放置圖標";
-    const defaultMsg = state.mode === 'touch' ? touchMsg : mouseMsg;
 
     if (state.selectedBosses.length === 0) {
         toast.textContent = isEn ? zhToEn["請選擇目標王"] : "請選擇目標王";
@@ -1073,10 +1321,12 @@ function runFilter(silentMode = false) {
         mapEl.src = defaultMap;
         if (!silentMode) {
             wrapper.querySelectorAll('.icon').forEach(i => {
-                i.style.removeProperty('display'); // 清除強制的隱藏設定
+                i.style.removeProperty('display'); 
                 i.style.display = 'block';
             });
         }
+        // 未選擇時恢復工具列 (如果是 Touch 模式)
+        if (state.mode === 'touch') toolbar.classList.add('visible');
         return;
     }
 
@@ -1135,6 +1385,8 @@ function runFilter(silentMode = false) {
                 i.style.removeProperty('display');
                 i.style.display = 'block';
             });
+            // 失敗時顯示工具列 (如果是 Touch 模式)
+            if (state.mode === 'touch') toolbar.classList.add('visible');
         } 
         else if (uniqueFiltered.length === 1) {
             const result = uniqueFiltered[0];
@@ -1155,11 +1407,13 @@ function runFilter(silentMode = false) {
             };
             mapEl.style.pointerEvents = 'auto';
             
-            // [修正重點] 使用 setProperty 加上 important 來覆蓋 CSS 動畫的 !important
             wrapper.querySelectorAll('.icon').forEach(i => {
-                i.classList.remove('pop-effect'); // 嘗試移除動畫 class
-                i.style.setProperty('display', 'none', 'important'); // 強制隱藏
+                i.classList.remove('pop-effect');
+                i.style.setProperty('display', 'none', 'important'); 
             });
+            
+            // [新增] 找到唯一種子時，隱藏工具列
+            toolbar.classList.remove('visible');
 
         } else {
             mapEl.src = defaultMap;
@@ -1169,9 +1423,11 @@ function runFilter(silentMode = false) {
             const suffix = isEn ? zhToEn["張（繼續設定圖標可進一步篩選）"] : "張（繼續設定圖標可進一步篩選）";
             toast.textContent = `${remainingTxt} ${count} ${suffix}`;
             wrapper.querySelectorAll('.icon').forEach(i => {
-                i.style.removeProperty('display'); // 清除強制的隱藏設定
+                i.style.removeProperty('display'); 
                 i.style.display = 'block';
             });
+             // 還在篩選中時顯示工具列 (如果是 Touch 模式)
+             if (state.mode === 'touch') toolbar.classList.add('visible');
         }
     };
 
@@ -1224,7 +1480,6 @@ function setLang(l) {
     list.innerHTML = ''; 
     initWheel(); 
     
-    // 更新 Help Content (如果開著)
     if(window.updateHelpContent) window.updateHelpContent();
 
     runFilter();
@@ -1239,17 +1494,25 @@ function setMode(m) {
     
     const toolbar = document.getElementById('touch-toolbar');
     if (m === 'touch') {
-        toolbar.classList.add('visible');
+        // [修正] 切換到 Touch 模式時，如果已經篩選完成(唯一結果)，不要顯示 toolbar
+        const mapWrapper = document.getElementById('mapWrapper');
+        const isFinished = mapWrapper.querySelectorAll('.icon[style*="important"]').length > 0;
+        
+        if (!isFinished) toolbar.classList.add('visible');
     } else {
         toolbar.classList.remove('visible');
     }
     
-    // 更新 Help Content (如果開著)
     if(window.updateHelpContent) window.updateHelpContent();
 
     runFilter();
 }
 
+/* =========================================
+   UI 事件綁定 (Modal & Drawer)
+   ========================================= */
+
+// 1. Settings Modal
 const settingModal = document.getElementById('settingModal');
 document.getElementById('settings-trigger').onclick = () => {
     settingModal.style.display = 'block';
@@ -1257,11 +1520,35 @@ document.getElementById('settings-trigger').onclick = () => {
 settingModal.onclick = (e) => {
     if (e.target === settingModal) settingModal.style.display = 'none';
 };
-// Help Modal 點擊外部關閉
+
+// 2. Help Modal
 const helpModal = document.getElementById('helpModal');
 helpModal.onclick = (e) => {
     if (e.target === helpModal) helpModal.style.display = 'none';
 };
+
+// 3. Mobile Drawer
+const drawer = document.getElementById('drawer');
+const mobileMenuBtn = document.getElementById('mobile-menu-trigger');
+const closeDrawerBtn = document.getElementById('close-drawer-btn');
+
+if (mobileMenuBtn && drawer) {
+    mobileMenuBtn.addEventListener('click', () => {
+        drawer.classList.add('open');
+    });
+}
+if (closeDrawerBtn && drawer) {
+    closeDrawerBtn.addEventListener('click', () => {
+        drawer.classList.remove('open');
+    });
+}
+document.addEventListener('click', (e) => {
+    if (drawer && drawer.classList.contains('open')) {
+        if (!drawer.contains(e.target) && e.target !== mobileMenuBtn) {
+            drawer.classList.remove('open');
+        }
+    }
+});
 
 
 document.getElementById('lang-zh').onclick = () => setLang('zh');
@@ -1288,8 +1575,8 @@ window.onload = () => {
     setMode(state.mode); 
     initTouchDrag(); 
     
-    initWelcome(); // 初始化公告
-    initHelp();    // 初始化說明
+    initWelcome(); 
+    initHelp();    
     
     document.oncontextmenu = (e) => e.preventDefault();
 };
