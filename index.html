@@ -17,6 +17,10 @@
     --text-sub: #666;
     --accent-glow: rgba(255, 255, 255, 0.25);
     --font-stack: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
+    
+    /* [新增] 陀螺儀全域變數 (預設置中) */
+    --gyro-x: 50%;
+    --gyro-y: 50%;
 }
 
 * { box-sizing: border-box; user-select: none; -webkit-user-drag: none; -webkit-tap-highlight-color: transparent; }
@@ -86,13 +90,29 @@ body {
     content: "";
     position: absolute;
     top: -1px; left: -1px; right: -1px; bottom: -1px;
+    
+    /* 預設使用滑鼠座標變數 --x, --y (像素) */
     background: radial-gradient(300px circle at var(--x) var(--y), var(--accent-glow), transparent 40%);
+    
     z-index: -1;
-    opacity: 0; /* 預設隱藏，hover 時顯示 */
+    opacity: 0;
     transition: opacity 0.3s;
     pointer-events: none;
     border-radius: inherit;
 }
+
+/* [新增] 陀螺儀模式下的流光樣式 */
+body.gyro-mode .glow-box::before {
+    /* 強制顯示，稍微降低透明度讓它像環境光 */
+    opacity: 0.6 !important; 
+    
+    /* 改用百分比變數 --gyro-x, --gyro-y，讓光點在卡片內移動 */
+    background: radial-gradient(400px circle at var(--gyro-x) var(--gyro-y), var(--accent-glow), transparent 50%);
+    
+    /* 增加平滑過渡，讓光點移動不抖動 */
+    transition: opacity 0.5s ease; 
+}
+
 .glow-box::after {
     content: "";
     position: absolute;
@@ -103,12 +123,6 @@ body {
     margin: 1px;
 }
 .glow-box:hover::before { opacity: 1; }
-
-/* [新增] 當陀螺儀模式開啟時，強制顯示流光，不需 hover */
-body.gyro-mode .glow-box::before {
-    opacity: 0.8; /* 設定一個稍微柔和的透明度 */
-    transition: opacity 0.5s ease;
-}
 
 /* =========================================
    左側面板
@@ -957,27 +971,65 @@ function initHelp() {
     window.updateHelpContent = updateContent;
 }
 
-// [修正] 陀螺儀特效：加入開關與記憶功能
+// ==========================
+// [核心修正] 陀螺儀邏輯 & 滑鼠監聽管理
+// ==========================
+
+// 1. 定義滑鼠事件處理函式 (方便移除)
+const handleMouseMove = (e) => {
+    document.querySelectorAll('.glow-box').forEach(el => {
+        const rect = el.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        el.style.setProperty('--x', `${x}px`);
+        el.style.setProperty('--y', `${y}px`);
+    });
+};
+
+function initGlowEffect() {
+    // 預設先綁定滑鼠事件
+    document.addEventListener('mousemove', handleMouseMove);
+}
+
 function initGyro() {
     const btn = document.getElementById('btn-enable-gyro');
     if (!btn) return;
     
     let isGyroActive = false;
     
+    // 陀螺儀事件處理: 計算百分比
     const handleOrientation = (e) => {
         if (e.gamma === null || e.beta === null) return;
-        const x = (e.gamma + 45) / 90 * window.innerWidth;
-        const y = (e.beta - 30) / 60 * window.innerHeight;
         
-        document.querySelectorAll('.glow-box').forEach(el => {
-            el.style.setProperty('--x', `${x}px`);
-            el.style.setProperty('--y', `${y}px`);
-        });
+        // Gamma (左右傾斜): -45度(左) ~ 45度(右) -> 0% ~ 100%
+        let gx = (e.gamma + 45) / 90 * 100;
+        
+        // Beta (前後傾斜): 15度(上) ~ 75度(下) -> 0% ~ 100% (假設手持角度約 45度)
+        let gy = (e.beta - 15) / 60 * 100;
+        
+        // 限制範圍在 0-100% 之間，避免光點跑太遠
+        gx = Math.max(0, Math.min(100, gx));
+        gy = Math.max(0, Math.min(100, gy));
+        
+        document.body.style.setProperty('--gyro-x', `${gx}%`);
+        document.body.style.setProperty('--gyro-y', `${gy}%`);
     };
 
     const enableGyro = () => {
+        // 1. 移除滑鼠監聽 (避免干擾)
+        document.removeEventListener('mousemove', handleMouseMove);
+        
+        // 2. 清除所有卡片的 inline style (避免 --x, --y 殘留覆蓋 CSS)
+        document.querySelectorAll('.glow-box').forEach(el => {
+            el.style.removeProperty('--x');
+            el.style.removeProperty('--y');
+        });
+
+        // 3. 啟用陀螺儀監聽
         window.addEventListener('deviceorientation', handleOrientation);
-        document.body.classList.add('gyro-mode'); // 啟用 CSS 強制顯示流光
+        document.body.classList.add('gyro-mode'); 
+        
+        // 4. 更新按鈕狀態
         btn.classList.add('active');
         btn.textContent = "ENABLED";
         isGyroActive = true;
@@ -985,20 +1037,26 @@ function initGyro() {
     };
 
     const disableGyro = () => {
+        // 1. 移除陀螺儀監聽
         window.removeEventListener('deviceorientation', handleOrientation);
         document.body.classList.remove('gyro-mode');
+        
+        // 2. 恢復滑鼠監聽
+        document.addEventListener('mousemove', handleMouseMove);
+        
+        // 3. 更新按鈕狀態
         btn.classList.remove('active');
         btn.textContent = "ENABLE (iOS)";
         isGyroActive = false;
         localStorage.setItem('gyro_enabled', 'false');
     };
 
-    // 點擊事件：切換開關
+    // 按鈕點擊切換
     btn.onclick = () => {
         if (isGyroActive) {
             disableGyro();
         } else {
-            // 嘗試請求權限 (iOS 13+)
+            // iOS 13+ 權限請求
             if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
                 DeviceOrientationEvent.requestPermission()
                     .then(response => {
@@ -1010,23 +1068,21 @@ function initGyro() {
                     })
                     .catch(console.error);
             } else {
-                // 非 iOS 或舊版 Android，直接啟用
+                // Android 或其他
                 enableGyro();
             }
         }
     };
 
     // 初始化：讀取記憶設定
+    // 注意：iOS 不允許自動觸發 requestPermission，所以 iOS 用戶重整後仍需手動點擊一次
     const savedGyroState = localStorage.getItem('gyro_enabled');
     if (savedGyroState === 'true') {
-        // 嘗試自動啟用
-        // 注意：iOS 13+ 不允許非使用者觸發的權限請求，所以如果之前授權過，這裡可能有效，也可能無效
-        // 為了使用者體驗，我們嘗試啟用，如果失敗（因為沒有事件觸發），使用者仍需手動點擊
         if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-             // iOS 上無法自動啟用，需等待用戶點擊，保持按鈕為 "ENABLE"
-             // 這裡不做動作，讓使用者自己點
+             // iOS: 保持關閉狀態，等待用戶點擊按鈕
+             // 可以選擇把按鈕文字改成 "Tap to Enable" 提示用戶
         } else {
-             // Android 可以自動啟用
+             // Android: 自動啟用
              enableGyro();
         }
     }
@@ -1149,18 +1205,6 @@ function initWheel() {
     });
 
     snapTo(state.terrainIndex);
-}
-
-function initGlowEffect() {
-    document.addEventListener('mousemove', e => {
-        document.querySelectorAll('.glow-box').forEach(el => {
-            const rect = el.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            el.style.setProperty('--x', `${x}px`);
-            el.style.setProperty('--y', `${y}px`);
-        });
-    });
 }
 
 function renderBossList() {
