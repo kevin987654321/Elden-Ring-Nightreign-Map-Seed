@@ -88,7 +88,7 @@ body {
     top: -1px; left: -1px; right: -1px; bottom: -1px;
     background: radial-gradient(300px circle at var(--x) var(--y), var(--accent-glow), transparent 40%);
     z-index: -1;
-    opacity: 0;
+    opacity: 0; /* 預設隱藏，hover 時顯示 */
     transition: opacity 0.3s;
     pointer-events: none;
     border-radius: inherit;
@@ -103,6 +103,12 @@ body {
     margin: 1px;
 }
 .glow-box:hover::before { opacity: 1; }
+
+/* [新增] 當陀螺儀模式開啟時，強制顯示流光，不需 hover */
+body.gyro-mode .glow-box::before {
+    opacity: 0.8; /* 設定一個稍微柔和的透明度 */
+    transition: opacity 0.5s ease;
+}
 
 /* =========================================
    左側面板
@@ -951,58 +957,78 @@ function initHelp() {
     window.updateHelpContent = updateContent;
 }
 
-// [新增] 陀螺儀特效 (安全版)
+// [修正] 陀螺儀特效：加入開關與記憶功能
 function initGyro() {
     const btn = document.getElementById('btn-enable-gyro');
-    if (!btn) return; // [安全檢查] 若 HTML 沒更新，則不執行，避免報錯卡死
+    if (!btn) return;
     
-    // 處理 DeviceOrientation
+    let isGyroActive = false;
+    
     const handleOrientation = (e) => {
         if (e.gamma === null || e.beta === null) return;
-        
-        // Gamma: 左右傾斜 (-90 ~ 90) -> 對應 X 軸
-        // Beta: 前後傾斜 (-180 ~ 180) -> 對應 Y 軸
-        // 簡單映射: gamma -45~45 -> 0~window.innerWidth
-        
         const x = (e.gamma + 45) / 90 * window.innerWidth;
-        const y = (e.beta - 30) / 60 * window.innerHeight; // 預設手持角度約 30 度
+        const y = (e.beta - 30) / 60 * window.innerHeight;
         
         document.querySelectorAll('.glow-box').forEach(el => {
             el.style.setProperty('--x', `${x}px`);
             el.style.setProperty('--y', `${y}px`);
         });
-        
-        // 有數據就顯示為已啟用
-        btn.classList.add('active');
-        btn.textContent = "ENABLED";
     };
 
-    // iOS 權限請求按鈕邏輯
+    const enableGyro = () => {
+        window.addEventListener('deviceorientation', handleOrientation);
+        document.body.classList.add('gyro-mode'); // 啟用 CSS 強制顯示流光
+        btn.classList.add('active');
+        btn.textContent = "ENABLED";
+        isGyroActive = true;
+        localStorage.setItem('gyro_enabled', 'true');
+    };
+
+    const disableGyro = () => {
+        window.removeEventListener('deviceorientation', handleOrientation);
+        document.body.classList.remove('gyro-mode');
+        btn.classList.remove('active');
+        btn.textContent = "ENABLE (iOS)";
+        isGyroActive = false;
+        localStorage.setItem('gyro_enabled', 'false');
+    };
+
+    // 點擊事件：切換開關
     btn.onclick = () => {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-            // iOS 13+ 需要請求權限
-            DeviceOrientationEvent.requestPermission()
-                .then(response => {
-                    if (response === 'granted') {
-                        window.addEventListener('deviceorientation', handleOrientation);
-                        btn.classList.add('active');
-                        btn.textContent = "ENABLED";
-                    } else {
-                        alert("Permission denied");
-                    }
-                })
-                .catch(console.error);
+        if (isGyroActive) {
+            disableGyro();
         } else {
-            // 非 iOS 或舊版，直接監聽 (如果硬體支援)
-            window.addEventListener('deviceorientation', handleOrientation);
-            btn.classList.add('active');
-            btn.textContent = "ENABLED";
+            // 嘗試請求權限 (iOS 13+)
+            if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+                DeviceOrientationEvent.requestPermission()
+                    .then(response => {
+                        if (response === 'granted') {
+                            enableGyro();
+                        } else {
+                            alert("Permission denied");
+                        }
+                    })
+                    .catch(console.error);
+            } else {
+                // 非 iOS 或舊版 Android，直接啟用
+                enableGyro();
+            }
         }
     };
 
-    // 自動嘗試監聽 (針對 Android 或舊 iOS)
-    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
-        window.addEventListener('deviceorientation', handleOrientation);
+    // 初始化：讀取記憶設定
+    const savedGyroState = localStorage.getItem('gyro_enabled');
+    if (savedGyroState === 'true') {
+        // 嘗試自動啟用
+        // 注意：iOS 13+ 不允許非使用者觸發的權限請求，所以如果之前授權過，這裡可能有效，也可能無效
+        // 為了使用者體驗，我們嘗試啟用，如果失敗（因為沒有事件觸發），使用者仍需手動點擊
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+             // iOS 上無法自動啟用，需等待用戶點擊，保持按鈕為 "ENABLE"
+             // 這裡不做動作，讓使用者自己點
+        } else {
+             // Android 可以自動啟用
+             enableGyro();
+        }
     }
 }
 
@@ -1638,7 +1664,7 @@ function setMode(m) {
     runFilter();
 }
 
-// 處理帶有自定義彈窗的模式切換邏輯
+// [修正] 處理帶有自定義彈窗的模式切換邏輯
 let pendingMode = null; // 暫存目標模式
 
 function handleModeChangeAttempt(targetMode) {
@@ -1725,6 +1751,7 @@ if (mobileMenuBtn && drawer) {
         drawer.classList.add('open');
     });
 
+    // --- 左滑關閉邏輯 (包含方向鎖定與無縫動畫) ---
     let drawerStartX = 0;
     let drawerStartY = 0;
     let isDrawerDragging = false; 
@@ -1736,8 +1763,9 @@ if (mobileMenuBtn && drawer) {
         drawerStartY = e.touches[0].clientY;
         isDrawerDragging = false;
         
+        // 拖曳時暫時移除 transition 以求即時跟手
         drawer.style.transition = 'none';
-    }, {passive: false});
+    }, {passive: false}); // passive: false 才能使用 preventDefault
 
     drawer.addEventListener('touchmove', (e) => {
         if (!drawer.classList.contains('open')) return;
@@ -1747,18 +1775,22 @@ if (mobileMenuBtn && drawer) {
         const diffX = currentX - drawerStartX;
         const diffY = currentY - drawerStartY;
 
+        // 判斷拖曳意圖 (僅在第一次移動時判斷)
         if (!isDrawerDragging) {
+            // 如果垂直移動距離 > 水平移動距離，視為上下捲動瀏覽內容
             if (Math.abs(diffY) > Math.abs(diffX)) {
-                return; 
+                return; // 放棄這次的抽屜拖曳，允許原生捲動
             }
+            // 如果水平移動明顯，則鎖定為抽屜拖曳
             if (Math.abs(diffX) > 5) {
                 isDrawerDragging = true;
             }
         }
 
         if (isDrawerDragging) {
+            // 只有向左滑 (diffX < 0) 或微量向右彈性時才執行
             if (diffX < 0) {
-                e.preventDefault(); 
+                e.preventDefault(); // 禁止瀏覽器預設捲動行為 (防止畫面上下跑)
                 drawer.style.transform = `translateX(${diffX}px)`;
             }
         }
@@ -1767,21 +1799,28 @@ if (mobileMenuBtn && drawer) {
     drawer.addEventListener('touchend', (e) => {
         if (!drawer.classList.contains('open')) return;
         
+        // 恢復動畫過渡效果
         drawer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         
         const currentX = e.changedTouches[0].clientX;
         const diffX = currentX - drawerStartX;
         const drawerWidth = drawer.offsetWidth;
 
-        // 閾值判斷：向左滑動超過 15% (剩餘寬度 < 85%) 即可關閉
+        // [修正] 閾值判斷：向左滑動超過 15% (剩餘寬度 < 85%)
         if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.15)) {
+            // == 關閉邏輯 ==
+            // 1. 先用 inline style 讓它滑到 -100% (視覺上關閉)
             drawer.style.transform = 'translateX(-100%)';
+            
+            // 2. 等待動畫結束後，才真正移除 class 並清理 style
             setTimeout(() => {
                 drawer.classList.remove('open');
                 drawer.style.transform = ''; 
             }, 300);
         } else {
+            // == 回彈邏輯 ==
             drawer.style.transform = 'translateX(0)';
+            // 等待回彈動畫結束後清理 style，讓 CSS class 接手
             setTimeout(() => {
                 drawer.style.transform = ''; 
             }, 300);
@@ -1804,6 +1843,7 @@ document.addEventListener('click', (e) => {
 document.getElementById('lang-zh').onclick = () => setLang('zh');
 document.getElementById('lang-en').onclick = () => setLang('en');
 
+// [修改] 模式切換改為呼叫帶有確認邏輯的函數
 document.getElementById('mode-mouse').onclick = () => handleModeChangeAttempt('mouse');
 document.getElementById('mode-touch').onclick = () => handleModeChangeAttempt('touch');
 
