@@ -61,7 +61,6 @@ body {
    ========================================= */
 #app-container {
     display: grid;
-    /* [電腦版] 穩定的三欄佈局 */
     grid-template-columns: 290px 1fr 180px;
     width: 100%;
     height: 100%;
@@ -141,7 +140,6 @@ body {
     opacity: 0.8; 
     margin-bottom: 5px; 
 }
-/* 預設桌面版顯示，手機版會在下方 media query 隱藏 */
 .logo-desktop { display: block; }
 .logo-mobile { display: none; margin-top: 10px; }
 
@@ -197,7 +195,6 @@ body {
     width: 400px;
     height: 400px;
     transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* [電腦版] 保持原始縮放比例 1.45 */
     transform: scale(1.45);
 }
 
@@ -330,7 +327,6 @@ body {
     transform-style: preserve-3d;
     transition: transform 0.1s linear;
 }
-/* 當手指放開需要回彈時，透過 JS 加回這個 class */
 .wheel-list.snapping {
     transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -385,11 +381,7 @@ body {
 }
 .setting-btn.active { background: #ccc; color: #000; border-color: #fff; }
 .content-text { 
-    font-size: 13px; 
-    line-height: 1.6; 
-    color: #ccc; 
-    white-space: pre-wrap; 
-    margin: 8px 0; 
+    font-size: 13px; line-height: 1.6; color: #ccc; white-space: pre-wrap; margin: 8px 0; 
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 0;
@@ -478,7 +470,6 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         height: 100%;
         background: var(--panel-bg);
         z-index: 2200;
-        /* 加入 transform 的過渡，讓 JS 控制的 swiping 更順暢 */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: auto;
         padding: 20px;
@@ -487,7 +478,6 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
         
-        /* 預設位置使用 transform 移動，而非 left */
         left: 0;
         transform: translateX(-100%);
     }
@@ -666,7 +656,6 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
                  <button class="setting-btn" id="btn-enable-gyro" style="width:auto; padding:5px 12px;">ENABLE (iOS)</button>
             </div>
         </div>
-        
         <div style="text-align:center; margin-top:10px; font-size:12px; color:#555;" data-zh="點擊外部關閉" data-en="Click outside to close">
             Click outside to close
         </div>
@@ -962,9 +951,10 @@ function initHelp() {
     window.updateHelpContent = updateContent;
 }
 
-// [新增] 陀螺儀特效
+// [新增] 陀螺儀特效 (安全版)
 function initGyro() {
     const btn = document.getElementById('btn-enable-gyro');
+    if (!btn) return; // [安全檢查] 若 HTML 沒更新，則不執行，避免報錯卡死
     
     // 處理 DeviceOrientation
     const handleOrientation = (e) => {
@@ -1648,7 +1638,7 @@ function setMode(m) {
     runFilter();
 }
 
-// [新增] 處理帶有自定義彈窗的模式切換邏輯
+// 處理帶有自定義彈窗的模式切換邏輯
 let pendingMode = null; // 暫存目標模式
 
 function handleModeChangeAttempt(targetMode) {
@@ -1680,9 +1670,7 @@ function showConfirmModal(msgKey) {
     const modal = document.getElementById('confirmModal');
     const msgEl = document.getElementById('confirm-msg');
     
-    // 設定文字
     msgEl.textContent = zhToEn[msgKey] || msgKey; 
-    
     modal.style.display = 'block';
 }
 
@@ -1701,7 +1689,6 @@ confirmCancelBtn.onclick = () => {
     pendingMode = null;
 };
 
-// 點擊遮罩關閉
 confirmModal.onclick = (e) => {
     if (e.target === confirmModal) {
         confirmModal.style.display = 'none';
@@ -1738,7 +1725,6 @@ if (mobileMenuBtn && drawer) {
         drawer.classList.add('open');
     });
 
-    // --- 左滑關閉邏輯 ---
     let drawerStartX = 0;
     let drawerStartY = 0;
     let isDrawerDragging = false; 
@@ -1772,7 +1758,7 @@ if (mobileMenuBtn && drawer) {
 
         if (isDrawerDragging) {
             if (diffX < 0) {
-                e.preventDefault();
+                e.preventDefault(); 
                 drawer.style.transform = `translateX(${diffX}px)`;
             }
         }
@@ -1787,8 +1773,7 @@ if (mobileMenuBtn && drawer) {
         const diffX = currentX - drawerStartX;
         const drawerWidth = drawer.offsetWidth;
 
-        // [修改] 閾值判斷：原本是 0.25 (25%)，改為 0.15 (15%)
-        // 表示只要往左滑動超過 15% 的寬度，放手就會關閉 (即保留 85% 寬度)
+        // 閾值判斷：向左滑動超過 15% (剩餘寬度 < 85%) 即可關閉
         if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.15)) {
             drawer.style.transform = 'translateX(-100%)';
             setTimeout(() => {
@@ -1832,10 +1817,12 @@ document.getElementById('resetBtn').onclick = () => {
 };
 
 window.onload = () => {
-    initGlowEffect();
-    initGyro(); // [新增] 初始化陀螺儀
-    renderBossList();
-    initWheel();
+    // 使用 try-catch 確保初始化不會因為某個功能失敗而全盤崩潰
+    try { initGlowEffect(); } catch(e) { console.error(e); }
+    try { initGyro(); } catch(e) { console.error(e); }
+    try { renderBossList(); } catch(e) { console.error(e); }
+    try { initWheel(); } catch(e) { console.error(e); }
+    
     renderMapIcons();
     setLang(state.lang);
     setMode(state.mode); 
