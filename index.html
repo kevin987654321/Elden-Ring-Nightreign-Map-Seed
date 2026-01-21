@@ -18,7 +18,7 @@
     --accent-glow: rgba(255, 255, 255, 0.25);
     --font-stack: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
     
-    /* [新增] 陀螺儀全域變數 (預設置中) */
+    /* 陀螺儀預設值 (置中) */
     --gyro-x: 50%;
     --gyro-y: 50%;
 }
@@ -90,27 +90,20 @@ body {
     content: "";
     position: absolute;
     top: -1px; left: -1px; right: -1px; bottom: -1px;
-    
-    /* 預設使用滑鼠座標變數 --x, --y (像素) */
-    background: radial-gradient(300px circle at var(--x) var(--y), var(--accent-glow), transparent 40%);
-    
+    /* 預設滑鼠模式 (像素座標) */
+    background: radial-gradient(300px circle at var(--x, 50%) var(--y, 50%), var(--accent-glow), transparent 40%);
     z-index: -1;
-    opacity: 0;
+    opacity: 0; /* 預設隱藏 */
     transition: opacity 0.3s;
     pointer-events: none;
     border-radius: inherit;
 }
 
-/* [新增] 陀螺儀模式下的流光樣式 */
+/* 陀螺儀模式：強制顯示並使用百分比座標 */
 body.gyro-mode .glow-box::before {
-    /* 強制顯示，稍微降低透明度讓它像環境光 */
-    opacity: 0.6 !important; 
-    
-    /* 改用百分比變數 --gyro-x, --gyro-y，讓光點在卡片內移動 */
+    opacity: 0.8 !important; /* 強制顯示 */
     background: radial-gradient(400px circle at var(--gyro-x) var(--gyro-y), var(--accent-glow), transparent 50%);
-    
-    /* 增加平滑過渡，讓光點移動不抖動 */
-    transition: opacity 0.5s ease; 
+    transition: opacity 0.5s ease; /* 移除背景位置的過渡以求即時反應 */
 }
 
 .glow-box::after {
@@ -730,8 +723,8 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
     </div>
 </div>
 
-<script src="圖標位置資訊.js"></script>
-<script src="種子資訊.js"></script>
+<script src="data_icons.js"></script>
+<script src="data_seeds.js"></script>
 
 <script>
 /* =========================================
@@ -808,64 +801,64 @@ const zhToEn = {
 };
 
 const BOSS_DATA = [
-    { id: '黑夜野獸', name: '格拉狄烏斯', alias: '黑夜野獸', icon: '黑夜野獸圖標.png', enAlias: 'Beast of Night', enName: 'Gladius' },
-    { id: '黑夜之爵', name: '艾德雷', alias: '黑夜之爵', icon: '黑夜之爵圖標.png', enAlias: 'Baron of Night', enName: 'Adel' },
-    { id: '黑夜之智', name: '格諾斯塔', alias: '黑夜之智', icon: '黑夜之智圖標.png', enAlias: 'Wisdom', enName: 'Gnoster' },
-    { id: '深海黑夜', name: '瑪利斯', alias: '深海黑夜', icon: '深海黑夜圖標.png', enAlias: 'Fathom', enName: 'Maris' },
-    { id: '黑夜之魔', name: '利普拉', alias: '黑夜之魔', icon: '黑夜之魔圖標.png', enAlias: 'Creature of Night', enName: 'Libra' },
-    { id: '黑夜光騎士', name: '弗格爾', alias: '黑夜光騎士', icon: '黑夜光騎士圖標.png', enAlias: 'Champion', enName: 'Fulghor' },
-    { id: '黑夜霧霾', name: '卡莉果', alias: '黑夜霧霾', icon: '黑夜霧霾圖標.png', enAlias: 'Miasma', enName: 'Caligo' },
-    { id: '黑夜王', name: '布德奇冥', alias: '黑夜王', icon: '黑夜王圖標.png', enAlias: 'Nightlord', enName: 'Heolstor' },
-    { id: '安定者們', name: '哈爾莫妮亞', alias: '安定者們', icon: '安定者們圖標.png', enAlias: 'Balancers', enName: 'Harmonia' },
-    { id: '廢棄物之王', name: '史柴格斯', alias: '廢棄物之王', icon: '廢棄物之王圖標.png', enAlias: 'Dreglord', enName: 'Straghess' }
+    { id: '黑夜野獸', name: '格拉狄烏斯', alias: '黑夜野獸', icon: 'icon_beast.png', enAlias: 'Beast of Night', enName: 'Gladius' },
+    { id: '黑夜之爵', name: '艾德雷', alias: '黑夜之爵', icon: 'icon_baron.png', enAlias: 'Baron of Night', enName: 'Adel' },
+    { id: '黑夜之智', name: '格諾斯塔', alias: '黑夜之智', icon: 'icon_wisdom.png', enAlias: 'Wisdom', enName: 'Gnoster' },
+    { id: '深海黑夜', name: '瑪利斯', alias: '深海黑夜', icon: 'icon_fathom.png', enAlias: 'Fathom', enName: 'Maris' },
+    { id: '黑夜之魔', name: '利普拉', alias: '黑夜之魔', icon: 'icon_creature.png', enAlias: 'Creature of Night', enName: 'Libra' },
+    { id: '黑夜光騎士', name: '弗格爾', alias: '黑夜光騎士', icon: 'icon_champion.png', enAlias: 'Champion', enName: 'Fulghor' },
+    { id: '黑夜霧霾', name: '卡莉果', alias: '黑夜霧霾', icon: 'icon_miasma.png', enAlias: 'Miasma', enName: 'Caligo' },
+    { id: '黑夜王', name: '布德奇冥', alias: '黑夜王', icon: 'icon_nightlord.png', enAlias: 'Nightlord', enName: 'Heolstor' },
+    { id: '安定者們', name: '哈爾莫妮亞', alias: '安定者們', icon: 'icon_balancers.png', enAlias: 'Balancers', enName: 'Harmonia' },
+    { id: '廢棄物之王', name: '史柴格斯', alias: '廢棄物之王', icon: 'icon_dreglord.png', enAlias: 'Dreglord', enName: 'Straghess' }
 ];
 
 const TERRAINS = [
-    { id: '普通地形', name: '普通地形', en: 'Standard' },
-    { id: '山頂地形', name: '山頂地形', en: 'Mountaintop' },
-    { id: '火山地形', name: '火山地形', en: 'Crater' },
-    { id: '腐敗地形', name: '腐敗地形', en: 'Rot' },
-    { id: '隱城地形', name: '隱城地形', en: 'Hidden City' },
-    { id: '大空洞', name: '大空洞', en: 'Great Hollow' }
+    { id: 'map_standard', name: '普通地形', en: 'Standard' },
+    { id: 'map_mountaintop', name: '山頂地形', en: 'Mountaintop' },
+    { id: 'map_crater', name: '火山地形', en: 'Crater' },
+    { id: 'map_rot', name: '腐敗地形', en: 'Rot' },
+    { id: 'map_hidden', name: '隱城地形', en: 'Hidden City' },
+    { id: 'map_hollow', name: '大空洞', en: 'Great Hollow' }
 ];
 
 const terrainNightRanges = {
-  "普通地形": { "黑夜野獸":[0,19], "黑夜之爵":[40,59], "黑夜之智":[80,99], "深海黑夜":[120,139], "黑夜之魔":[160,179], "黑夜光騎士":[200,219], "黑夜霧霾":[240,259], "黑夜王":[280,299], "安定者們":[0,0], "廢棄物之王":[0,0]},
-  "山頂地形": { "黑夜野獸":[20,24], "黑夜之爵":[60,64], "黑夜之智":[100,104], "深海黑夜":[140,144], "黑夜之魔":[180,184], "黑夜光騎士":[220,224], "黑夜霧霾":[260,264], "黑夜王":[300,304], "安定者們":[0,0], "廢棄物之王":[0,0]},
-  "火山地形": { "黑夜野獸":[25,29], "黑夜之爵":[65,69], "黑夜之智":[105,109], "深海黑夜":[145,149], "黑夜之魔":[185,189], "黑夜光騎士":[225,229], "黑夜霧霾":[265,269], "黑夜王":[305,309], "安定者們":[0,0], "廢棄物之王":[0,0]},
-  "腐敗地形": { "黑夜野獸":[30,34], "黑夜之爵":[70,74], "黑夜之智":[110,114], "深海黑夜":[150,154], "黑夜之魔":[190,194], "黑夜光騎士":[230,234], "黑夜霧霾":[270,274], "黑夜王":[310,314], "安定者們":[0,0], "廢棄物之王":[0,0]},
-  "隱城地形": { "黑夜野獸":[35,39], "黑夜之爵":[75,79], "黑夜之智":[115,119], "深海黑夜":[155,159], "黑夜之魔":[195,199], "黑夜光騎士":[235,239], "黑夜霧霾":[275,279], "黑夜王":[315,319], "安定者們":[0,0], "廢棄物之王":[0,0]},
-  "大空洞": { "黑夜野獸":[0,0], "黑夜之爵":[0,0], "黑夜之智":[0,0], "深海黑夜":[0,0], "黑夜之魔":[0,0], "黑夜光騎士":[0,0], "黑夜霧霾":[0,0], "黑夜王":[0,0], "安定者們":[0,0], "廢棄物之王":[0,0]}
+  "map_standard": { "黑夜野獸":[0,19], "黑夜之爵":[40,59], "黑夜之智":[80,99], "深海黑夜":[120,139], "黑夜之魔":[160,179], "黑夜光騎士":[200,219], "黑夜霧霾":[240,259], "黑夜王":[280,299], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "map_mountaintop": { "黑夜野獸":[20,24], "黑夜之爵":[60,64], "黑夜之智":[100,104], "深海黑夜":[140,144], "黑夜之魔":[180,184], "黑夜光騎士":[220,224], "黑夜霧霾":[260,264], "黑夜王":[300,304], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "map_crater": { "黑夜野獸":[25,29], "黑夜之爵":[65,69], "黑夜之智":[105,109], "深海黑夜":[145,149], "黑夜之魔":[185,189], "黑夜光騎士":[225,229], "黑夜霧霾":[265,269], "黑夜王":[305,309], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "map_rot": { "黑夜野獸":[30,34], "黑夜之爵":[70,74], "黑夜之智":[110,114], "深海黑夜":[150,154], "黑夜之魔":[190,194], "黑夜光騎士":[230,234], "黑夜霧霾":[270,274], "黑夜王":[310,314], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "map_hidden": { "黑夜野獸":[35,39], "黑夜之爵":[75,79], "黑夜之智":[115,119], "深海黑夜":[155,159], "黑夜之魔":[195,199], "黑夜光騎士":[235,239], "黑夜霧霾":[275,279], "黑夜王":[315,319], "安定者們":[0,0], "廢棄物之王":[0,0]},
+  "map_hollow": { "黑夜野獸":[0,0], "黑夜之爵":[0,0], "黑夜之智":[0,0], "深海黑夜":[0,0], "黑夜之魔":[0,0], "黑夜光騎士":[0,0], "黑夜霧霾":[0,0], "黑夜王":[0,0], "安定者們":[0,0], "廢棄物之王":[0,0]}
 };
 
 const COORDINATE_DB = {
-    "普通地形": [
+    "map_standard": [
         {top: 66, left: 213}, {top: 129, left: 68}, {top: 147, left: 132}, 
         {top: 132, left: 286}, {top: 129, left: 326}, {top: 221, left: 61}, 
         {top: 258, left: 219}, {top: 233, left: 338}, {top: 292, left: 58}, 
         {top: 285, left: 176}, {top: 332, left: 228}
     ],
-    "山頂地形": [
+    "map_mountaintop": [
         {top: 66, left: 213}, {top: 132, left: 286}, {top: 129, left: 326}, 
         {top: 221, left: 61}, {top: 258, left: 219}, {top: 233, left: 338}, 
         {top: 292, left: 58}, {top: 285, left: 176}, {top: 332, left: 228}
     ],
-    "火山地形": [
+    "map_crater": [
         {top: 129, left: 68}, {top: 132, left: 286}, {top: 129, left: 326},
         {top: 221, left: 61}, {top: 258, left: 219}, {top: 233, left: 338},
         {top: 292, left: 58}, {top: 285, left: 176}, {top: 332, left: 228}
     ],
-    "腐敗地形": [
+    "map_rot": [
         {top: 66, left: 213}, {top: 129, left: 68}, {top: 147, left: 132},
         {top: 132, left: 286}, {top: 129, left: 326}, {top: 221, left: 61},
         {top: 292, left: 58}, {top: 285, left: 176}
     ],
-    "隱城地形": [
+    "map_hidden": [
         {top: 66, left: 213}, {top: 129, left: 68}, {top: 147, left: 132},
         {top: 132, left: 286}, {top: 129, left: 326}, {top: 258, left: 219},
         {top: 233, left: 338}, {top: 332, left: 228}
     ],
-    "大空洞": [
+    "map_hollow": [
         {top: 66, left: 213}, {top: 129, left: 68}, {top: 147, left: 132},
         {top: 132, left: 286}, {top: 129, left: 326}, {top: 221, left: 61},
         {top: 258, left: 219}, {top: 233, left: 338}, {top: 292, left: 58},
@@ -896,7 +889,7 @@ if (savedMode) {
 
 let state = {
     lang: defaultLang,
-    terrain: '普通地形',
+    terrain: 'map_standard',
     selectedBosses: [],
     icons: {},
     mode: defaultMode,
@@ -972,7 +965,7 @@ function initHelp() {
 }
 
 // ==========================
-// [核心修正] 陀螺儀邏輯 & 滑鼠監聽管理
+// [核心修正] 陀螺儀邏輯 (Debug + HTTPS Check)
 // ==========================
 
 // 1. 定義滑鼠事件處理函式 (方便移除)
@@ -995,31 +988,47 @@ function initGyro() {
     const btn = document.getElementById('btn-enable-gyro');
     if (!btn) return;
     
+    // [Debug] 用來顯示感測器數值到狀態列的函式
+    const updateDebugStatus = (x, y) => {
+        const toast = document.getElementById('status-toast');
+        if (toast) {
+            toast.textContent = `Gyro X: ${Math.round(x)}%  Y: ${Math.round(y)}%`;
+        }
+    };
+    
     let isGyroActive = false;
     
-    // 陀螺儀事件處理: 計算百分比
     const handleOrientation = (e) => {
         if (e.gamma === null || e.beta === null) return;
         
         // Gamma (左右傾斜): -45度(左) ~ 45度(右) -> 0% ~ 100%
         let gx = (e.gamma + 45) / 90 * 100;
         
-        // Beta (前後傾斜): 15度(上) ~ 75度(下) -> 0% ~ 100% (假設手持角度約 45度)
+        // Beta (前後傾斜): 15度(上) ~ 75度(下) -> 0% ~ 100%
         let gy = (e.beta - 15) / 60 * 100;
         
-        // 限制範圍在 0-100% 之間，避免光點跑太遠
         gx = Math.max(0, Math.min(100, gx));
         gy = Math.max(0, Math.min(100, gy));
         
-        document.body.style.setProperty('--gyro-x', `${gx}%`);
-        document.body.style.setProperty('--gyro-y', `${gy}%`);
+        // 寫入根元素，確保全域都能讀到
+        document.documentElement.style.setProperty('--gyro-x', `${gx}%`);
+        document.documentElement.style.setProperty('--gyro-y', `${gy}%`);
+        
+        // [Debug] 更新畫面顯示數值
+        updateDebugStatus(gx, gy);
     };
 
     const enableGyro = () => {
-        // 1. 移除滑鼠監聽 (避免干擾)
+        // [HTTPS 檢查]
+        if (location.protocol !== 'https:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+            alert("Gyroscope requires HTTPS connection!");
+            return;
+        }
+
+        // 1. 移除滑鼠監聽
         document.removeEventListener('mousemove', handleMouseMove);
         
-        // 2. 清除所有卡片的 inline style (避免 --x, --y 殘留覆蓋 CSS)
+        // 2. 清除所有卡片的 inline style
         document.querySelectorAll('.glow-box').forEach(el => {
             el.style.removeProperty('--x');
             el.style.removeProperty('--y');
@@ -1029,26 +1038,35 @@ function initGyro() {
         window.addEventListener('deviceorientation', handleOrientation);
         document.body.classList.add('gyro-mode'); 
         
-        // 4. 更新按鈕狀態
+        // 4. 更新按鈕
         btn.classList.add('active');
         btn.textContent = "ENABLED";
         isGyroActive = true;
         localStorage.setItem('gyro_enabled', 'true');
+        
+        // 提示使用者
+        const toast = document.getElementById('status-toast');
+        if(toast) toast.textContent = "Sensor Active (Wait for data...)";
     };
 
     const disableGyro = () => {
-        // 1. 移除陀螺儀監聽
         window.removeEventListener('deviceorientation', handleOrientation);
         document.body.classList.remove('gyro-mode');
         
-        // 2. 恢復滑鼠監聽
         document.addEventListener('mousemove', handleMouseMove);
         
-        // 3. 更新按鈕狀態
         btn.classList.remove('active');
         btn.textContent = "ENABLE (iOS)";
         isGyroActive = false;
         localStorage.setItem('gyro_enabled', 'false');
+        
+        // 恢復一般狀態文字
+        const toast = document.getElementById('status-toast');
+        if(toast) toast.textContent = "Sensor Disabled";
+        
+        // 清除根元素變數
+        document.documentElement.style.removeProperty('--gyro-x');
+        document.documentElement.style.removeProperty('--gyro-y');
     };
 
     // 按鈕點擊切換
@@ -1063,26 +1081,24 @@ function initGyro() {
                         if (response === 'granted') {
                             enableGyro();
                         } else {
-                            alert("Permission denied");
+                            alert("Permission denied. Reset settings to try again.");
                         }
                     })
-                    .catch(console.error);
+                    .catch(e => {
+                        console.error(e);
+                        alert("Error requesting permission: " + e.message);
+                    });
             } else {
-                // Android 或其他
                 enableGyro();
             }
         }
     };
 
-    // 初始化：讀取記憶設定
-    // 注意：iOS 不允許自動觸發 requestPermission，所以 iOS 用戶重整後仍需手動點擊一次
+    // 初始化讀取設定
     const savedGyroState = localStorage.getItem('gyro_enabled');
     if (savedGyroState === 'true') {
-        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
-             // iOS: 保持關閉狀態，等待用戶點擊按鈕
-             // 可以選擇把按鈕文字改成 "Tap to Enable" 提示用戶
-        } else {
-             // Android: 自動啟用
+        // iOS 需要使用者手勢，無法自動開啟，所以僅 Android 自動開啟
+        if (!(typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function')) {
              enableGyro();
         }
     }
@@ -1246,9 +1262,9 @@ function renderMapIcons() {
         
         const status = state.icons[state.terrain][i];
 
-        if (status === '教堂') img.src = '教堂圖標.png';
-        else if (status === '法師塔') img.src = '法師塔圖標.png';
-        else img.src = '圖標位置.png';
+        if (status === '教堂') img.src = 'icon_church.png';
+        else if (status === '法師塔') img.src = 'icon_tower.png';
+        else img.src = 'icon_placeholder.png';
 
         img.onmousedown = (e) => handleIconClick(i, e);
         img.oncontextmenu = (e) => e.preventDefault();
@@ -1359,9 +1375,9 @@ function handleIconClick(idx, e) {
 function updateIconVisual(img, type) {
     if (!img) return;
     
-    if (type === '教堂') img.src = '教堂圖標.png';
-    else if (type === '法師塔') img.src = '法師塔圖標.png';
-    else img.src = '圖標位置.png';
+    if (type === '教堂') img.src = 'icon_church.png';
+    else if (type === '法師塔') img.src = 'icon_tower.png';
+    else img.src = 'icon_placeholder.png';
     
     img.classList.remove('pop-effect');
     
@@ -1408,7 +1424,7 @@ function initTouchDrag() {
                 if (navigator.vibrate) navigator.vibrate(50);
                 
                 ghost = document.createElement('img');
-                ghost.src = type === '教堂' ? '教堂圖標.png' : (type === '法師塔' ? '法師塔圖標.png' : '圖標位置.png');
+                ghost.src = type === '教堂' ? 'icon_church.png' : (type === '法師塔' ? 'icon_tower.png' : 'icon_placeholder.png');
                 ghost.className = 'drag-ghost';
                 if(type === null) ghost.style.opacity = '0.5';
                 
@@ -1708,7 +1724,11 @@ function setMode(m) {
     runFilter();
 }
 
-// [修正] 處理帶有自定義彈窗的模式切換邏輯
+// [修改] 模式切換改為呼叫帶有確認邏輯的函數
+document.getElementById('mode-mouse').onclick = () => handleModeChangeAttempt('mouse');
+document.getElementById('mode-touch').onclick = () => handleModeChangeAttempt('touch');
+
+// 處理帶有自定義彈窗的模式切換邏輯
 let pendingMode = null; // 暫存目標模式
 
 function handleModeChangeAttempt(targetMode) {
@@ -1716,14 +1736,10 @@ function handleModeChangeAttempt(targetMode) {
     let needConfirm = false;
     let msgKey = '';
 
-    // 情境1：手機嘗試切換到鍵鼠模式
     if (isTouchDev && targetMode === 'mouse') {
         needConfirm = true;
         msgKey = state.lang === 'en' ? 'confirm_mouse_on_touch_en' : 'confirm_mouse_on_touch';
-    }
-
-    // 情境2：電腦嘗試切換到觸控模式
-    else if (!isTouchDev && targetMode === 'touch') {
+    } else if (!isTouchDev && targetMode === 'touch') {
         needConfirm = true;
         msgKey = state.lang === 'en' ? 'confirm_touch_on_mouse_en' : 'confirm_touch_on_mouse';
     }
@@ -1744,7 +1760,6 @@ function showConfirmModal(msgKey) {
     modal.style.display = 'block';
 }
 
-// 確認視窗按鈕綁定
 const confirmModal = document.getElementById('confirmModal');
 const confirmOkBtn = document.getElementById('confirm-ok-btn');
 const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
@@ -1765,131 +1780,6 @@ confirmModal.onclick = (e) => {
         pendingMode = null;
     }
 };
-
-
-/* =========================================
-   UI 事件綁定 (Modal & Drawer)
-   ========================================= */
-
-// 1. Settings Modal
-const settingModal = document.getElementById('settingModal');
-document.getElementById('settings-trigger').onclick = () => {
-    settingModal.style.display = 'block';
-};
-settingModal.onclick = (e) => {
-    if (e.target === settingModal) settingModal.style.display = 'none';
-};
-
-// 2. Help Modal
-const helpModal = document.getElementById('helpModal');
-helpModal.onclick = (e) => {
-    if (e.target === helpModal) helpModal.style.display = 'none';
-};
-
-// 3. Mobile Drawer (包含左滑關閉與方向鎖定邏輯)
-const drawer = document.getElementById('drawer');
-const mobileMenuBtn = document.getElementById('mobile-menu-trigger');
-
-if (mobileMenuBtn && drawer) {
-    mobileMenuBtn.addEventListener('click', () => {
-        drawer.classList.add('open');
-    });
-
-    // --- 左滑關閉邏輯 (包含方向鎖定與無縫動畫) ---
-    let drawerStartX = 0;
-    let drawerStartY = 0;
-    let isDrawerDragging = false; 
-
-    drawer.addEventListener('touchstart', (e) => {
-        if (!drawer.classList.contains('open')) return;
-        
-        drawerStartX = e.touches[0].clientX;
-        drawerStartY = e.touches[0].clientY;
-        isDrawerDragging = false;
-        
-        // 拖曳時暫時移除 transition 以求即時跟手
-        drawer.style.transition = 'none';
-    }, {passive: false}); // passive: false 才能使用 preventDefault
-
-    drawer.addEventListener('touchmove', (e) => {
-        if (!drawer.classList.contains('open')) return;
-        
-        const currentX = e.touches[0].clientX;
-        const currentY = e.touches[0].clientY;
-        const diffX = currentX - drawerStartX;
-        const diffY = currentY - drawerStartY;
-
-        // 判斷拖曳意圖 (僅在第一次移動時判斷)
-        if (!isDrawerDragging) {
-            // 如果垂直移動距離 > 水平移動距離，視為上下捲動瀏覽內容
-            if (Math.abs(diffY) > Math.abs(diffX)) {
-                return; // 放棄這次的抽屜拖曳，允許原生捲動
-            }
-            // 如果水平移動明顯，則鎖定為抽屜拖曳
-            if (Math.abs(diffX) > 5) {
-                isDrawerDragging = true;
-            }
-        }
-
-        if (isDrawerDragging) {
-            // 只有向左滑 (diffX < 0) 或微量向右彈性時才執行
-            if (diffX < 0) {
-                e.preventDefault(); // 禁止瀏覽器預設捲動行為 (防止畫面上下跑)
-                drawer.style.transform = `translateX(${diffX}px)`;
-            }
-        }
-    }, {passive: false});
-
-    drawer.addEventListener('touchend', (e) => {
-        if (!drawer.classList.contains('open')) return;
-        
-        // 恢復動畫過渡效果
-        drawer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
-        
-        const currentX = e.changedTouches[0].clientX;
-        const diffX = currentX - drawerStartX;
-        const drawerWidth = drawer.offsetWidth;
-
-        // [修正] 閾值判斷：向左滑動超過 15% (剩餘寬度 < 85%)
-        if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.15)) {
-            // == 關閉邏輯 ==
-            // 1. 先用 inline style 讓它滑到 -100% (視覺上關閉)
-            drawer.style.transform = 'translateX(-100%)';
-            
-            // 2. 等待動畫結束後，才真正移除 class 並清理 style
-            setTimeout(() => {
-                drawer.classList.remove('open');
-                drawer.style.transform = ''; 
-            }, 300);
-        } else {
-            // == 回彈邏輯 ==
-            drawer.style.transform = 'translateX(0)';
-            // 等待回彈動畫結束後清理 style，讓 CSS class 接手
-            setTimeout(() => {
-                drawer.style.transform = ''; 
-            }, 300);
-        }
-        
-        isDrawerDragging = false;
-    });
-}
-
-document.addEventListener('click', (e) => {
-    if (drawer && drawer.classList.contains('open')) {
-        if (!drawer.contains(e.target) && e.target !== mobileMenuBtn) {
-            drawer.classList.remove('open');
-            drawer.style.transform = '';
-        }
-    }
-});
-
-
-document.getElementById('lang-zh').onclick = () => setLang('zh');
-document.getElementById('lang-en').onclick = () => setLang('en');
-
-// [修改] 模式切換改為呼叫帶有確認邏輯的函數
-document.getElementById('mode-mouse').onclick = () => handleModeChangeAttempt('mouse');
-document.getElementById('mode-touch').onclick = () => handleModeChangeAttempt('touch');
 
 document.getElementById('clearBtn').onclick = () => {
     state.icons[state.terrain] = Array(12).fill(null);
