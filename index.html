@@ -390,7 +390,6 @@ body {
     color: #ccc; 
     white-space: pre-wrap; 
     margin: 8px 0; 
-    /* [保留] 上下細線分隔 */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 0;
@@ -661,6 +660,13 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
                 <button class="setting-btn" id="mode-touch">TOUCH</button>
             </div>
         </div>
+        <div class="setting-row">
+            <span>MOTION EFFECT</span>
+            <div>
+                 <button class="setting-btn" id="btn-enable-gyro" style="width:auto; padding:5px 12px;">ENABLE (iOS)</button>
+            </div>
+        </div>
+        
         <div style="text-align:center; margin-top:10px; font-size:12px; color:#555;" data-zh="點擊外部關閉" data-en="Click outside to close">
             Click outside to close
         </div>
@@ -954,6 +960,60 @@ function initHelp() {
 
     closeBtn.onclick = () => modal.style.display = 'none';
     window.updateHelpContent = updateContent;
+}
+
+// [新增] 陀螺儀特效
+function initGyro() {
+    const btn = document.getElementById('btn-enable-gyro');
+    
+    // 處理 DeviceOrientation
+    const handleOrientation = (e) => {
+        if (e.gamma === null || e.beta === null) return;
+        
+        // Gamma: 左右傾斜 (-90 ~ 90) -> 對應 X 軸
+        // Beta: 前後傾斜 (-180 ~ 180) -> 對應 Y 軸
+        // 簡單映射: gamma -45~45 -> 0~window.innerWidth
+        
+        const x = (e.gamma + 45) / 90 * window.innerWidth;
+        const y = (e.beta - 30) / 60 * window.innerHeight; // 預設手持角度約 30 度
+        
+        document.querySelectorAll('.glow-box').forEach(el => {
+            el.style.setProperty('--x', `${x}px`);
+            el.style.setProperty('--y', `${y}px`);
+        });
+        
+        // 有數據就顯示為已啟用
+        btn.classList.add('active');
+        btn.textContent = "ENABLED";
+    };
+
+    // iOS 權限請求按鈕邏輯
+    btn.onclick = () => {
+        if (typeof DeviceOrientationEvent !== 'undefined' && typeof DeviceOrientationEvent.requestPermission === 'function') {
+            // iOS 13+ 需要請求權限
+            DeviceOrientationEvent.requestPermission()
+                .then(response => {
+                    if (response === 'granted') {
+                        window.addEventListener('deviceorientation', handleOrientation);
+                        btn.classList.add('active');
+                        btn.textContent = "ENABLED";
+                    } else {
+                        alert("Permission denied");
+                    }
+                })
+                .catch(console.error);
+        } else {
+            // 非 iOS 或舊版，直接監聽 (如果硬體支援)
+            window.addEventListener('deviceorientation', handleOrientation);
+            btn.classList.add('active');
+            btn.textContent = "ENABLED";
+        }
+    };
+
+    // 自動嘗試監聽 (針對 Android 或舊 iOS)
+    if (window.DeviceOrientationEvent && typeof DeviceOrientationEvent.requestPermission !== 'function') {
+        window.addEventListener('deviceorientation', handleOrientation);
+    }
 }
 
 /* =========================================
@@ -1678,7 +1738,7 @@ if (mobileMenuBtn && drawer) {
         drawer.classList.add('open');
     });
 
-    // --- 左滑關閉邏輯 (包含方向鎖定與無縫動畫) ---
+    // --- 左滑關閉邏輯 ---
     let drawerStartX = 0;
     let drawerStartY = 0;
     let isDrawerDragging = false; 
@@ -1690,9 +1750,8 @@ if (mobileMenuBtn && drawer) {
         drawerStartY = e.touches[0].clientY;
         isDrawerDragging = false;
         
-        // 拖曳時暫時移除 transition 以求即時跟手
         drawer.style.transition = 'none';
-    }, {passive: false}); // passive: false 才能使用 preventDefault
+    }, {passive: false});
 
     drawer.addEventListener('touchmove', (e) => {
         if (!drawer.classList.contains('open')) return;
@@ -1702,22 +1761,18 @@ if (mobileMenuBtn && drawer) {
         const diffX = currentX - drawerStartX;
         const diffY = currentY - drawerStartY;
 
-        // 判斷拖曳意圖 (僅在第一次移動時判斷)
         if (!isDrawerDragging) {
-            // 如果垂直移動距離 > 水平移動距離，視為上下捲動瀏覽內容
             if (Math.abs(diffY) > Math.abs(diffX)) {
-                return; // 放棄這次的抽屜拖曳，允許原生捲動
+                return; 
             }
-            // 如果水平移動明顯，則鎖定為抽屜拖曳
             if (Math.abs(diffX) > 5) {
                 isDrawerDragging = true;
             }
         }
 
         if (isDrawerDragging) {
-            // 只有向左滑 (diffX < 0) 或微量向右彈性時才執行
             if (diffX < 0) {
-                e.preventDefault(); // 禁止瀏覽器預設捲動行為 (防止畫面上下跑)
+                e.preventDefault();
                 drawer.style.transform = `translateX(${diffX}px)`;
             }
         }
@@ -1726,28 +1781,22 @@ if (mobileMenuBtn && drawer) {
     drawer.addEventListener('touchend', (e) => {
         if (!drawer.classList.contains('open')) return;
         
-        // 恢復動畫過渡效果
         drawer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         
         const currentX = e.changedTouches[0].clientX;
         const diffX = currentX - drawerStartX;
         const drawerWidth = drawer.offsetWidth;
 
-        // 閾值判斷：向左滑動超過 25% (剩餘寬度 < 75%)
-        if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.25)) {
-            // == 關閉邏輯 ==
-            // 1. 先用 inline style 讓它滑到 -100% (視覺上關閉)
+        // [修改] 閾值判斷：原本是 0.25 (25%)，改為 0.15 (15%)
+        // 表示只要往左滑動超過 15% 的寬度，放手就會關閉 (即保留 85% 寬度)
+        if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.15)) {
             drawer.style.transform = 'translateX(-100%)';
-            
-            // 2. 等待動畫結束後，才真正移除 class 並清理 style
             setTimeout(() => {
                 drawer.classList.remove('open');
                 drawer.style.transform = ''; 
             }, 300);
         } else {
-            // == 回彈邏輯 ==
             drawer.style.transform = 'translateX(0)';
-            // 等待回彈動畫結束後清理 style，讓 CSS class 接手
             setTimeout(() => {
                 drawer.style.transform = ''; 
             }, 300);
@@ -1770,7 +1819,6 @@ document.addEventListener('click', (e) => {
 document.getElementById('lang-zh').onclick = () => setLang('zh');
 document.getElementById('lang-en').onclick = () => setLang('en');
 
-// [修改] 模式切換改為呼叫帶有確認彈窗邏輯的函數
 document.getElementById('mode-mouse').onclick = () => handleModeChangeAttempt('mouse');
 document.getElementById('mode-touch').onclick = () => handleModeChangeAttempt('touch');
 
@@ -1785,6 +1833,7 @@ document.getElementById('resetBtn').onclick = () => {
 
 window.onload = () => {
     initGlowEffect();
+    initGyro(); // [新增] 初始化陀螺儀
     renderBossList();
     initWheel();
     renderMapIcons();
