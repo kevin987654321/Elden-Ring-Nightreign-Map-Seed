@@ -4,7 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <meta name="google" content="notranslate"> 
+<meta name="description" content="The Elden Ring Nightreign map torrent finder supports both mobile and computer use. Simply select the BOSS and enter the map information to search.">
 <title>Elden Ring Nightreign Map Seed</title>
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
 /* =========================================
    全域設定 & 變數
@@ -19,10 +21,7 @@
     --font-stack: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Microsoft JhengHei", sans-serif;
 }
 
-/* [修改] 強化禁止選取與長按選單 
-   -webkit-touch-callout: none; 禁止 iOS 長按跳出選單
-   user-select: none; 禁止選取文字
-*/
+/* [修改] 強化禁止選取與長按選單 */
 * { 
     box-sizing: border-box; 
     user-select: none; 
@@ -32,9 +31,8 @@
     -webkit-touch-callout: none; 
 }
 
-/* 確保圖片也不會被拖曳或長按 */
 img {
-    pointer-events: auto; /* 保持點擊事件 */
+    pointer-events: auto;
     -webkit-user-drag: none;
 }
 
@@ -53,7 +51,7 @@ body {
 }
 
 /* =========================================
-   強制橫屏提示層 (預設隱藏)
+   強制橫屏提示層
    ========================================= */
 #orientation-lock {
     display: none;
@@ -78,7 +76,6 @@ body {
    ========================================= */
 #app-container {
     display: grid;
-    /* [電腦版] 穩定的三欄佈局 */
     grid-template-columns: 290px 1fr 180px;
     width: 100%;
     height: 100%;
@@ -87,7 +84,6 @@ body {
     transition: opacity 0.3s;
 }
 
-/* 手機版按鈕預設隱藏 */
 #mobile-menu-trigger { display: none; }
 .mobile-close-btn { display: none; }
 
@@ -158,7 +154,6 @@ body {
     opacity: 0.8; 
     margin-bottom: 5px; 
 }
-/* 預設桌面版顯示，手機版會在下方 media query 隱藏 */
 .logo-desktop { display: block; }
 .logo-mobile { display: none; margin-top: 10px; }
 
@@ -214,7 +209,6 @@ body {
     width: 400px;
     height: 400px;
     transition: transform 0.5s cubic-bezier(0.25, 0.8, 0.25, 1);
-    /* [電腦版] 保持原始縮放比例 1.45 */
     transform: scale(1.45);
 }
 
@@ -347,7 +341,6 @@ body {
     transform-style: preserve-3d;
     transition: transform 0.1s linear;
 }
-/* 當手指放開需要回彈時，透過 JS 加回這個 class */
 .wheel-list.snapping {
     transition: transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
@@ -407,7 +400,6 @@ body {
     color: #ccc; 
     white-space: pre-wrap; 
     margin: 8px 0; 
-    /* [保留] 上下細線分隔 */
     border-top: 1px solid rgba(255, 255, 255, 0.1);
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
     padding: 12px 0;
@@ -496,7 +488,6 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         height: 100%;
         background: var(--panel-bg);
         z-index: 2200;
-        /* 加入 transform 的過渡，讓 JS 控制的 swiping 更順暢 */
         transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         pointer-events: auto;
         padding: 20px;
@@ -504,8 +495,6 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         box-shadow: 10px 0 30px rgba(0,0,0,0.5);
         overflow-y: auto;
         -webkit-overflow-scrolling: touch;
-        
-        /* 預設位置使用 transform 移動，而非 left */
         left: 0;
         transform: translateX(-100%);
     }
@@ -793,8 +782,9 @@ const zhToEn = {
   "開始使用": "START",
   "操作說明": "INSTRUCTIONS",
   
-  "mouse_help": "鍵鼠模式\n> 點擊選擇夜王\n> 按住 Ctrl 並點擊多選或取消選擇\n> 按住 Ctrl+Shift 並任意點擊全選\n\n> 點擊地圖放置圖標\n> 右鍵點擊放置法師塔",
-  "mouse_help_en": "MOUSE MODE\n> Click to select Lord\n> Hold Ctrl + Click to multi-select/toggle\n> Hold Ctrl + Shift + Click to Select All\n\n> Left Click Map: Place Church\n> Right Click Map: Place Tower",
+  // [修改] 更新按鍵說明
+  "mouse_help": "鍵鼠模式\n> 點擊選擇夜王\n> 按住 Ctrl 點擊多選\n> 按住 Ctrl+Shift 點擊全選\n\n> 左鍵：放置教堂 / 右鍵：放置法師塔\n> Ctrl + 點擊圖標：清除\n> Ctrl + Z：復原上一步\n> 數字鍵 1-6：快速切換地形",
+  "mouse_help_en": "MOUSE MODE\n> Click to select Lord\n> Hold Ctrl + Click to multi-select\n> Hold Ctrl + Shift + Click to Select All\n\n> Left Click: Church / Right Click: Tower\n> Ctrl + Click Icon: Clear\n> Ctrl + Z: Undo\n> Keys 1-6: Switch Terrain",
   
   "touch_help": "觸控模式\n> 點擊選擇夜王\n> 再次點擊取消選擇\n> 點擊其他夜王多選\n\n> 切換並放置對應圖標\n> 長按拖曳對應圖標到點位即可放置",
   "touch_help_en": "TOUCH MODE\n> Tap to select Lord\n> Tap again to deselect\n> Tap others to multi-select\n\n> Tap tool to switch & place\n> Long press & drag icon to place",
@@ -905,6 +895,51 @@ let state = {
     terrainIndex: 0
 };
 
+// [新增] 歷史紀錄堆疊
+let historyStack = [];
+
+// [新增] 儲存當前地形的狀態到歷史紀錄
+function pushHistory() {
+    // 深拷貝當前地形的圖標陣列
+    const currentIcons = [...state.icons[state.terrain]];
+    historyStack.push({
+        terrain: state.terrain,
+        icons: currentIcons
+    });
+    // 限制紀錄長度 (例如 30 步)
+    if (historyStack.length > 30) historyStack.shift();
+}
+
+// [新增] 執行 Undo
+function undoLastAction() {
+    if (historyStack.length === 0) return;
+    
+    const lastState = historyStack.pop();
+    
+    // 如果上一步是在不同地形，先切換過去
+    if (state.terrain !== lastState.terrain) {
+        state.terrain = lastState.terrain;
+        
+        // 同步右側滾輪位置
+        const idx = TERRAINS.findIndex(t => t.id === lastState.terrain);
+        if (window.snapToTerrain) window.snapToTerrain(idx);
+    }
+
+    state.icons[state.terrain] = lastState.icons;
+    
+    // 重新渲染
+    renderMapIcons();
+    runFilter();
+    
+    // 顯示提示
+    const toast = document.getElementById('status-toast');
+    const oldText = toast.textContent;
+    toast.textContent = state.lang === 'en' ? "Undo" : "已復原";
+    setTimeout(() => {
+        if(toast.textContent === "Undo" || toast.textContent === "已復原") runFilter(true);
+    }, 1000); 
+}
+
 TERRAINS.forEach(t => {
     state.icons[t.id] = Array(12).fill(null);
 });
@@ -936,12 +971,10 @@ function initWelcome() {
         }
     };
 
-    // [新增] 切換中文
     switchZh.onclick = () => {
         setLang('zh');
     };
 
-    // [新增] 前往設定
     goSettings.onclick = () => {
         welcomeModal.style.display = 'none';
         settingModal.style.display = 'block';
@@ -1015,6 +1048,9 @@ function initWheel() {
             list.classList.remove('snapping');
         }, 300);
     };
+
+    // [新增] 暴露給全域使用 (給鍵盤事件呼叫)
+    window.snapToTerrain = snapTo;
 
     // 1. 電腦版滑鼠滾輪
     container.onwheel = (e) => {
@@ -1237,8 +1273,17 @@ function handleIconClick(idx, e) {
     let next = null;
 
     if (state.mode === 'mouse') {
-        if (e.button === 0) next = '教堂';
-        else if (e.button === 2) next = '法師塔';
+        // [修改] 邏輯判定順序
+        if (e.ctrlKey) {
+            // 1. Ctrl + 點擊 = 清除
+            next = null; 
+        } else if (e.button === 0) {
+            // 2. 左鍵 = 教堂
+            next = '教堂';
+        } else if (e.button === 2) {
+            // 3. 右鍵 = 法師塔
+            next = '法師塔';
+        }
     } else {
         if (state.touchTool === null) {
             next = null; 
@@ -1246,6 +1291,11 @@ function handleIconClick(idx, e) {
             if (current === state.touchTool) next = null; 
             else next = state.touchTool;
         }
+    }
+
+    // [新增] 狀態改變前，先記錄歷史 (如果狀態真的有變)
+    if (state.icons[state.terrain][idx] !== next) {
+        pushHistory();
     }
 
     state.icons[state.terrain][idx] = next;
@@ -1566,7 +1616,6 @@ function setLang(l) {
         el.textContent = l === 'en' ? (zhToEn[key] || key) : key;
     });
 
-    // 如果是中文，隱藏 Welcome 裡的切換按鈕
     const zhBtn = document.getElementById('welcome-switch-zh');
     if (zhBtn) {
         zhBtn.style.display = (l === 'zh') ? 'none' : 'block';
@@ -1604,21 +1653,18 @@ function setMode(m) {
     runFilter();
 }
 
-// [新增] 處理帶有自定義彈窗的模式切換邏輯
-let pendingMode = null; // 暫存目標模式
+let pendingMode = null; 
 
 function handleModeChangeAttempt(targetMode) {
     const isTouchDev = isTouchDevice(); 
     let needConfirm = false;
     let msgKey = '';
 
-    // 情境1：手機嘗試切換到鍵鼠模式
     if (isTouchDev && targetMode === 'mouse') {
         needConfirm = true;
         msgKey = state.lang === 'en' ? 'confirm_mouse_on_touch_en' : 'confirm_mouse_on_touch';
     }
 
-    // 情境2：電腦嘗試切換到觸控模式
     else if (!isTouchDev && targetMode === 'touch') {
         needConfirm = true;
         msgKey = state.lang === 'en' ? 'confirm_touch_on_mouse_en' : 'confirm_touch_on_mouse';
@@ -1636,13 +1682,11 @@ function showConfirmModal(msgKey) {
     const modal = document.getElementById('confirmModal');
     const msgEl = document.getElementById('confirm-msg');
     
-    // 設定文字
     msgEl.textContent = zhToEn[msgKey] || msgKey; 
     
     modal.style.display = 'block';
 }
 
-// 確認視窗按鈕綁定
 const confirmModal = document.getElementById('confirmModal');
 const confirmOkBtn = document.getElementById('confirm-ok-btn');
 const confirmCancelBtn = document.getElementById('confirm-cancel-btn');
@@ -1657,7 +1701,6 @@ confirmCancelBtn.onclick = () => {
     pendingMode = null;
 };
 
-// 點擊遮罩關閉
 confirmModal.onclick = (e) => {
     if (e.target === confirmModal) {
         confirmModal.style.display = 'none';
@@ -1670,7 +1713,6 @@ confirmModal.onclick = (e) => {
    UI 事件綁定 (Modal & Drawer)
    ========================================= */
 
-// 1. Settings Modal
 const settingModal = document.getElementById('settingModal');
 document.getElementById('settings-trigger').onclick = () => {
     settingModal.style.display = 'block';
@@ -1679,13 +1721,12 @@ settingModal.onclick = (e) => {
     if (e.target === settingModal) settingModal.style.display = 'none';
 };
 
-// 2. Help Modal
 const helpModal = document.getElementById('helpModal');
 helpModal.onclick = (e) => {
     if (e.target === helpModal) helpModal.style.display = 'none';
 };
 
-// 3. Mobile Drawer (包含左滑關閉與方向鎖定邏輯)
+// 3. Mobile Drawer
 const drawer = document.getElementById('drawer');
 const mobileMenuBtn = document.getElementById('mobile-menu-trigger');
 
@@ -1694,10 +1735,11 @@ if (mobileMenuBtn && drawer) {
         drawer.classList.add('open');
     });
 
-    // --- 左滑關閉邏輯 (包含方向鎖定與無縫動畫) ---
+    // --- 左滑關閉邏輯 (修正版) ---
     let drawerStartX = 0;
     let drawerStartY = 0;
     let isDrawerDragging = false; 
+    let isScrolling = false; // [新增] 標記是否正在垂直捲動
 
     drawer.addEventListener('touchstart', (e) => {
         if (!drawer.classList.contains('open')) return;
@@ -1705,35 +1747,34 @@ if (mobileMenuBtn && drawer) {
         drawerStartX = e.touches[0].clientX;
         drawerStartY = e.touches[0].clientY;
         isDrawerDragging = false;
+        isScrolling = false; 
         
-        // 拖曳時暫時移除 transition 以求即時跟手
         drawer.style.transition = 'none';
-    }, {passive: false}); // passive: false 才能使用 preventDefault
+    }, {passive: false});
 
     drawer.addEventListener('touchmove', (e) => {
         if (!drawer.classList.contains('open')) return;
+        if (isScrolling) return; 
         
         const currentX = e.touches[0].clientX;
         const currentY = e.touches[0].clientY;
         const diffX = currentX - drawerStartX;
         const diffY = currentY - drawerStartY;
 
-        // 判斷拖曳意圖 (僅在第一次移動時判斷)
         if (!isDrawerDragging) {
-            // 如果垂直移動距離 > 水平移動距離，視為上下捲動瀏覽內容
+            // [修改] 如果垂直移動距離 > 水平移動距離，視為上下捲動，不觸發關閉
             if (Math.abs(diffY) > Math.abs(diffX)) {
-                return; // 放棄這次的抽屜拖曳，允許原生捲動
+                isScrolling = true; 
+                return; 
             }
-            // 如果水平移動明顯，則鎖定為抽屜拖曳
             if (Math.abs(diffX) > 5) {
                 isDrawerDragging = true;
             }
         }
 
         if (isDrawerDragging) {
-            // 只有向左滑 (diffX < 0) 或微量向右彈性時才執行
             if (diffX < 0) {
-                e.preventDefault(); // 禁止瀏覽器預設捲動行為 (防止畫面上下跑)
+                e.preventDefault(); 
                 drawer.style.transform = `translateX(${diffX}px)`;
             }
         }
@@ -1742,24 +1783,19 @@ if (mobileMenuBtn && drawer) {
     drawer.addEventListener('touchend', (e) => {
         if (!drawer.classList.contains('open')) return;
         
-        // 恢復動畫過渡效果
         drawer.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94)';
         
         const currentX = e.changedTouches[0].clientX;
         const diffX = currentX - drawerStartX;
         const drawerWidth = drawer.offsetWidth;
 
-        // [修改] 閾值判斷：從 0.25 改為 0.15 (15%)
         if (diffX < 0 && Math.abs(diffX) > (drawerWidth * 0.15)) {
-            // == 關閉邏輯 ==
             drawer.style.transform = 'translateX(-100%)';
-            
             setTimeout(() => {
                 drawer.classList.remove('open');
                 drawer.style.transform = ''; 
             }, 300);
         } else {
-            // == 回彈邏輯 ==
             drawer.style.transform = 'translateX(0)';
             setTimeout(() => {
                 drawer.style.transform = ''; 
@@ -1769,20 +1805,17 @@ if (mobileMenuBtn && drawer) {
         isDrawerDragging = false;
     });
 
-    // --- [新增] 右滑開啟邏輯 (邊緣觸發) ---
+    // --- 右滑開啟邏輯 ---
     let edgeStartX = 0;
     let edgeStartY = 0;
     let isEdgeSwipe = false;
 
-    // 全域監聽 TouchStart
     document.addEventListener('touchstart', (e) => {
-        // 如果選單已經開了，就不處理開啟邏輯
         if (drawer.classList.contains('open')) return;
         
         const x = e.touches[0].clientX;
         const y = e.touches[0].clientY;
 
-        // [要求] 螢幕左方 20% 範圍內才觸發
         if (x < window.innerWidth * 0.2) {
             isEdgeSwipe = true;
             edgeStartX = x;
@@ -1790,7 +1823,7 @@ if (mobileMenuBtn && drawer) {
         } else {
             isEdgeSwipe = false;
         }
-    }, { passive: true }); // passive: true 讓滾動不卡頓，直到我們確認要攔截
+    }, { passive: true });
 
     document.addEventListener('touchmove', (e) => {
         if (!isEdgeSwipe) return;
@@ -1800,16 +1833,13 @@ if (mobileMenuBtn && drawer) {
         const diffX = x - edgeStartX;
         const diffY = y - edgeStartY;
 
-        // [要求] 如果垂直移動 > 水平移動，視為一般操作/滾動，取消選單側滑
         if (Math.abs(diffY) > Math.abs(diffX)) {
             isEdgeSwipe = false;
             return;
         }
 
-        // 如果向右滑動幅度大於 10px，則視為意圖打開選單
         if (diffX > 10) {
-            // 這邊我們直接觸發打開，不跟手拖曳 (因為跟手容易與地圖互動衝突)
-            isEdgeSwipe = false; // 觸發一次後就重置
+            isEdgeSwipe = false; 
             drawer.classList.add('open');
         }
     }, { passive: false });
@@ -1828,7 +1858,6 @@ document.addEventListener('click', (e) => {
 document.getElementById('lang-zh').onclick = () => setLang('zh');
 document.getElementById('lang-en').onclick = () => setLang('en');
 
-// [修改] 模式切換改為呼叫帶有確認彈窗邏輯的函數
 document.getElementById('mode-mouse').onclick = () => handleModeChangeAttempt('mouse');
 document.getElementById('mode-touch').onclick = () => handleModeChangeAttempt('touch');
 
@@ -1840,6 +1869,27 @@ document.getElementById('clearBtn').onclick = () => {
 document.getElementById('resetBtn').onclick = () => {
     location.reload();
 };
+
+/* [新增] 全域鍵盤監聽事件 */
+document.addEventListener('keydown', (e) => {
+    // 僅在鍵鼠模式下生效
+    if (state.mode !== 'mouse') return;
+
+    // 1. Ctrl + Z (Undo)
+    if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'z') {
+        e.preventDefault();
+        undoLastAction();
+    }
+
+    // 2. 數字鍵 1-6 切換地形
+    // 檢查是否按下數字鍵且沒有按住 Shift/Ctrl (避免衝突)
+    if (e.key >= '1' && e.key <= '6' && !e.ctrlKey && !e.shiftKey) {
+        const idx = parseInt(e.key) - 1; // 轉為陣列索引 (0-5)
+        if (window.snapToTerrain) {
+            window.snapToTerrain(idx);
+        }
+    }
+});
 
 window.onload = () => {
     initGlowEffect();
