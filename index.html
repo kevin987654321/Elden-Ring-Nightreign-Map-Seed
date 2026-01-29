@@ -1752,9 +1752,6 @@ function setTouchTool(tool) {
 /* =========================================
    篩選邏輯
    ========================================= */
-/* =========================================
-   新增：碰撞切換相關邏輯 (請放在 runFilter 上方)
-   ========================================= */
 window.collisionCandidates = [];
 window.collisionIndex = 0;
 
@@ -1926,6 +1923,11 @@ function runFilter(silentMode = false) {
                 ? BOSS_DATA.find(b => b.id === result._night)?.enAlias 
                 : result._night;
                 
+            // === [已修復] 這裡補上了更新 Toast 文字的代碼 ===
+            toast.textContent = isEn 
+                ? `${zhToEn["找到唯一符合種子"]}: ${result.file} | ${bossName}`
+                : `找到唯一符合種子：${result.file} | ${bossName}`;
+            // ============================================
 
             mapEl.style.pointerEvents = 'auto';
             
