@@ -655,6 +655,49 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
     #help-trigger { top: auto; bottom: 60px; right: 170px; width: 32px; height: 32px; }
 }
 
+/* === 新增：碰撞切換控制項樣式 === */
+.collision-controls {
+    margin-top: 8px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 15px;
+    pointer-events: auto; /* 確保按鈕可點擊 */
+}
+
+.nav-arrow {
+    background: rgba(255, 255, 255, 0.15);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: #fff;
+    border-radius: 50%; /* 圓形按鈕 */
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 14px;
+    transition: all 0.2s;
+    user-select: none;
+}
+
+.nav-arrow:hover {
+    background: rgba(255, 255, 255, 0.4);
+    transform: scale(1.1);
+}
+
+.nav-arrow:active {
+    transform: scale(0.9);
+}
+
+.nav-counter {
+    font-family: monospace;
+    font-size: 14px;
+    color: #ddd;
+    min-width: 40px;
+    text-align: center;
+}
+	
 </style>
 </head>
 <body>
@@ -778,9 +821,11 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         <div class="modal-title">WELCOME</div>
         <div class="content-text" id="welcome-content">
 
-<b style="color:#FF0000;"># The Great Hollow is currently available, although some seeds may overlap; this will be fixed in the future.
+<b style="color:#FF0000;"># The Great Hollow section is now available; the rest of the DLC will be released in a few days.
+
 The DLC's information section will be added in a few days.
-The DLC's Default is currently unavailable and will be updated in a few days.</b>
+
+The DLC's Default section is currently unavailable and will be updated in a few days.
 
 - Completely redesigned the overall appearance.
 			
@@ -872,6 +917,7 @@ const zhToEn = {
   "下次更新前不再顯示": "Don't show until next update",
   "開始使用": "START",
   "操作說明": "INSTRUCTIONS",
+  "有數張完全相同的種子，請切換選擇": "Almost identical seeds detected. Please switch to select one.",
   
   // [修改] 更新按鍵說明
   "mouse_help": "鍵鼠模式\n> 點擊選擇夜王\n> 按住 Ctrl 點擊多選\n> 按住 Ctrl+Shift 點擊全選\n\n> 左鍵：放置教堂 / 右鍵：放置法師塔\n> Ctrl + 點擊圖標：清除\n> Ctrl + Z：復原上一步\n> 數字鍵 1-6：快速切換地形\n\nSources of the 320 images:\nhttps://thefifthmatt.github.io/nightreign/",
@@ -1691,6 +1737,60 @@ function setTouchTool(tool) {
 /* =========================================
    篩選邏輯
    ========================================= */
+/* =========================================
+   新增：碰撞切換相關邏輯 (請放在 runFilter 上方)
+   ========================================= */
+window.collisionCandidates = [];
+window.collisionIndex = 0;
+
+window.changeCollisionIndex = (dir) => {
+    if (!window.collisionCandidates || window.collisionCandidates.length === 0) return;
+    
+    const len = window.collisionCandidates.length;
+    // 循環切換邏輯 (上一張/下一張)
+    window.collisionIndex = (window.collisionIndex + dir + len) % len;
+    
+    const result = window.collisionCandidates[window.collisionIndex];
+    
+    // 1. 更新地圖
+    const mapEl = document.getElementById('大地圖');
+    if(mapEl) mapEl.src = result.file;
+    
+    // 2. 更新資料欄位
+    updateDataDisplay(result);
+    
+    // 3. 更新計數器顯示
+    const counterEl = document.getElementById('col-counter');
+    if (counterEl) {
+        counterEl.textContent = `${window.collisionIndex + 1} / ${len}`;
+    }
+};
+
+function showCollisionToast() {
+    const toast = document.getElementById('status-toast');
+    const len = window.collisionCandidates.length;
+    const current = window.collisionIndex + 1;
+    const isEn = state.lang === 'en';
+    
+    const msg = isEn 
+        ? zhToEn["有數張完全相同的種子，請切換選擇"] 
+        : "有數張完全相同的種子，請切換選擇";
+
+    // 建立 HTML：包含左右箭頭按鈕
+    toast.innerHTML = `
+        <div style="margin-bottom:5px;">${msg}</div>
+        <div class="collision-controls">
+            <button class="nav-arrow" onclick="window.changeCollisionIndex(-1)">&#9664;</button>
+            <span class="nav-counter" id="col-counter">${current} / ${len}</span>
+            <button class="nav-arrow" onclick="window.changeCollisionIndex(1)">&#9654;</button>
+        </div>
+    `;
+    toast.style.pointerEvents = 'auto'; 
+}
+
+/* =========================================
+   修改後的 runFilter 函式
+   ========================================= */
 function runFilter(silentMode = false) {
     const mapEl = document.getElementById('大地圖');
     const toast = document.getElementById('status-toast');
@@ -1701,6 +1801,9 @@ function runFilter(silentMode = false) {
 
     document.oncontextmenu = (e) => e.preventDefault();
     mapEl.style.pointerEvents = 'none';
+    
+    // 每次重新篩選時，先恢復 Toast 的點擊穿透 (避免擋住地圖操作)
+    toast.style.pointerEvents = 'none';
 
     if (state.selectedBosses.length === 0) {
         toast.textContent = isEn ? zhToEn["請選擇目標王"] : "請選擇目標王";
@@ -1728,34 +1831,25 @@ function runFilter(silentMode = false) {
     
     let filteredResults = [];
 
-	for (const night of nightsToCheck) {
+    for (const night of nightsToCheck) {
         const range = nightRanges[night];
-        
-
         if (!range) continue;
         if (!Array.isArray(range[0]) && range[0] === 0 && range[1] === 0) continue;
 
         let candidates = IMAGES.filter(img => {
             const num = parseInt(img.file, 10);
-            
             if (Array.isArray(range[0])) {
-
                 return range.some(subRange => num >= subRange[0] && num <= subRange[1]);
             } else {
-
                 return num >= range[0] && num <= range[1];
             }
-
         });
-
 
         candidates = candidates.filter(img => {
             for (let i = 1; i < state.icons[state.terrain].length; i++) {
                 const need = state.icons[state.terrain][i];
                 if (!need) continue; 
-
                 const actual = img.points[i - 1] || '無';
-                
                 if (need === '無') {
                     if (actual !== '無') return false;
                 } else {
@@ -1780,7 +1874,7 @@ function runFilter(silentMode = false) {
             toast.textContent = isEn ? zhToEn["篩選失敗 — 沒有符合的種子。"] : "篩選失敗 — 沒有符合的種子。";
             resetDataDisplay();
             wrapper.querySelectorAll('.icon').forEach(i => {
-                i.style.removeProperty('display');
+                i.style.removeProperty('display'); 
                 i.style.display = 'block';
             });
             if (state.mode === 'touch') toolbar.classList.add('visible');
@@ -1810,25 +1904,55 @@ function runFilter(silentMode = false) {
             });
             
             toolbar.classList.remove('visible');
+        } 
+        else {
+            // === 檢查是否所有候選種子的 points 都完全相同 (碰撞) ===
+            const firstPointsJSON = JSON.stringify(uniqueFiltered[0].points);
+            const isIndistinguishable = uniqueFiltered.every(item => 
+                JSON.stringify(item.points) === firstPointsJSON
+            );
 
-        } else {
-            mapEl.src = defaultMap;
-            resetDataDisplay();
-            const count = uniqueFiltered.length;
-            const remainingTxt = isEn ? zhToEn["還剩"] : "還剩";
-            const suffix = isEn ? zhToEn["張（繼續設定圖標可進一步篩選）"] : "張（繼續設定圖標可進一步篩選）";
-            toast.textContent = `${remainingTxt} ${count} ${suffix}`;
-            wrapper.querySelectorAll('.icon').forEach(i => {
-                i.style.removeProperty('display'); 
-                i.style.display = 'block';
-            });
-             if (state.mode === 'touch') toolbar.classList.add('visible');
+            if (isIndistinguishable) {
+                // [完全吻合模式]
+                window.collisionCandidates = uniqueFiltered;
+                window.collisionIndex = 0; // 預設第一張
+                
+                // 顯示第一張內容
+                const result = uniqueFiltered[0];
+                mapEl.src = result.file;
+                updateDataDisplay(result);
+                
+                // 顯示帶切換按鈕的 Toast
+                showCollisionToast();
+
+                // 隱藏地圖上的圖標
+                wrapper.querySelectorAll('.icon').forEach(i => {
+                    i.classList.remove('pop-effect');
+                    i.style.setProperty('display', 'none', 'important'); 
+                });
+                toolbar.classList.remove('visible');
+
+            } else {
+                // [普通篩選模式] (多個結果但圖標不同)
+                mapEl.src = defaultMap;
+                resetDataDisplay();
+                const count = uniqueFiltered.length;
+                const remainingTxt = isEn ? zhToEn["還剩"] : "還剩";
+                const suffix = isEn ? zhToEn["張（繼續設定圖標可進一步篩選）"] : "張（繼續設定圖標可進一步篩選）";
+                toast.textContent = `${remainingTxt} ${count} ${suffix}`;
+                wrapper.querySelectorAll('.icon').forEach(i => {
+                    i.style.removeProperty('display'); 
+                    i.style.display = 'block';
+                });
+                if (state.mode === 'touch') toolbar.classList.add('visible');
+            }
         }
     };
 
     if (!silentMode) setTimeout(handleResult, 100);
     else handleResult();
 }
+
 function updateDataDisplay(imgData) {
     if (!imgData) return;
     const isEn = state.lang === 'en';
