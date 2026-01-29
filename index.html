@@ -665,11 +665,13 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
     pointer-events: auto; /* 確保按鈕可點擊 */
 }
 
+/* 修改或新增以下樣式 */
 .nav-arrow {
+    /* ... 保持原樣 ... */
     background: rgba(255, 255, 255, 0.15);
     border: 1px solid rgba(255, 255, 255, 0.3);
     color: #fff;
-    border-radius: 50%; /* 圓形按鈕 */
+    border-radius: 50%;
     width: 32px;
     height: 32px;
     display: flex;
@@ -679,6 +681,19 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
     font-size: 14px;
     transition: all 0.2s;
     user-select: none;
+}
+
+.confirm-btn {
+    margin-left: 10px;     /* 與計數器拉開距離 */
+    font-weight: bold;     /* 讓勾勾稍微粗一點 */
+}
+
+/* 滑鼠經過時變為純白高亮 */
+.confirm-btn:hover {
+    background: rgba(255, 255, 255, 0.3);
+    border-color: #fff;
+    color: #fff;
+    transform: scale(1.1);
 }
 
 .nav-arrow:hover {
@@ -1765,6 +1780,28 @@ window.changeCollisionIndex = (dir) => {
         counterEl.textContent = `${window.collisionIndex + 1} / ${len}`;
     }
 };
+// === 新增：確認選擇函式 ===
+window.confirmCollisionSelection = () => {
+    const toast = document.getElementById('status-toast');
+    
+    // 取得當前選定的種子
+    const result = window.collisionCandidates[window.collisionIndex];
+    if (!result) return;
+
+    const isEn = state.lang === 'en';
+    const bossName = isEn 
+        ? BOSS_DATA.find(b => b.id === result._night)?.enAlias 
+        : result._night;
+
+    // 關鍵動作：將 Toast 內容重寫為「一般結果」，箭頭與按鈕就會消失
+    toast.innerHTML = isEn 
+        ? `${zhToEn["找到唯一符合種子"]}: ${result.file} | ${bossName}`
+        : `找到唯一符合種子：${result.file} | ${bossName}`;
+
+    // 恢復地圖操作權限 (如右鍵)
+    const mapEl = document.getElementById('大地圖');
+    if (mapEl) mapEl.style.pointerEvents = 'auto';
+};
 
 function showCollisionToast() {
     const toast = document.getElementById('status-toast');
@@ -1776,18 +1813,19 @@ function showCollisionToast() {
         ? zhToEn["有數張完全相同的種子，請切換選擇"] 
         : "有數張完全相同的種子，請切換選擇";
 
-    // 建立 HTML：包含左右箭頭按鈕
+    // 這裡的按鈕會自動套用上面的極簡 CSS
     toast.innerHTML = `
         <div style="margin-bottom:5px;">${msg}</div>
         <div class="collision-controls">
             <button class="nav-arrow" onclick="window.changeCollisionIndex(-1)">&#9664;</button>
             <span class="nav-counter" id="col-counter">${current} / ${len}</span>
             <button class="nav-arrow" onclick="window.changeCollisionIndex(1)">&#9654;</button>
+            
+            <button class="nav-arrow confirm-btn" onclick="window.confirmCollisionSelection()" title="Confirm">✔</button>
         </div>
     `;
     toast.style.pointerEvents = 'auto'; 
 }
-
 /* =========================================
    修改後的 runFilter 函式
    ========================================= */
@@ -1888,14 +1926,7 @@ function runFilter(silentMode = false) {
                 ? BOSS_DATA.find(b => b.id === result._night)?.enAlias 
                 : result._night;
                 
-            toast.textContent = isEn 
-                ? `${zhToEn["找到唯一符合種子"]}: ${result.file} | ${bossName}`
-                : `找到唯一符合種子：${result.file} | ${bossName}`;
-            
-            document.oncontextmenu = (e) => {
-                if (e.target.id === '大地圖') return true;
-                e.preventDefault();
-            };
+
             mapEl.style.pointerEvents = 'auto';
             
             wrapper.querySelectorAll('.icon').forEach(i => {
