@@ -409,11 +409,71 @@ body {
     background: rgba(0,0,0,0.8); z-index: 2000; display: none;
     backdrop-filter: blur(5px);
 }
+/* =========================================
+   修改：彈窗容器 (手機靠上、限制高度)
+   ========================================= */
 .modal-box {
-    position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
-    width: 380px; max-width: 90%; background: #1a1a1a; border: 1px solid #333;
-    padding: 25px; border-radius: 8px; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    display: flex; flex-direction: column; gap: 12px;
+    position: absolute; 
+    top: 50%; 
+    left: 50%; 
+    transform: translate(-50%, -50%);
+    width: 380px; 
+    max-width: 90%; 
+    background: #1a1a1a; 
+    border: 1px solid #333;
+    padding: 25px; 
+    border-radius: 8px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    
+    /* 彈性佈局，確保內容過長時按鈕不會跑掉 */
+    display: flex; 
+    flex-direction: column; 
+    gap: 12px;
+    max-height: 85vh; /* 限制最大高度 */
+}
+
+/* 手機版專用：靠上對齊 */
+@media screen and (max-width: 900px) {
+    .modal-box {
+        top: 40px; /* 距離頂部 40px，避免太貼邊 */
+        transform: translateX(-50%); /* 取消垂直置中 */
+        max-height: calc(100vh - 80px); /* 扣除上下邊距，確保不會超出畫面 */
+    }
+}
+
+/* =========================================
+   修改：內容文字區 (自訂滾動條)
+   ========================================= */
+.content-text { 
+    font-size: 13px; 
+    line-height: 1.6; 
+    color: #ccc; 
+    white-space: pre-wrap; 
+    margin: 8px 0; 
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 12px 0;
+    
+    /* 滾動功能 */
+    overflow-y: auto; 
+    flex: 1;
+    padding-right: 10px; /* 預留空間給滾動條，避免文字貼死 */
+}
+
+/* --- 新增：自訂滾動條樣式 (Webkit核心: Chrome, Safari, Edge) --- */
+.content-text::-webkit-scrollbar { 
+    width: 4px; /* 寬度設為 4px */
+}
+.content-text::-webkit-scrollbar-track { 
+    background: rgba(0, 0, 0, 0.2); /* 軌道背景 (半透明深色) */
+    border-radius: 2px;
+}
+.content-text::-webkit-scrollbar-thumb { 
+    background: #444; /* 滾動條本體顏色 */
+    border-radius: 2px; 
+}
+.content-text::-webkit-scrollbar-thumb:hover { 
+    background: #666; /* 滑鼠經過變亮 */
 }
 .modal-title { font-size: 15px; color: #fff; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px; text-align: center; }
 .setting-row { display: flex; justify-content: space-between; align-items: center; font-size: 13px; }
@@ -1074,6 +1134,14 @@ function initWelcome() {
     } else {
         welcomeModal.style.display = 'block';
     }
+
+    // [新增] 點擊背景空白處關閉
+    welcomeModal.onclick = (e) => {
+        if (e.target === welcomeModal) {
+            welcomeModal.style.display = 'none';
+
+        }
+    };
 
     closeBtn.onclick = () => {
         welcomeModal.style.display = 'none';
