@@ -480,6 +480,7 @@ input[type="checkbox"] { accent-color: #666; vertical-align: middle; }
         overflow: visible;
     }
 
+
     /* 懸浮快捷區 */
     .quick-filters-group {
         position: fixed;
@@ -823,7 +824,15 @@ const zhToEn = {
   "confirm_touch_on_mouse": "偵測到您的裝置為滑鼠操作，觸控模式專為手指拖曳優化。確定切換？",
   "confirm_touch_on_mouse_en": "Your device appears to be mouse-based. Touch mode is optimized for finger dragging. Continue?",
   
-  "確認": "CONFIRM", "取消": "CANCEL", "模式切換": "SWITCH MODE"
+  "確認": "CONFIRM", "取消": "CANCEL", "模式切換": "SWITCH MODE",
+
+  // 新增翻譯
+  "魔": "Magic", "火": "Fire",
+  "聖": "Holy", "腐": "Rot",
+  "雷": "Lightning", "睡": "Sleep",
+  "主城1": "Castle 1", "主城2": "Castle 2", "大教堂": "Cathedral",
+  "大空洞特殊說明": "The Great Hollow has a special feature: clicking a special icon allows you to switch between two modes.",
+  "大空洞特殊說明_zh": "大空洞特殊機制：點擊特殊圖標可在兩種型態間切換。"
 };
 
 const BOSS_DATA = [
@@ -923,6 +932,13 @@ const terrainNightRanges = {
   }
 };
 
+// [新增] 定義大空洞特殊規則
+const HOLLOW_SPECIAL_RULES = {
+    1: { name: '主城1', default: '主城1圖標位置.png', states: ['魔', '火'], imgs: { '魔': '魔力城.png', '火': '火焰城.png' } },
+    2: { name: '主城2', default: '主城2圖標位置.png', states: ['聖', '腐'], imgs: { '聖': '神聖城.png', '腐': '腐敗城.png' } },
+    3: { name: '大教堂', default: '大教堂圖標位置.png', states: ['雷', '睡'], imgs: { '雷': '雷電大教堂.png', '睡': '睡眠大教堂.png' } }
+};
+
 const COORDINATE_DB = {
     "普通地形": [
         {top: 66, left: 213}, {top: 129, left: 68}, {top: 147, left: 132}, 
@@ -951,7 +967,10 @@ const COORDINATE_DB = {
         {top: 233, left: 338}, {top: 332, left: 228}
     ],
     "大空洞": [
-        {top: 200, left: 250}, {top: 208, left: 110},
+        // 特殊點位 1, 2, 3
+        {top: 92, left: 108}, {top: 277, left: 265}, {top: 147, left: 335},
+        // 普通點位
+        {top: 208, left: 110}, {top: 200, left: 250},
         {top: 342, left: 115}
     ]
 };
@@ -1081,11 +1100,22 @@ function initHelp() {
 
     const updateContent = () => {
         const isEn = state.lang === 'en';
+        let text = "";
+        
+        // 基礎說明
         if (state.mode === 'mouse') {
-            content.textContent = isEn ? zhToEn['mouse_help_en'] : zhToEn['mouse_help'];
+            text = isEn ? zhToEn['mouse_help_en'] : zhToEn['mouse_help'];
         } else {
-            content.textContent = isEn ? zhToEn['touch_help_en'] : zhToEn['touch_help'];
+            text = isEn ? zhToEn['touch_help_en'] : zhToEn['touch_help'];
         }
+        
+        // [新增] 大空洞額外說明
+        if (state.terrain === '大空洞') {
+            const extra = isEn ? zhToEn["大空洞特殊說明"] : zhToEn["大空洞特殊說明_zh"];
+            text += `\n\n----------------\n${extra}`;
+        }
+        
+        content.textContent = text;
     };
 
     trigger.onclick = () => {
@@ -1264,21 +1294,43 @@ function renderMapIcons() {
         const i = idx + 1;
         const img = document.createElement('img');
         img.className = 'icon';
+		
+        if (state.terrain === '大空洞' && i === 3) {
+            img.style.width = '30px';
+            img.style.height = '30px';
+        }
+
         img.style.top = pos.top + 'px';
         img.style.left = pos.left + 'px';
         img.dataset.idx = i;
         
         const status = state.icons[state.terrain][i];
 
-        if (status === '教堂') img.src = '教堂圖標.png';
-        else if (status === '法師塔') img.src = '法師塔圖標.png';
-        else img.src = '圖標位置.png';
+        // 使用共用函式設定圖片
+        updateIconSrc(img, status, i);
 
         img.onmousedown = (e) => handleIconClick(i, e);
         img.oncontextmenu = (e) => e.preventDefault();
 
         wrapper.appendChild(img);
     });
+}
+
+// [新增] 集中管理圖片路徑邏輯
+function updateIconSrc(img, status, idx) {
+    if (state.terrain === '大空洞' && idx <= 3) {
+        const rule = HOLLOW_SPECIAL_RULES[idx];
+        if (!status) {
+            img.src = rule.default; // 顯示底圖
+        } else {
+            img.src = rule.imgs[status]; // 顯示狀態圖
+        }
+    } else {
+        // 普通地形邏輯
+        if (status === '教堂') img.src = '教堂圖標.png';
+        else if (status === '法師塔') img.src = '法師塔圖標.png';
+        else img.src = '圖標位置.png';
+    }
 }
 
 /* =========================================
@@ -1355,37 +1407,58 @@ function switchTerrain(id) {
    圖標操作邏輯
    ========================================= */
 function handleIconClick(idx, e) {
-    e.preventDefault();
-    e.stopPropagation();
+    if (e) {
+        e.preventDefault();
+        e.stopPropagation();
+    }
 
-    let img = e.currentTarget; 
+    let img = e ? e.currentTarget : null;
     if (!img) img = document.querySelector(`#mapWrapper .icon[data-idx="${idx}"]`);
     
     const current = state.icons[state.terrain][idx];
     let next = null;
-
-    if (state.mode === 'mouse') {
-        // [修改] 邏輯判定順序
-        if (e.ctrlKey) {
-            // 1. Ctrl + 點擊 = 清除
-            next = null; 
-        } else if (e.button === 0) {
-            // 2. 左鍵 = 教堂
-            next = '教堂';
-        } else if (e.button === 2) {
-            // 3. 右鍵 = 法師塔
-            next = '法師塔';
-        }
-    } else {
-        if (state.touchTool === null) {
-            next = null; 
+    
+    // --- [新增] 大空洞特殊邏輯 ---
+    if (state.terrain === '大空洞' && idx <= 3) {
+        // 如果是 Ctrl + 點擊，或者使用橡皮擦，則重置
+        if ((e && e.ctrlKey) || (state.mode === 'touch' && state.touchTool === 'eraser')) {
+            next = null;
         } else {
-            if (current === state.touchTool) next = null; 
-            else next = state.touchTool;
+            // 切換邏輯: Null -> State1 -> State2 -> State1 ...
+            const rule = HOLLOW_SPECIAL_RULES[idx];
+            if (!current) {
+                next = rule.states[0]; // 初始點擊變第一個狀態 (如: 魔)
+            } else if (current === rule.states[0]) {
+                next = rule.states[1]; // 切換到第二個狀態 (如: 火)
+            } else {
+                next = rule.states[0]; // 切換回第一個狀態 (如: 魔)
+            }
+        }
+    } 
+    // --- 普通邏輯 (原有代碼) ---
+    else {
+        if (state.mode === 'mouse') {
+            if (e && e.ctrlKey) {
+                next = null; 
+            } else if (e && e.button === 0) {
+                next = '教堂';
+            } else if (e && e.button === 2) {
+                next = '法師塔';
+            }
+        } else {
+            // Touch 模式
+            if (state.touchTool === null) {
+                next = null; 
+            } else if (state.touchTool === 'eraser') {
+                 next = null;
+            } else {
+                if (current === state.touchTool) next = null; 
+                else next = state.touchTool;
+            }
         }
     }
 
-    // [新增] 狀態改變前，先記錄歷史 (如果狀態真的有變)
+    // 歷史紀錄與更新
     if (state.icons[state.terrain][idx] !== next) {
         pushHistory();
     }
@@ -1397,9 +1470,11 @@ function handleIconClick(idx, e) {
 function updateIconVisual(img, type) {
     if (!img) return;
     
-    if (type === '教堂') img.src = '教堂圖標.png';
-    else if (type === '法師塔') img.src = '法師塔圖標.png';
-    else img.src = '圖標位置.png';
+    // 取得當前圖標的 index
+    const idx = parseInt(img.dataset.idx);
+    
+    // 使用新函式設定圖片
+    updateIconSrc(img, type, idx);
     
     img.classList.remove('pop-effect');
     
@@ -1525,6 +1600,11 @@ function findAndSetNearestIcon(x, y, type) {
     });
 
     if (target && targetIdx !== -1) {
+        // [新增] 保護機制：大空洞前三個圖標禁止被拖曳工具覆蓋
+        if (state.terrain === '大空洞' && targetIdx <= 3) {
+            return; 
+        }
+
         state.icons[state.terrain][targetIdx] = type;
         updateIconVisual(target, type);
     }
@@ -2013,6 +2093,3 @@ window.onload = () => {
 </script>
 </body>
 </html>
-
-
-
